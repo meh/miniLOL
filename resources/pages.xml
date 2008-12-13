@@ -14,7 +14,7 @@
     <!ELEMENT links (link+)>
     <!ATTLIST links
         class  CDATA "links"
-        symbol CDATA #IMPLIED
+        before CDATA #IMPLIED
         type   CDATA #IMPLIED
     >
 
@@ -24,8 +24,8 @@
         id          CDATA ""
         src         CDATA #REQUIRED
         text        CDATA #REQUIRED
-        symbol      CDATA #IMPLIED
-        description CDATA #IMPLIED
+        before      CDATA #IMPLIED
+        after       CDATA #IMPLIED
         type        CDATA #IMPLIED
         domain      CDATA "out"
         menu        CDATA #IMPLIED
@@ -57,10 +57,10 @@ The example below should be self explanatory.
         <![CDATA[
             This is a links collection:<br/>
         ]]>
-        <links symbol="-&#160;">
-            <link domain="in" src="stuff" text="Stuff" arguments="decoration=- times=40" description=" ~ Internal link"/>
-            <link src="separated" text="Separated" description=" ~ Internal link but in data/"/>
-            <link src="http://lulz.thruhere.net" text="IN LULZ WE TRUST" description=" ~ External link"/>
+        <links before="-&#160;">
+            <link domain="in" src="stuff" text="Stuff" arguments="decoration=- times=40" after=" ~ Internal link"/>
+            <link src="separated" text="Separated" after=" ~ Internal link but in data/"/>
+            <link src="http://lulz.thruhere.net" text="IN LULZ WE TRUST" after=" ~ External link"/>
         </links>
     </page>
 

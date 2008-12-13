@@ -273,7 +273,7 @@ var miniLOL = {
                     }
                     
                     var links     = contents[i].getElementsByTagName('link');
-                    var linksSymb = ele.getAttribute('symbol'); ele.removeAttribute('symbol');
+                    var linksSymb = ele.getAttribute('before'); ele.removeAttribute('before');
                     var linksArgs = ele.getAttribute('arguments'); ele.removeAttribute('arguments');
                     var linksType = ele.getAttribute('type'); ele.removeAttribute('type');
                     var linksMenu = ele.getAttribute('menu') || miniLOL.menu.current; ele.removeAttribute('menu');
@@ -285,25 +285,25 @@ var miniLOL = {
                         var src     = link.getAttribute('src'); link.removeAttribute('src');
                         var target  = link.getAttribute('target'); link.removeAttribute('target');
                         var text    = link.getAttribute('text'); link.removeAttribute('text');
-                        var symb    = link.getAttribute('symbol') || linksSymb || ''; link.removeAttribute('symbol');
-                        var desc    = link.getAttribute('description') || ''; link.removeAttribute('description');
+                        var before  = link.getAttribute('before') || linksSymb || ''; link.removeAttribute('before');
+                        var after   = link.getAttribute('after') || ''; link.removeAttribute('after');
                         var domain  = link.getAttribute('domain'); link.removeAttribute('domain');
                         var args    = link.getAttribute('arguments') || linksArgs; link.removeAttribute('arguments');
                         var menu    = link.getAttribute('menu') || linksMenu; link.removeAttribute('menu');
         
-                        var out = src.match(/^http:\/\//);
+                        var out = src.match(/^\w+:\/\//);
         
                         var linkClass = link.getAttribute('class'); link.removeAttribute('class');
                         var linkId    = link.getAttribute('id'); link.removeAttribute('id');
         
                         output += '<div class="#{0}" id="#{1}">#{2}'.interpolate(
-                                  [linkClass, linkId, symb]);
+                                  [linkClass, linkId, before]);
                         if (target || out) {
                             src = !out ? 'data/'+src : src;
                             target = target || '_blank';
     
                             output += '<a href="#{0}" target="#{1}" #{2}>#{3}</a>#{4}'.interpolate(
-                                      [src, target, attrs(link.attributes), text, desc]);
+                                      [src, target, attrs(link.attributes), text, after]);
                         }
                         else {
                             var ltype = link.getAttribute('type') || linksType; link.removeAttribute('type');
@@ -314,7 +314,7 @@ var miniLOL = {
                             menu  = miniLOL.menu.exists ? '&amp;menu='+menu : '';
     
                             output += '<a href="#{0}#{1}#{2}#{3}" #{4}>#{5}</a>#{6}'.interpolate(
-                                      [src, args, ltype, menu, attrs(link.attributes), text, desc]);
+                                      [src, args, ltype, menu, attrs(link.attributes), text, after]);
                         }
                         output += '</div>';
                     }
