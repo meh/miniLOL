@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!DOCTYPE pages [
+    <!ELEMENT pages (page*)>
+
+    <!ELEMENT page ANY>
+    <!ATTLIST page
+        id        ID    #REQUIRED
+        type      CDATA #IMPLIED
+        arguments CDATA ""
+        menu      CDATA "default"
+    >
+
+    <!ELEMENT links (link+)>
+    <!ATTLIST links
+        class  CDATA "links"
+        symbol CDATA #IMPLIED
+        type   CDATA #IMPLIED
+    >
+
+    <!ELEMENT link EMPTY>
+    <!ATTLIST link
+        class       CDATA "link"
+        id          CDATA ""
+        src         CDATA #REQUIRED
+        text        CDATA #REQUIRED
+        symbol      CDATA #IMPLIED
+        description CDATA #IMPLIED
+        type        CDATA #IMPLIED
+        domain      CDATA "out"
+        menu        CDATA #IMPLIED
+    >
+]>
+
+<!--
+This XML file can contain the whole website or it can contain just the main pages.
+
+Writing it is really simple, each page can contain CDATA sections or links collections
+
+Page tags also have type and arguments attributes these are defaults for the page,
+they can be overloaded by the query.
+
+CDATA sections are outputted as they are.
+Links collections are outputted like lists of links.
+
+The example below should be self explanatory.
+-->
+
+<pages>
+    <page id="home">
+        <![CDATA[
+            This is a homepage.
+        ]]>
+    </page>
+
+    <page id="links">
+        <![CDATA[
+            This is a links collection:<br/>
+        ]]>
+        <links symbol="-&#160;">
+            <link domain="in" src="stuff" text="Stuff" arguments="decoration=- times=40" description=" ~ Internal link"/>
+            <link src="separated" text="Separated" description=" ~ Internal link but in data/"/>
+            <link src="http://lulz.thruhere.net" text="IN LULZ WE TRUST" description=" ~ External link"/>
+        </links>
+    </page>
+
+    <page id="stuff" menu="stuff" type="simple" arguments="decoration=~ times=20">
+        <![CDATA[NIGGER NIGGER NIGGER NIGGER NIGGER NIGGER
+             NIGGER NIGGER NIGGER NIGGER NIGGER NIGGER
+             NIGGER NIGGER NIGGER NIGGER NIGGER NIGGER
+        ]]>
+    </page>
+</pages>

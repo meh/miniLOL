@@ -1,0 +1,98 @@
+a:link, a:visited, a:active
+{
+    color: #888888;
+    font-family: courier new;
+    font-size: 12px;
+    text-decoration: underline;
+}
+
+a:hover
+{
+    color: #E4E4E4;
+    text-decoration: none;
+}
+
+#head a
+{
+    color: #888888;
+    font-size: 13px;
+    text-decoration: none;
+    font-family: courier new;
+    font-weight: bold;
+}
+
+#head a:hover
+{
+    color: #E4E4E4;
+}
+
+img
+{
+    border: none;
+    text-align: center;
+}
+
+body
+{
+    background-color: #000000;
+    color: #777777;
+    font-family: courier new;
+    font-size: 11px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: justify;
+}
+
+#container
+{
+    position: absolute;
+    top: 50px;
+    border: solid 1px #222222;
+    width: 500px;
+    padding: 10px;
+}
+
+#head
+{
+    background-color: #000000;
+    width: 490px;
+    margin-right: auto;
+    margin-left: auto;
+    margin-bottom: 10px;
+    padding: 5px;
+    text-align: center;
+    border: solid 1px #222222;
+}
+
+#body
+{
+    background-color: #000000;
+    width: 490px;
+    height: 340px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: justify;
+    border: solid 1px #222222;
+    padding: 5px;
+}
+
+#credits
+{
+    background-color: #000000;
+    width: 490px;
+    margin-right: auto;
+    margin-left: auto;
+    margin-top: 10px;
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 3px;
+    text-align: right;
+    border: solid 1px #222222;
+    height: 15px;
+    font-size: 10px;
+}
+
+div.introduction
+{
+    margin-bottom: 10px;
+}

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!DOCTYPE configuration [
+    <!ELEMENT configuration ANY>
+]>
+
+<!--
+
+Actually the configuration has just some vars but a module could need some
+things to be set and those configurations will go here.
+
+-->
+
+<configuration>
+    <refreshEvery>360</refreshEvery>
+    <siteTitle>miniLOL</siteTitle>
+    <homePage>home</homePage>
+
+    <contentNode>body</contentNode>
+    <menuNode>menu</menuNode>
+
+    <loadingMessage><![CDATA[<center>Loading...</center>]]></loadingMessage>
+</configuration>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!DOCTYPE modules [
+    <!ELEMENT modules (module*)>
+
+    <!ELEMENT module EMPTY>
+    <!ATTLIST module
+        src  CDATA #REQUIRED
+        name CDATA #IMPLIED
+    >
+]>
+
+<!--
+
+This file contains the used modules, the module name isn't required.
+
+-->
+
+<modules>
+    <module src="centrify.js"/>
+</modules>

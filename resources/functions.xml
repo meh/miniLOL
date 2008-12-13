@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!DOCTYPE functions [
+    <!ELEMENT functions (function*)>
+
+    <!ELEMENT function (#PCDATA)>
+    <!ATTLIST function name CDATA #REQUIRED>
+]>
+
+<!--
+
+In this file you can declare output wrapper functions.
+
+text is the raw data variable that contains the output so you have
+to modify it in order to change the output, you don't have to put a
+return statement because text will be returned by default.
+
+args instead are the arguments passed when the page was viewed.
+eg: #page=faggotree&level=5 args will be {page : faggotree, level : 5}
+
+Remember that it's javascript so you can write anything, but don't exagerate,
+try to keep the function simple.
+
+Wrappers are useful if you are going to use a module like syntax highlighting.
+
+-->
+
+<functions>
+    <function name="simple"><![CDATA[
+        text = text.replace(/&/g,  '&amp;');
+        text = text.replace(/</g,  '&lt;');
+        text = text.replace(/>/g,  '&gt;');
+        text = text.replace(/\n/g, '<br/>');
+
+        text = args.decoration.times(parseInt(args.times)||10)+'<br/>'+text+args.decoration.times(parseInt(args.times)||10)+'<br/>';
+    ]]></function>
+</functions>
