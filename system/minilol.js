@@ -129,9 +129,11 @@ var miniLOL = {
                 asynchronous: false,
     
                 onSuccess: function (http) { 
+                    miniLOL.module.loaded = {};
                     var modules = http.responseXML.documentElement.getElementsByTagName('module');
                     for (var i = 0; i < modules.length; i++) {
                         include("js", "modules/"+modules[i].getAttribute("src"));
+                        miniLOL.module.loaded[modules[i].getAttribute("name")] = true;
                     }
                 },
     
@@ -176,7 +178,7 @@ var miniLOL = {
             'miniLOL._init.modules();',
             'miniLOL.config.contentNode = $(miniLOL.config.contentNode);',
             'miniLOL.config.menuNode    = miniLOL.menu.exists ? $(miniLOL.config.menuNode) : null;',
-            'miniLOL.config.contentNode.innerHTML = miniLOL.go(location.href.match(/[#?]/) ? location.href : "#home");'
+            'miniLOL.config.contentNode.innerHTML = miniLOL.go(location.href.match(/[#?]/) ? location.href : "#"+miniLOL.config.homePage);'
         ];
 
         for (var i = 0; i < cmds.length; i++) {
@@ -342,8 +344,6 @@ var miniLOL = {
 
         load: function (path, queries)
         {
-            miniLOL.config.contentNode.innerHTML = miniLOL.config.loadingMessage;
-
             new Ajax.Request('data/'+path, {
                 method: 'get',
         
@@ -377,20 +377,28 @@ var miniLOL = {
                     });
                 }
             });
+
+            return miniLOL.config.contentNode.innerHTML = miniLOL.config.loadingMessage;
         }
     },
 
     module: {
-        execute: function (module, vars)
+        execute: function (name, vars)
         {
-            var check = function(module, vars) {
-                if (typeof(module) != 'object') {
-                    setTimeout(function(){module.execute(vars)}, 5);
+            if (typeof(name) == 'undefined' || !miniLOL.module.loaded[name]) {
+                return "The module isn't loaded.";
+            }
+
+            var check = function(name, vars) {
+                if (typeof(miniLOL.modules[name]) != 'object') {
+                    setTimeout(function(){check(name, vars)}, 5);
                     return;
                 }
-                module.execute(vars);
+                miniLOL.modules[name].execute(vars);
             }
-            setTimeout(function(){check(module, vars)}, 5);
+            setTimeout(function(){check(name, vars)}, 5);
+
+            return miniLOL.config.loadingMessage;
         }
     },
 
@@ -405,15 +413,14 @@ var miniLOL = {
             return miniLOL.page.get(queries.page, queries);
         }
         else if (queries.page) {
-            miniLOL.page.load(queries.page, queries);
-            return miniLOL.config.loadingMessage;
+            return miniLOL.page.load(queries.page, queries);
         }
         else if (queries.module) {
-            miniLOL.module.execute(miniLOL.modules[queries.module], queries);
-            return miniLOL.config.loadingMessage;
+            miniLOL.config.menuNode.innerHTML = miniLOL.menu.exists ? miniLOL.menu.get('default') : null;
+            return miniLOL.module.execute(miniLOL.modules[queries.module], queries);
         }
         else {
-            return "Umh.. wat.";
+            document.body.innerHTML = 'wat';
         }
     }
 };
