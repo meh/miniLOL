@@ -23,7 +23,7 @@ function attrs(attributes){var text="";for(var i=0;i<attributes.length;i++){text
  ****************************************************************************/
 
 var miniLOL = {
-    version: '0.2.1',
+    version: '0.2.2',
 
     _init: {
         config: function () {
@@ -162,6 +162,8 @@ var miniLOL = {
 
             functions: {}
         };
+
+        miniLOL.modules = {};
 
         var cmds = [
             'miniLOL._init.config();',
@@ -378,6 +380,20 @@ var miniLOL = {
         }
     },
 
+    module: {
+        execute: function (module, vars)
+        {
+            var check = function(module, vars) {
+                if (typeof(module) != 'object') {
+                    setTimeout(function(){module.execute(vars)}, 5);
+                    return;
+                }
+                module.execute(vars);
+            }
+            setTimeout(function(){check(module, vars)}, 5);
+        }
+    },
+
     go: function (url)
     {
         url = url.replace(/#/, '?');
@@ -392,8 +408,13 @@ var miniLOL = {
             miniLOL.page.load(queries.page, queries);
             return miniLOL.config.loadingMessage;
         }
+        else if (queries.module) {
+            miniLOL.module.execute(miniLOL.modules[queries.module], queries);
+            return miniLOL.config.loadingMessage;
+        }
         else {
-            return "wat";
+            return "Umh.. wat.";
         }
     }
 };
+
