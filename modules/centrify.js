@@ -3,12 +3,16 @@
  * of the page, as you can see it's really easy writing a module.
  */
 
-function centrify () {
-    var container = $('container');
+miniLOL.module.create("centrify", {
+    onLoad: function () {
+        this.execute();
+        miniLOL.module.addEvent('window.onresize', this.execute);
+    },
 
-    container.style.top  = ((document.viewport.getHeight() - container.getHeight())/2)-10 + 'px';
-    container.style.left = ((document.viewport.getWidth()  - container.getWidth()) /2) + 'px';
-}
-
-window.onresize = centrify;
-setTimeout('centrify()', 1);
+    execute: function () {
+        $('container').setStyle({
+            top : ((document.viewport.getHeight() - $('container').getHeight())/2)+'px',
+            left: ((document.viewport.getWidth()  - $('container').getWidth() )/2)+'px'
+        });
+    }
+});
