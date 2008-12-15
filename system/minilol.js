@@ -133,6 +133,7 @@ var miniLOL = {
                     var modules = http.responseXML.documentElement.getElementsByTagName('module');
                     for (var i = 0; i < modules.length; i++) {
                         include("js", "modules/"+modules[i].getAttribute("src"));
+                        miniLOL.module.loading[modules[i].getAttribute("name")] = true;
                     }
                 },
     
@@ -165,6 +166,7 @@ var miniLOL = {
         };
 
         miniLOL.module.list = {};
+        miniLOL.module.loading = {};
 
         var cmds = [
             'miniLOL._init.config();',
@@ -424,13 +426,19 @@ var miniLOL = {
             }
 
             if (module.onLoad) module.onLoad();
-            miniLOL.module.list[name] = module;
+            miniLOL.module.list[name]    = module;
+            delete miniLOL.module.loading[name];
         },
 
         execute: function (name, vars)
         {
             if (typeof(name) == 'undefined' || typeof(miniLOL.module.list[name]) != 'object') {
-                return "The module isn't loaded.";
+                if (typeof(miniLOL.module.loading[name]) == 'undefined') {
+                    return "The module isn't loaded.";
+                }
+                else {
+                    setTimeout(function(){miniLOL.module.execute(name, vars)}, 5);
+                }
             }
 
             var check = function(name, vars) {
