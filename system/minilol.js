@@ -3,7 +3,7 @@ var Prototype={Version:"1.6.0.3",Browser:{IE:!!(window.attachEvent&&navigator.us
 // unFocus.History, version2.0 (Beta 2) (2007/09/10) | Copyright: 2005-2007, Kevin Newman (http://www.unfocus.com/Projects/HistoryKeeper/) | License: http://www.gnu.org/licenses/lgpl.html
 eval(function(p,a,c,k,e,r){e=function(c){return(c<a?'':e(parseInt(c/a)))+((c=c%a)>35?String.fromCharCode(c+29):c.toString(36))};if(!''.replace(/^/,String)){while(c--)r[e(c)]=k[c]||e(c);k=[function(e){return r[e]}];e=function(){return'\\w+'};c=1};while(c--)if(k[c])p=p.replace(new RegExp('\\b'+e(c)+'\\b','g'),k[c]);return p}('8 o={};o.Q=2(){h.j={};B(8 i=0;i<18.l;i++){h.j[18[i]]=[]}};o.Q.W={12:2(a,b){B(8 i=0;i<h.j[a].l;i++)4(h.j[a][i]==b)7;h.j[a].1Z(b)},1V:2(a,b){B(8 i=0;i<h.j[a].l;i++){4(h.j[a][i]==b){h.j.1S(i,1);7}}},p:2(a,b){B(8 i=0;i<h.j[a].l;i++)h.j[a][i](b)}};o.14=(2(){2 C(){8 c=h,E=1E,v,3;8 d=2(){7 1p.1k.23(1)};3=d();8 e=2(a){z.1p.1k=a};2 1f(){8 a=d();4(3!=a){3=a;c.p("n",a)}}4(O)v=O(1f,E);2 r(a){4(!1c(a)){8 b;4(/1b/.19(A.17)&&!z.16)b=6.w(\'<a G="\'+a+\'">\'+a+"</a>");u b=6.w("a");b.t("G",a);Z(b.D){V="U";1D="1A";1d=s()+"R";1v=1t()+"R"}6.k.L(b,6.k.P)}}2 1c(a){4(6.24(a).l>0)7 q}4(1i 1h.1g=="22"){2 s(){7 1h.1g}}u 4(6.N&&6.N.M){2 s(){7 6.N.M}}u 4(6.k){2 s(){7 6.k.M}}21(20(s).1X().1e(/1W/g,"1U").1e(/Y/g,"X"));c.1T=2(){7 3};2 9(a){4(3!=a){r(a);3=a;e(a);c.p("n",a)}7 q}c.9=2(a){r(3);c.9=9;7 c.9(a)};4(/1a\\/\\d+/.19(A.1n)&&A.1n.1o(/1a\\/(\\d+)/)[1]<1R){8 f=H.l,x={},m,y=15;2 S(){m=6.w("1O");m.13="1N";m.1M="1L";6.k.L(m,6.k.P)}e=2(a){x[f]=a;m.1K="#"+d();m.1J()};d=2(){7 x[f]};x[f]=3;2 T(a){4(3!=a){r(a);3=a;f=H.l+1;y=q;e(a);c.p("n",a);y=15}7 q}c.9=2(a){r(3);S();c.9=T;7 c.9(a)};2 10(){4(!y){8 a=H.l;4(a!=f){f=a;8 b=d();4(3!=b){3=b;c.p("n",b)}}}};1I(v);v=O(10,E)}u 4(1i 1H!="1G"&&z.1F&&!z.16&&A.17.1o(/1b (\\d\\.\\d)/)[1]>=5.5){8 g,F;2 11(){8 a="1C";g=6.w("1B");g.t("G",a);g.t("13",a);g.t("1P",\'1Q:;\');g.D.V="U";g.D.1d="-1z";6.k.L(g,6.k.P);F=1y[a];J(3,q)}2 J(a){Z(F.6){1x("1w/I");1u("<I><1q></1q><k 1s",\'1Y="1r.o.14.K(\\\'\'+a+\'\\\');">\',a+"</k></I>");25()}}2 1m(a){3=a;c.p("n",a)}c.K=2(){c.K=1m};2 1l(a){4(3!=a){3=a;J(a)}7 q};c.9=2(a){11();c.9=1l;7 c.9(a)};c.12("n",2(a){e(a)})}}C.W=1j o.Q("n");7 1j C()})();',62,130,'||function|_currentHash|if||document|return|var|addHistory||||||||this||_listeners|body|length|_form|historyChange|unFocus|notifyListeners|true|_createAnchor|getScrollY|setAttribute|else|_intervalID|createElement|_historyStates|_recentlyAdded|window|navigator|for|Keeper|style|_pollInterval|_historyFrameRef|name|history|html|_createHistoryHTML|_updateFromHistory|insertBefore|scrollTop|documentElement|setInterval|firstChild|EventManager|px|_createSafariSetHashForm|addHistorySafari|absolute|position|prototype|||with|_watchHistoryLength|_createHistoryFrame|addEventListener|id|History|false|opera|userAgent|arguments|test|WebKit|MSIE|_checkAnchorExists|top|replace|_watchHash|pageYOffset|self|typeof|new|hash|addHistoryIE|updateFromHistory|appVersion|match|location|head|parent|onl|getScrollX|write|left|text|open|frames|900px|block|iframe|unFocusHistoryFrame|display|200|print|undefined|ActiveXObject|clearInterval|submit|action|get|method|unFocusHistoryForm|form|src|javascript|420|splice|getCurrent|Left|removeEventListener|Top|toString|oad|push|String|eval|number|substring|getElementsByName|close'.split('|'),0,{}));unFocus.History.addEventListener('historyChange', function(historyHash){miniLOL.config.contentNode.innerHTML=miniLOL.go('#'+(historyHash?historyHash:miniLOL.config.homePage));});
 // Workaround functions 
-function attrs(attributes){var text="";for(var i=0;i<attributes.length;i++){text+=attributes.item(i).nodeName+'="'+attributes.item(i).nodeValue+'" ';}return text;};function getElementById(d,id){if(!Prototype.Browser.Gecko&&!Prototype.Browser.Opera){var e=d.getElementsByTagName('*');for(var i=0;i<e.length;i++){if(e[i].getAttribute('id')==id)return e[i];}}else{return d.getElementById(id);}}function include(type,filename){var head=document.getElementsByTagName('head')[0];switch(type){case "js":var script=document.createElement('script');script.setAttribute('src', filename);script.setAttribute('type','text/javascript');head.appendChild(script);break;case "css":var link=document.createElement('link');link.setAttribute('rel','stylesheet');link.setAttribute('href',filename);link.setAttribute('type','text/css');head.appendChild(link);break;}}function _clone(f){var t=f.toString();t=t.replace(/.*?\{/,'');t=t.replace(/\}[^\}]*$/,'');return new Function(t);}
+function attrs(attributes){var text="";for(var i=0;i<attributes.length;i++){text+=attributes.item(i).nodeName+'="'+attributes.item(i).nodeValue+'" ';}return text;};function _$(id){if(!Prototype.Browser.Gecko&&!Prototype.Browser.Opera){var e=this.getElementsByTagName('*');for(var i=0;i<e.length;i++){if(e[i].getAttribute('id')==id)return e[i];}}else{return this.getElementById(id);}}function include(type,filename){var head=document.getElementsByTagName('head')[0];switch(type){case "js":var script=document.createElement('script');script.setAttribute('src', filename);script.setAttribute('type','text/javascript');head.appendChild(script);break;case "css":var link=document.createElement('link');link.setAttribute('rel','stylesheet');link.setAttribute('href',filename);link.setAttribute('type','text/css');head.appendChild(link);break;}};function _clone(f){f=f.toString();return new Function(f.substring(f.indexOf("{")+1,f.lastIndexOf("}")));};
 
 /****************************************************************************
  * Copyleft meh.                                                            *
@@ -54,7 +54,8 @@ var miniLOL = {
                 asynchronous: false,
 
                 onSuccess: function (http) {
-                    if (getElementById(http.responseXML, 'default')) {
+                    http.responseXML.$ = _$;
+                    if (http.responseXML.$('default')) {
                         miniLOL._cache.menus = http.responseXML;
                     }
                     else {
@@ -74,6 +75,7 @@ var miniLOL = {
                 asynchronous: false,
     
                 onSuccess: function (http) {
+                    http.responseXML.$ = _$;
                     miniLOL._cache.pages  = http.responseXML;
                     miniLOL._cache.cached = {};
                 },
@@ -147,6 +149,16 @@ var miniLOL = {
     
     initialize: function ()
     {
+        if (Prototype.Browser.IE) {
+            document.body.innerHTML
+                = '<center>miniLOL is a Javascript/XML based CMS thus, being in the XXI century, '+
+                  'I pretend those two standards to be respected.<br/>'+
+                  'Get a real browser like '+
+                  '<a href="http://getfirefox.com">Firefox</a> or '+
+                  '<a href="http://www.opera.com/">Opera</a>.</center>';
+            return;
+        }
+
         miniLOL._error  = false;
 
         miniLOL.menu.exists  = true;
@@ -207,7 +219,7 @@ var miniLOL = {
         get: function (name)
         {
             if (miniLOL.menu.exists) {
-                var menu = getElementById(miniLOL._cache.menus, name);
+                var menu = miniLOL._cache.menus.$(name);
                 return menu.firstChild.nodeValue;
             }
         },
@@ -219,7 +231,7 @@ var miniLOL = {
                     this.eleName = miniLOL.menu.current;
                 }
 
-                var template =    getElementById(miniLOL._cache.menus, name).getAttribute('template')
+                var template =    miniLOL._cache.menus.$(name).getAttribute('template')
                                || miniLOL._cache.menus.documentElement.getAttribute('template');
                 
                 miniLOL.config.menuNode.innerHTML = template.interpolate({
@@ -246,7 +258,7 @@ var miniLOL = {
     page: {
         get: function (name, queries)
         {
-            var page = getElementById(miniLOL._cache.pages, name);
+            var page = miniLOL._cache.pages.$(name);
             var type = queries.type;
         
             if (page == null) return "404 - Not Found";
@@ -426,7 +438,7 @@ var miniLOL = {
             }
 
             if (module.onLoad) module.onLoad();
-            miniLOL.module.list[name]    = module;
+            miniLOL.module.list[name] = module;
             delete miniLOL.module.loading[name];
         },
 
@@ -459,7 +471,7 @@ var miniLOL = {
         url = url.replace(/#/, '?');
         var queries = url.toQueryParams();
     
-        matches = /\?([^=]+)(&|$)/.exec(url);
+        var matches = /\?([^=]+)(&|$)/.exec(url);
         if (matches) {
             queries.page = matches[1];
             return miniLOL.page.get(queries.page, queries);
