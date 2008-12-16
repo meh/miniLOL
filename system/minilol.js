@@ -76,8 +76,8 @@ var miniLOL = {
     
                 onSuccess: function (http) {
                     http.responseXML.$ = _$;
-                    miniLOL._cache.pages  = http.responseXML;
-                    miniLOL._cache.cached = {};
+                    miniLOL._cache.pages.dom = http.responseXML;
+                    miniLOL._cache.pages.cache = {};
                 },
     
                 onFailure: function (http) {
@@ -171,8 +171,10 @@ var miniLOL = {
         miniLOL._cache = {
             menus: null,
 
-            pages: null,
-            cached: {},
+            pages: {
+                dom: null,
+                cache: {}
+            },
 
             functions: {}
         };
@@ -255,7 +257,7 @@ var miniLOL = {
     page: {
         get: function (name, queries)
         {
-            var page = miniLOL._cache.pages.$(name);
+            var page = miniLOL._cache.pages.dom.$(name);
             var type = queries.type;
         
             if (page == null) return "404 - Not Found";
@@ -279,13 +281,13 @@ var miniLOL = {
                 }
             }
         
-            if (miniLOL._cache.cached[name]) {
-                miniLOL._cache.cached[name].evalScripts();
+            if (miniLOL._cache.pages.cache[name]) {
+                miniLOL._cache.pages.cache[name].evalScripts();
                 if (miniLOL._cache.functions[type]) {
-                    return miniLOL._cache.functions[type](miniLOL._cache.cached[name], queries);
+                    return miniLOL._cache.functions[type](miniLOL._cache.pages.cache[name], queries);
                 }
                 else {
-                    return miniLOL._cache.cached[name];
+                    return miniLOL._cache.pages.cache[name];
                 }
             }
     
@@ -355,7 +357,7 @@ var miniLOL = {
             }
 
             output.evalScripts();
-            miniLOL._cache.cached[name] = output;
+            miniLOL._cache.pages.cache[name] = output;
 
             if (miniLOL._cache.functions[type]) {
                 return miniLOL._cache.functions[type](output, queries);
