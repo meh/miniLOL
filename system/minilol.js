@@ -428,17 +428,11 @@ var miniLOL = {
             eval("#{0}('add', func);".interpolate([place]));
         },
 
-        create: function (name, methods)
+        create: function (name, obj)
         {
-            var module = new Object;
-            module.name = name;
-
-            for (var i in methods) {
-                module[i] = methods[i];
-            }
-
-            if (module.onLoad) module.onLoad();
-            miniLOL.module.list[name] = module;
+            obj.name = name;
+            if (obj.onLoad) obj.onLoad();
+            miniLOL.module.list[name] = obj;
             delete miniLOL.module.loading[name];
         },
 
