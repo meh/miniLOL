@@ -159,7 +159,7 @@ var miniLOL = {
             return;
         }
 
-        miniLOL._error  = false;
+        miniLOL._error = false;
 
         miniLOL.menu.exists  = true;
         miniLOL.menu.current = null;
@@ -180,27 +180,24 @@ var miniLOL = {
         miniLOL.module.list = {};
         miniLOL.module.loading = {};
 
-        var cmds = [
-            'miniLOL._init.config();',
-            'document.title = miniLOL.config.siteTitle;',
-            'document.body.innerHTML = miniLOL.config.loadingMessage;',
-            'miniLOL._init.menus();',
-            'miniLOL._init.pages();',
-            'miniLOL._init.functions();',
-            'miniLOL._init.template();',
-            'miniLOL._init.modules();',
-            'miniLOL.config.contentNode = $(miniLOL.config.contentNode);',
-            'miniLOL.config.menuNode    = miniLOL.menu.exists ? $(miniLOL.config.menuNode) : null;',
-            'miniLOL.config.contentNode.innerHTML = miniLOL.go(location.href.match(/[#?]/) ? location.href : "#"+miniLOL.config.homePage);'
-        ];
+        ['miniLOL._init.config();',
+         'document.title = miniLOL.config.siteTitle;',
+         'document.body.innerHTML = miniLOL.config.loadingMessage;',
+         'miniLOL._init.menus();',
+         'miniLOL._init.pages();',
+         'miniLOL._init.functions();',
+         'miniLOL._init.template();',
+         'miniLOL._init.modules();',
+         'miniLOL.config.contentNode = $(miniLOL.config.contentNode);',
+         'miniLOL.config.menuNode    = miniLOL.menu.exists ? $(miniLOL.config.menuNode) : null;',
+         'miniLOL.config.contentNode.innerHTML = miniLOL.go(location.href.match(/[#?]/) ? location.href : "#"+miniLOL.config.homePage);'
+        ].each(function(cmd) {
+            eval(cmd);
 
-        for (var i = 0; i < cmds.length; i++) {
-            eval(cmds[i]);
-            
             if (miniLOL._error) {
-                return;
+                throw $break;
             }
-        }
+        });
     
         new PeriodicalExecuter(miniLOL.refresh, miniLOL.config.refreshEvery)
     },
@@ -457,6 +454,15 @@ var miniLOL = {
             setTimeout(function(){check(name, vars)}, 5);
 
             return miniLOL.config.loadingMessage;
+        },
+
+        reload: function (name)
+        {
+            if (miniLOL.module.list[name]) {
+                if (miniLOL.module.list[name].onLoad) {
+                    miniLOL.module.list[name].onLoad();
+                }
+            }
         }
     },
 
