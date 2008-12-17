@@ -430,6 +430,7 @@ var miniLOL = {
         create: function (name, obj)
         {
             obj.name = name;
+            obj.root = 'modules/'+name;
             if (obj.onLoad) obj.onLoad();
             miniLOL.module.list[name] = obj;
             delete miniLOL.module.loading[name];
