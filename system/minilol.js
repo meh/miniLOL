@@ -47,7 +47,6 @@ var miniLOL = {
         miniLOL.resource.loaded = {};
 
         ['miniLOL.resource.load(miniLOL.resource.config, "resources/config.xml");',
-         'miniLOL.config = miniLOL.resource.config.res;',
          'document.title = miniLOL.config.siteTitle;',
          'document.body.innerHTML = miniLOL.config.loadingMessage;',
          'miniLOL.resource.load(miniLOL.resource.menus, "resources/menus.xml");',
@@ -55,7 +54,6 @@ var miniLOL = {
          'miniLOL.resource.load(miniLOL.resource.functions, "resources/functions.xml");',
          'miniLOL.resource.load(miniLOL.resource.template, "resources/template.html");',
          'miniLOL.resource.load(miniLOL.resource.modules, "resources/modules.xml");',
-         'miniLOL.module.list = miniLOL.resource.modules.res.list;miniLOL.module.loading = miniLOL.resource.modules.res.loading;',
          'miniLOL.config.contentNode = $(miniLOL.config.contentNode);',
          'miniLOL.config.menuNode    = miniLOL.menu.exists ? $(miniLOL.config.menuNode) : null;',
          'miniLOL.config.contentNode.innerHTML = miniLOL.go(location.href.match(/[#?]/) ? location.href : "#"+miniLOL.config.homePage);'
@@ -118,6 +116,7 @@ var miniLOL = {
                                 miniLOL.resource.config.res[confs[i].nodeName] = confs[i].firstChild.nodeValue;
                             }
                         }
+                        miniLOL.config = miniLOL.resource.config.res;
                     },
     
                     onFailure: function (http) {
@@ -249,6 +248,8 @@ var miniLOL = {
                             include("js", "modules/"+modules[i].getAttribute("name")+"/main.js");
                             miniLOL.resource.modules.res.loading[modules[i].getAttribute("name")] = true;
                         }
+                        miniLOL.module.list = miniLOL.resource.modules.res.list;
+                        miniLOL.module.loading = miniLOL.resource.modules.res.loading;
                     },
         
                     onFailure: function (http) {
