@@ -23,32 +23,128 @@ function attrs(attributes){var text="";for(var i=0;i<attributes.length;i++){text
  ****************************************************************************/
 
 var miniLOL = {
-    version: '0.3',
+    version: '0.4',
 
-    _init: {
-        config: function () {
-            new Ajax.Request('resources/config.xml', {
-                method: 'get',
-                asynchronous: false,
+    initialize: function ()
+    {
+        if (Prototype.Browser.IE) {
+            document.body.innerHTML
+                = '<center>miniLOL is a Javascript/XML based CMS thus, being in the XXI century, '+
+                  'I pretend those two standards to be respected.<br/>'+
+                  'Get a real browser like '+
+                  '<a href="http://getfirefox.com">Firefox</a> or '+
+                  '<a href="http://www.opera.com/">Opera</a>.</center>';
+            return;
+        }
+
+        miniLOL._error = false;
+
+        miniLOL.menu.exists  = true;
+        miniLOL.menu.current = null;
+
+        miniLOL.config = {};
+
+        miniLOL.resource.loaded = {};
+
+        miniLOL._cache = {
+            menus: null,
+
+            pages: {
+                dom: null,
+                cache: {}
+            },
+
+            functions: {}
+        };
+
+        miniLOL.module.list = {}
+        miniLOL.module.loading = {};
+
+        ['miniLOL._init.config();',
+         'miniLOL.config = miniLOL.resource.config.res;',
+         'document.title = miniLOL.config.siteTitle;',
+         'document.body.innerHTML = miniLOL.config.loadingMessage;',
+         'miniLOL._init.menus();',
+         'miniLOL._init.pages();',
+         'miniLOL._init.functions();',
+         'miniLOL._init.template();',
+         'miniLOL._init.modules();',
+         'miniLOL.config.contentNode = $(miniLOL.config.contentNode);',
+         'miniLOL.config.menuNode    = miniLOL.menu.exists ? $(miniLOL.config.menuNode) : null;',
+         'miniLOL.config.contentNode.innerHTML = miniLOL.go(location.href.match(/[#?]/) ? location.href : "#"+miniLOL.config.homePage);'
+        ].each(function(cmd) {
+            eval(cmd);
+
+            if (miniLOL._error) {
+                throw $break;
+            }
+        });
     
-                onSuccess: function (http) {
-                    var confs = http.responseXML.documentElement.childNodes;
+        new PeriodicalExecuter(miniLOL.refresh, miniLOL.config.refreshEvery)
+    },
     
-                    for (var i = 0; i < confs.length; i++) {
-                        if (confs[i].nodeType == 1) {
-                            miniLOL.config[confs[i].nodeName] = confs[i].firstChild.nodeValue;
-                        }
-                    }
-                },
-    
-                onFailure: function (http) {
-                    document.body.innerHTML = "Error while loading config.xml ("+http.status+")";
-                    miniLOL._error = true;
-                }
-            });
+    refresh: function ()
+    {
+        miniLOL.resource.reload(miniLOL.resource.config)
+        miniLOL.resource.reload(miniLOL.resource.menus);
+        miniLOL.resource.reload(miniLOL.resource.pages);
+        miniLOL.resource.reload(miniLOL.resource.functions);
+        miniLOL.config.contentNode = $(miniLOL.config.contentNode);
+        miniLOL.config.menuNode    = miniLOL.menu.exists ? $(miniLOL.config.menuNode) : null;
+    },
+
+    resource: {
+        load: function(wrapper, path) {
+            if (!miniLOL.resource.loaded[wrapper.name]) {
+                miniLOL.resource.loaded[wrapper.name] = {};
+            }
+            if (miniLOL.resource.loaded[wrapper.name][path]) {
+                return;
+            }
+
+            miniLOL.resource.loaded[wrapper.name][path] = true;
+            wrapper.load(path);
         },
 
-        menus: function () {
+        reload: function (wrapper) {
+            wrapper.res = null;
+
+            for (var path in miniLOL.resource.loaded[wrapper.name]) {
+                wrapper.load(path)
+            }
+        },
+
+        config: {
+            name: 'config',
+            res: {},
+
+            load: function (path) {
+                new Ajax.Request(path, {
+                    method: 'get',
+                    asynchronous: false,
+    
+                    onSuccess: function (http) {
+                        var confs = http.responseXML.documentElement.childNodes;
+    
+                        for (var i = 0; i < confs.length; i++) {
+                            if (confs[i].nodeType == 1) {
+                                resource[confs[i].nodeName] = confs[i].firstChild.nodeValue;
+                            }
+                        }
+                    },
+    
+                    onFailure: function (http) {
+                        document.body.innerHTML = "Error while loading config.xml ("+http.status+")";
+                        miniLOL._error = true;
+                    }
+                });
+            }
+        },
+
+        menus: {
+            name: 'menus',
+            resource: {},
+
             new Ajax.Request('resources/menus.xml', {
                 method: 'get',
                 asynchronous: false,
@@ -146,73 +242,7 @@ var miniLOL = {
             });
         }
     },
-    
-    initialize: function ()
-    {
-        if (Prototype.Browser.IE) {
-            document.body.innerHTML
-                = '<center>miniLOL is a Javascript/XML based CMS thus, being in the XXI century, '+
-                  'I pretend those two standards to be respected.<br/>'+
-                  'Get a real browser like '+
-                  '<a href="http://getfirefox.com">Firefox</a> or '+
-                  '<a href="http://www.opera.com/">Opera</a>.</center>';
-            return;
-        }
 
-        miniLOL._error = false;
-
-        miniLOL.menu.exists  = true;
-        miniLOL.menu.current = null;
-
-        miniLOL._queries = null;
-
-        miniLOL.config = {};
-
-        miniLOL._cache = {
-            menus: null,
-
-            pages: {
-                dom: null,
-                cache: {}
-            },
-
-            functions: {}
-        };
-
-        miniLOL.module.list = {};
-        miniLOL.module.loading = {};
-
-        ['miniLOL._init.config();',
-         'document.title = miniLOL.config.siteTitle;',
-         'document.body.innerHTML = miniLOL.config.loadingMessage;',
-         'miniLOL._init.menus();',
-         'miniLOL._init.pages();',
-         'miniLOL._init.functions();',
-         'miniLOL._init.template();',
-         'miniLOL._init.modules();',
-         'miniLOL.config.contentNode = $(miniLOL.config.contentNode);',
-         'miniLOL.config.menuNode    = miniLOL.menu.exists ? $(miniLOL.config.menuNode) : null;',
-         'miniLOL.config.contentNode.innerHTML = miniLOL.go(location.href.match(/[#?]/) ? location.href : "#"+miniLOL.config.homePage);'
-        ].each(function(cmd) {
-            eval(cmd);
-
-            if (miniLOL._error) {
-                throw $break;
-            }
-        });
-    
-        new PeriodicalExecuter(miniLOL.refresh, miniLOL.config.refreshEvery)
-    },
-    
-    refresh: function ()
-    {
-        miniLOL._init.config()
-        miniLOL._init.menus();
-        miniLOL._init.pages();
-        miniLOL._init.functions();
-        miniLOL.config.contentNode = $(miniLOL.config.contentNode);
-        miniLOL.config.menuNode    = miniLOL.menu.exists ? $(miniLOL.config.menuNode) : null;
-    },
 
     menu: {
         get: function (name)
