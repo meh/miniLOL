@@ -393,7 +393,7 @@ var miniLOL = {
                         var args    = link.getAttribute('arguments') || linksArgs; link.removeAttribute('arguments');
                         var menu    = link.getAttribute('menu') || linksMenu; link.removeAttribute('menu');
         
-                        var out = src.match(/^\w+:\/\//);
+                        var out = src.match(/^(\w+:\/\/|mailto:)/);
         
                         var linkClass = link.getAttribute('class'); link.removeAttribute('class');
                         var linkId    = link.getAttribute('id'); link.removeAttribute('id');
