@@ -134,7 +134,7 @@ var miniLOL = {
                     miniLOL.module.list = {};
                     var modules = http.responseXML.documentElement.getElementsByTagName('module');
                     for (var i = 0; i < modules.length; i++) {
-                        include("js", "modules/"+modules[i].getAttribute("src"));
+                        include("js", "modules/"+modules[i].getAttribute("name")+"/main.js");
                         miniLOL.module.loading[modules[i].getAttribute("name")] = true;
                     }
                 },

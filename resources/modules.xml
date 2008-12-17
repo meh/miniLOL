@@ -5,7 +5,6 @@
 
     <!ELEMENT module EMPTY>
     <!ATTLIST module
-        src  CDATA #REQUIRED
         name CDATA #REQUIRED
     >
 ]>
@@ -17,5 +16,5 @@ This file contains the used modules, the module name isn't required.
 -->
 
 <modules>
-    <module name="centrify" src="centrify.js"/>
+    <module name="centrify"/>
 </modules>
