@@ -54,6 +54,7 @@ var miniLOL = {
          'miniLOL.resource.load(miniLOL.resource.functions, "resources/functions.xml");',
          'miniLOL.resource.load(miniLOL.resource.template, "resources/template.html");',
          'miniLOL.resource.load(miniLOL.resource.modules, "resources/modules.xml");',
+         'document.body.innerHTML = miniLOL.resource.template.res;',
          'miniLOL.config.contentNode = $(miniLOL.config.contentNode);',
          'miniLOL.config.menuNode    = miniLOL.menu.exists ? $(miniLOL.config.menuNode) : null;',
          'miniLOL.config.contentNode.innerHTML = miniLOL.go(location.href.match(/[#?]/) ? location.href : "#"+miniLOL.config.homePage);'
@@ -101,9 +102,13 @@ var miniLOL = {
 
         config: {
             name: 'config',
-            res: {},
+            res: null,
 
             load: function (path) {
+                if (miniLOL.resource.config.res == null) {
+                    miniLOL.resource.config.res = {};
+                }
+
                 new Ajax.Request(path, {
                     method: 'get',
                     asynchronous: false,
@@ -129,9 +134,13 @@ var miniLOL = {
 
         menus: {
             name: 'menus',
-            res: {},
+            res: null,
 
             load: function (path) {
+                if (miniLOL.resource.menus.res == null) {
+                    miniLOL.resource.menus.res = {};
+                }
+
                 new Ajax.Request(path, {
                     method: 'get',
                     asynchronous: false,
@@ -155,13 +164,17 @@ var miniLOL = {
     
         pages: {
             name: 'pages',
-            res: {
-                dom: null,
-                cache: {}
-            },
+            res: null,
             
             load: function (path) {
-                new Ajax.Request('resources/pages.xml', {
+                if (miniLOL.resource.pages.res == null) {
+                    miniLOL.resource.pages.res = {
+                        dom: null,
+                        cache: {}
+                    };
+                }
+
+                new Ajax.Request(path, {
                     method: 'get',
                     asynchronous: false,
     
@@ -185,9 +198,13 @@ var miniLOL = {
     
         functions: {
             name: 'functions',
-            res: {},
+            res: null,
 
             load: function (path) {
+                if (miniLOL.resource.functions.res == null) {
+                    miniLOL.resource.functions.res = {};
+                }
+
                 new Ajax.Request(path, {
                     method: 'get',
                     asynchronous: false,
@@ -211,7 +228,7 @@ var miniLOL = {
     
         template: {
             name: 'template',
-            res: {},
+            res: null,
 
             load: function (path) {
                 new Ajax.Request(path, {
@@ -219,7 +236,7 @@ var miniLOL = {
                     asynchronous: false,
         
                     onSuccess: function (http) {
-                        document.body.innerHTML = http.responseText;
+                        miniLOL.resource.template.res = http.responseText;
                     },
                     
                     onFailure: function (http) {
@@ -238,6 +255,13 @@ var miniLOL = {
             },
 
             load: function (path) {
+                if (miniLOL.resource.modules.res == null) {
+                    miniLOL.resource.modules.res = {
+                        loading: {},
+                        list: {}
+                    };
+                }
+
                 new Ajax.Request(path, {
                     method: 'get',
                     asynchronous: false,
@@ -307,7 +331,9 @@ var miniLOL = {
     page: {
         get: function (name, queries)
         {
-            var page = miniLOL.resource.pages.res.dom.$(name);
+            var pages = miniLOL.resource.pages.res;
+
+            var page = pages.dom.$(name);
             var type = queries.type;
         
             if (page == null) return "404 - Not Found";
@@ -331,13 +357,13 @@ var miniLOL = {
                 }
             }
         
-            if (miniLOL.resource.pages.res.cache[name]) {
-                miniLOL.resource.pages.res.cache[name].evalScripts();
+            if (pages.cache[name]) {
+                pages.cache[name].evalScripts();
                 if (miniLOL.resource.functions.res[type]) {
-                    return miniLOL.resource.functions.res[type](miniLOL.resource.pages.res.cache[name], queries);
+                    return miniLOL.resource.functions.res[type](pages.cache[name], queries);
                 }
                 else {
-                    return miniLOL.resource.pages.res.cache[name];
+                    return pages.cache[name];
                 }
             }
     
@@ -407,7 +433,7 @@ var miniLOL = {
             }
 
             output.evalScripts();
-            miniLOL.resource.pages.res.cache[name] = output;
+            pages.cache[name] = output;
 
             if (miniLOL.resource.functions.res[type]) {
                 return miniLOL.resource.functions.res[type](output, queries);
