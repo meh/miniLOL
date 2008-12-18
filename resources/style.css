@@ -74,6 +74,7 @@ body
     text-align: justify;
     border: solid 1px #222222;
     padding: 5px;
+    overflow: auto;
 }
 
 #credits
