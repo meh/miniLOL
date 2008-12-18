@@ -113,10 +113,18 @@ var miniLOL = {
                     asynchronous: false,
     
                     onSuccess: function (http) {
-                        var confs = http.responseXML.documentElement.childNodes;
-    
+                        var domain = http.responseXML.documentElement.getAttribute('domain');
+                        var confs  = http.responseXML.documentElement.getElementsByTagName('*');;
+
+                        if (typeof(miniLOL.resource.config.res[domain]) != 'object') {
+                            miniLOL.resource.config.res[domain] = {};
+                        }
+
                         for (var i = 0; i < confs.length; i++) {
-                            if (confs[i].nodeType == 1) {
+                            if (domain) {
+                                miniLOL.resource.config.res[domain][confs[i].nodeName] = confs[i].firstChild.nodeValue;
+                            }
+                            else {
                                 miniLOL.resource.config.res[confs[i].nodeName] = confs[i].firstChild.nodeValue;
                             }
                         }
