@@ -345,7 +345,7 @@ var miniLOL = {
             if (type == null) type = page.getAttribute('type');
         
             if (miniLOL.menu.exists) {
-                miniLOL.menu.current = page.getAttribute('menu');
+                miniLOL.menu.current = queries.menu || page.getAttribute('menu');
 
                 if (miniLOL.menu.current == 'default') {
                     miniLOL.config.menuNode.innerHTML = miniLOL.menu.get(miniLOL.menu.current);
