@@ -23,7 +23,7 @@ function attrs(attributes){var text="";for(var i=0;i<attributes.length;i++){text
  ****************************************************************************/
 
 var miniLOL = {
-    version: '0.4',
+    version: '0.5',
 
     initialize: function ()
     {
@@ -504,7 +504,8 @@ var miniLOL = {
         addEvent: function (place, func)
         {
             var attach = "#{0}=_clone(miniLOL.module.dispatcher);#{0}=#{0}.bind(#{0});".interpolate([place]);
-            try { if (typeof(place) != 'function' || place('minilol') != 'win') eval(attach);
+            try { if ((typeof place == 'function' && place('minilol') != 'win')
+                   || (typeof place == 'string'   && eval(place)('minilol') != 'win')) { alert('lol'); eval(attach) };
             } catch (e) { eval(attach); }
             
             eval("#{0}('add', func);".interpolate([place]));
