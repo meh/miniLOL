@@ -358,7 +358,7 @@ var miniLOL = {
             if (miniLOL.menu.exists) {
                 miniLOL.menu.current = menu || 'default';
 
-                if (menu == 'default') {
+                if (miniLOL.menu.current == 'default') {
                     miniLOL.config.menuNode.innerHTML = miniLOL.menu.get('default');
                 }
                 else {
