@@ -576,7 +576,7 @@ var miniLOL = {
         execute: function (name, vars, onGo) {
             if (typeof(name) == 'undefined' || typeof(miniLOL.modules.list[name]) != 'object') {
                 if (typeof(miniLOL.modules.loading[name]) == 'undefined') {
-                    return "The module isn't loaded.";
+                    return false;
                 }
                 else {
                     setTimeout(function(){miniLOL.module.execute(name, vars)}, 5);
@@ -621,7 +621,9 @@ var miniLOL = {
         }
         else if (queries.module) {
             miniLOL.menu.check(queries.menu);
-            miniLOL.module.execute(queries.module, queries, true);
+            if (!miniLOL.module.execute(queries.module, queries, true)) {
+                miniLOL.config.contentNode.innerHTML = "The module isn't loaded";
+            }
         }
         else {
             miniLOL.config.contentNode.innerHTML = 'wat';
