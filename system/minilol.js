@@ -589,7 +589,7 @@ var miniLOL = {
             catch (e) {
                 miniLOL.config.contentNode.innerHTML = (e.toString().empty())
                     ? "An error occurred while executing the module."
-                    : e.toString();
+                    : "Line " + e.lineNumber + ": " + e.toString();
 
                 return false;
             }
@@ -619,14 +619,14 @@ var miniLOL = {
             queries.page = matches[1];
             return miniLOL.page.get(queries.page, queries);
         }
-        else if (queries.page) {
-            miniLOL.menu.check(queries.menu);
-            return miniLOL.page.load(queries.page, queries);
-        }
         else if (queries.module) {
             miniLOL.menu.check(queries.menu);
             return miniLOL.module.execute(queries.module, queries, true);
         }
+        else if (queries.page) {
+            miniLOL.menu.check(queries.menu);
+            return miniLOL.page.load(queries.page, queries);
+        } 
         else {
             miniLOL.config.contentNode.innerHTML = 'wat';
             return false;
