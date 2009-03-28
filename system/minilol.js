@@ -563,7 +563,13 @@ var miniLOL = {
             obj.name = name;
             obj.root = 'modules/'+name;
             if (obj.onLoad) {
-                obj.onLoad();
+                obj.onLoad.bind(obj)();
+            }
+
+            for (var func in obj) {
+                if (typeof obj[func] == 'function') {
+                    obj[func] = obj[func].bind(obj);
+                }
             }
 
             miniLOL.modules.list[name] = obj;
@@ -581,9 +587,9 @@ var miniLOL = {
                 miniLOL.modules.list[name].execute(vars);
             }
             catch (e) {
-                miniLOL.config.contentNode.innerHTML = (e.empty())
+                miniLOL.config.contentNode.innerHTML = (e.toString().empty())
                     ? "An error occurred while executing the module."
-                    : e;
+                    : e.toString();
 
                 return false;
             }
