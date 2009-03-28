@@ -97,9 +97,10 @@ var miniLOL = {
 
             if (!ok) {
                 setTimeout(function(){check(false);}, 10);
+                return false;
             }
 
-            miniLOL.go(location.href.match(/[#?]/) ? location.href : "#"+miniLOL.config.homePage);
+            miniLOL.go(/[#?]/.test(location.href) ? location.href : "#"+miniLOL.config.homePage);
         }; check(false);
     },
     
@@ -313,7 +314,7 @@ var miniLOL = {
                     onSuccess: function (http) { 
                         var modules = http.responseXML.documentElement.getElementsByTagName('module');
                         for (var i = 0; i < modules.length; i++) {
-                            include("js", "modules/"+modules[i].getAttribute("name")+"/main.js");
+                            include("js", "modules/"+modules[i].getAttribute("name")+"/init.js");
                             miniLOL.modules.loading[modules[i].getAttribute("name")] = true;
                         }
                     },
@@ -574,27 +575,25 @@ var miniLOL = {
         },
 
         execute: function (name, vars, onGo) {
-            if (typeof(name) == 'undefined' || typeof(miniLOL.modules.list[name]) != 'object') {
-                if (typeof(miniLOL.modules.loading[name]) == 'undefined') {
-                    return false;
-                }
-                else {
-                    setTimeout(function(){miniLOL.module.execute(name, vars)}, 5);
-                }
+            miniLOL.config.contentNode.innerHTML = miniLOL.config.loadingMessage;
+            
+            alert(name);
+            try {
+                miniLOL.modules.list[name].execute(vars);
+            }
+            catch (e) {
+                miniLOL.config.contentNode.innerHTML = (e.empty())
+                    ? "An error occurred while executing the module."
+                    : e;
+
+                return false;
             }
 
-            miniLOL.config.contentNode.innerHTML = miniLOL.config.loadingMessage;
-            var check = function(name, vars) {
-                if (typeof(miniLOL.modules.list[name]) != 'object') {
-                    setTimeout(function(){check(name, vars)}, 5);
-                    return;
-                }
-                miniLOL.modules.list[name].execute(vars);
-                if (onGo) {
-                    window.onGo();
-                }
+            if (onGo) {
+                window.onGo();
             }
-            setTimeout(function(){check(name, vars)}, 5);
+
+            return true;
         },
 
         reload: function (name) {
@@ -609,21 +608,19 @@ var miniLOL = {
     go: function (url) {
         url = url.replace(/#/, '?');
         var queries = url.toQueryParams();
-
         var matches = /\?([^=]+)(&|$)/.exec(url);
+
         if (matches) {
             queries.page = matches[1];
-            miniLOL.page.get(queries.page, queries);
+            return miniLOL.page.get(queries.page, queries);
         }
         else if (queries.page) {
             miniLOL.menu.check(queries.menu);
-            miniLOL.page.load(queries.page, queries);
+            return miniLOL.page.load(queries.page, queries);
         }
         else if (queries.module) {
             miniLOL.menu.check(queries.menu);
-            if (!miniLOL.module.execute(queries.module, queries, true)) {
-                miniLOL.config.contentNode.innerHTML = "The module isn't loaded";
-            }
+            return miniLOL.module.execute(queries.module, queries, true);
         }
         else {
             miniLOL.config.contentNode.innerHTML = 'wat';
