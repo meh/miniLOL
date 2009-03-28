@@ -576,8 +576,7 @@ var miniLOL = {
 
         execute: function (name, vars, onGo) {
             miniLOL.config.contentNode.innerHTML = miniLOL.config.loadingMessage;
-            
-            alert(name);
+
             try {
                 miniLOL.modules.list[name].execute(vars);
             }
