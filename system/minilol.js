@@ -100,7 +100,7 @@ var miniLOL = {
                 return false;
             }
 
-            miniLOL.go(/[#?]/.test(location.href) ? location.href : "#"+miniLOL.config.homePage);
+            miniLOL.go(/\/[#?].+/.test(location.href) ? location.href : "#"+miniLOL.config.homePage);
         }; check(false);
     },
     
