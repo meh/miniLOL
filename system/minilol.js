@@ -314,7 +314,7 @@ var miniLOL = {
                     onSuccess: function (http) { 
                         var modules = http.responseXML.documentElement.getElementsByTagName('module');
                         for (var i = 0; i < modules.length; i++) {
-                            include("js", "modules/"+modules[i].getAttribute("name")+"/init.js");
+                            include("js", "modules/"+modules[i].getAttribute("name")+"/main.js");
                             miniLOL.modules.loading[modules[i].getAttribute("name")] = true;
                         }
                     },
