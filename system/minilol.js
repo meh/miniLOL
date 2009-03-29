@@ -628,6 +628,7 @@ var miniLOL = {
             return miniLOL.page.load(queries.page, queries);
         } 
         else {
+            miniLOL.menu.check(queries.menu);
             miniLOL.config.contentNode.innerHTML = 'wat';
             return false;
         }
