@@ -33,7 +33,8 @@ var miniLOL = {
                   'Get a real browser like '+
                   '<a href="http://getfirefox.com">Firefox</a> or '+
                   '<a href="http://www.opera.com/">Opera</a>.</center>';
-            return;
+
+            throw new Error("You fail at computar.");
         }
 
         window.onGo = function () {
@@ -581,7 +582,14 @@ var miniLOL = {
         },
 
         execute: function (name, vars, onGo) {
-            miniLOL.config.contentNode.innerHTML = miniLOL.config.loadingMessage;
+            if (onGo) {
+                miniLOL.config.contentNode.innerHTML = miniLOL.config.loadingMessage;
+
+                if (!miniLOL.modules.list[name]) {
+                    miniLOL.config.contentNode.innerHTML = "The module isn't loaded.";
+                    return false;
+                }
+            }
 
             try {
                 miniLOL.modules.list[name].execute(vars);
@@ -589,7 +597,7 @@ var miniLOL = {
             catch (e) {
                 miniLOL.config.contentNode.innerHTML = (e.toString().empty())
                     ? "An error occurred while executing the module."
-                    : "Line " + e.lineNumber + ": " + e.toString();
+                    : e.fileName + "@" + e.lineNumber + ":<br/>" + e.toString();
 
                 return false;
             }
