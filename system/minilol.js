@@ -23,7 +23,7 @@ function attrs(attributes){var text="";for(var i=0;i<attributes.length;i++){text
  ****************************************************************************/
 
 var miniLOL = {
-    version: '0.5',
+    version: '0.5.1',
 
     initialize: function () {
         if (Prototype.Browser.IE) {
@@ -91,9 +91,8 @@ var miniLOL = {
         var check = function (ok) {
             ok = true;
             for (var i in miniLOL.modules.loading) {
-                if (miniLOL.modules.loading[i]) {
-                    ok = false;
-                }
+                ok = false;
+                break;
             }
 
             if (!ok) {
@@ -115,16 +114,27 @@ var miniLOL = {
     },
 
     resource: {
-        load: function (wrapper, path) {
+        load: function (wrapper) {
             if (!miniLOL.resource.loaded[wrapper.name]) {
                 miniLOL.resource.loaded[wrapper.name] = {};
             }
-            if (miniLOL.resource.loaded[wrapper.name][path]) {
+
+            var paths = $A(arguments).slice(1);
+            for (var i = 0; i < paths.length; i++) {
+                if (miniLOL.resource.loaded[wrapper.name][paths[i]]) {
+                    paths.splice(i, 1);
+                }
+            }
+
+            if (paths.length == 0) {
                 return;
             }
 
-            miniLOL.resource.loaded[wrapper.name][path] = true;
-            wrapper.load(path);
+            for (var i = 0; i < paths.length; i++) {
+                miniLOL.resource.loaded[wrapper.name][paths[i]] = true;
+            }
+
+            wrapper.load.apply(this, paths);
         },
 
         reload: function (wrapper) {
@@ -563,8 +573,13 @@ var miniLOL = {
         create: function (name, obj) {
             obj.name = name;
             obj.root = 'modules/'+name;
+
             if (obj.onLoad) {
                 obj.onLoad.bind(obj)();
+            }
+
+            if (!obj.execute) {
+                obj.execute = new Function;
             }
 
             for (var func in obj) {
