@@ -120,28 +120,23 @@ var miniLOL = {
             }
 
             var paths = $A(arguments).slice(1);
-            for (var i = 0; i < paths.length; i++) {
-                if (miniLOL.resource.loaded[wrapper.name][paths[i]]) {
-                    paths.splice(i, 1);
-                }
-            }
 
             if (paths.length == 0) {
                 return;
             }
 
             for (var i = 0; i < paths.length; i++) {
-                miniLOL.resource.loaded[wrapper.name][paths[i]] = true;
+                miniLOL.resource.loaded[wrapper.name] = paths.slice(0);
             }
 
-            wrapper.load.apply(this, paths);
+            wrapper.load.apply(wrapper, paths);
         },
 
         reload: function (wrapper) {
             wrapper.res = null;
 
             for (var path in miniLOL.resource.loaded[wrapper.name]) {
-                wrapper.load(path)
+                wrapper.load.apply(wrapper, path)
             }
         },
 
@@ -150,10 +145,11 @@ var miniLOL = {
             res: null,
 
             load: function (path) {
-                if (miniLOL.resource.config.res == null) {
-                    miniLOL.resource.config.res = {};
-                }
-                miniLOL.config = miniLOL.resource.config.res;
+                if (this.res == null) {
+                    this.res = {};
+                } var res = this.res;
+
+                miniLOL.config = this.res;
 
                 new Ajax.Request(path, {
                     method: 'get',
@@ -164,15 +160,15 @@ var miniLOL = {
                         var confs  = http.responseXML.documentElement.getElementsByTagName('*');;
 
                         if (typeof(miniLOL.resource.config.res[domain]) != 'object') {
-                            miniLOL.resource.config.res[domain] = {};
+                            res[domain] = {};
                         }
 
                         for (var i = 0; i < confs.length; i++) {
                             if (domain) {
-                                miniLOL.resource.config.res[domain][confs[i].nodeName] = confs[i].firstChild.nodeValue;
+                                res[domain][confs[i].nodeName] = confs[i].firstChild.nodeValue;
                             }
                             else {
-                                miniLOL.resource.config.res[confs[i].nodeName] = confs[i].firstChild.nodeValue;
+                                res[confs[i].nodeName] = confs[i].firstChild.nodeValue;
                             }
                         }
                     },
@@ -190,9 +186,10 @@ var miniLOL = {
             res: null,
 
             load: function (path) {
-                if (miniLOL.resource.menus.res == null) {
-                    miniLOL.resource.menus.res = {};
-                }
+                if (this.res == null) {
+                    this.res = {};
+                } var res = this.res;
+
                 miniLOL.menus = miniLOL.resource.menus.res;
 
                 new Ajax.Request(path, {
@@ -221,13 +218,14 @@ var miniLOL = {
             res: null,
             
             load: function (path) {
-                if (miniLOL.resource.pages.res == null) {
-                    miniLOL.resource.pages.res = {
+                if (this.res == null) {
+                    this.res = {
                         dom: null,
                         cache: {}
                     };
-                }
-                miniLOL.pages = miniLOL.resource.pages.res;
+                } var res = this.res;
+
+                miniLOL.pages = this.res;
 
                 new Ajax.Request(path, {
                     method: 'get',
@@ -256,10 +254,10 @@ var miniLOL = {
             res: null,
 
             load: function (path) {
-                if (miniLOL.resource.functions.res == null) {
-                    miniLOL.resource.functions.res = {};
+                if (this.res == null) {
+                    this.res = {};
                 }
-                miniLOL.functions = miniLOL.resource.functions.res;
+                miniLOL.functions = this.res;
 
                 new Ajax.Request(path, {
                     method: 'get',
@@ -310,13 +308,14 @@ var miniLOL = {
             },
 
             load: function (path) {
-                if (miniLOL.resource.modules.res == null) {
-                    miniLOL.resource.modules.res = {
+                if (this.res == null) {
+                    this.res = {
                         loading: {},
                         list: {}
                     };
-                }
-                miniLOL.modules = miniLOL.resource.modules.res;
+                } var res = this.res;
+
+                miniLOL.modules = this.res;
 
                 new Ajax.Request(path, {
                     method: 'get',
