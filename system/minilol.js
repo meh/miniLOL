@@ -88,7 +88,7 @@ var miniLOL = {
 
         miniLOL.config.contentNode.innerHTML = 'Initializing modules...';
     
-        var check = function (ok) {
+        var check = function () {
             ok = true;
             for (var i in miniLOL.modules.loading) {
                 ok = false;
@@ -96,7 +96,7 @@ var miniLOL = {
             }
 
             if (!ok) {
-                setTimeout(function(){check(false);}, 10);
+                setTimeout(function(){check();}, 10);
                 return false;
             }
 
@@ -115,10 +115,6 @@ var miniLOL = {
 
     resource: {
         load: function (wrapper) {
-            if (!miniLOL.resource.loaded[wrapper.name]) {
-                miniLOL.resource.loaded[wrapper.name] = {};
-            }
-
             var paths = $A(arguments).slice(1);
 
             if (paths.length == 0) {
@@ -134,10 +130,7 @@ var miniLOL = {
 
         reload: function (wrapper) {
             wrapper.res = null;
-
-            for (var path in miniLOL.resource.loaded[wrapper.name]) {
-                wrapper.load.apply(wrapper, path)
-            }
+            wrapper.load.apply(wrapper, miniLOL.resource.loaded[wrapper.name]);
         },
 
         config: {
@@ -573,8 +566,9 @@ var miniLOL = {
             obj.name = name;
             obj.root = 'modules/'+name;
 
+            var del = true;
             if (obj.onLoad) {
-                obj.onLoad.bind(obj)();
+                del = (obj.onLoad.bind(obj)() !== false);
             }
 
             if (!obj.execute) {
@@ -588,7 +582,10 @@ var miniLOL = {
             }
 
             miniLOL.modules.list[name] = obj;
-            delete miniLOL.modules.loading[name];
+
+            if (del) {
+                delete miniLOL.modules.loading[name];
+            }
 
             if (obj.onGo) {
                 window.onGo('add', obj.onGo);
