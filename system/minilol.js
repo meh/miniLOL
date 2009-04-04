@@ -75,7 +75,7 @@ var miniLOL = {
          'miniLOL.resource.load(miniLOL.resource.modules, "resources/modules.xml");',
          'document.body.innerHTML = miniLOL.template;',
         ].each(function(cmd) {
-            try { eval(cmd); } catch (e) { }
+            try { eval(cmd); } catch (e) { miinLOL._error = true; }
 
             if (miniLOL._error) {
                 throw $break;
@@ -84,6 +84,7 @@ var miniLOL = {
 
         new PeriodicalExecuter(miniLOL.refresh, miniLOL.config.refreshEvery)
 
+        miniLOL.menu.check('default');
         $(miniLOL.config.contentNode).innerHTML = 'Initializing modules...';
     
         var check = function () {
