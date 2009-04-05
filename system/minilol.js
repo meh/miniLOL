@@ -23,7 +23,7 @@ function attrs(attributes){var text="";for(var i=0;i<attributes.length;i++){text
  ****************************************************************************/
 
 var miniLOL = {
-    version: '0.5.1',
+    version: '0.6',
 
     initialize: function () {
         if (Prototype.Browser.IE) {
@@ -73,7 +73,6 @@ var miniLOL = {
          'miniLOL.resource.load(miniLOL.resource.functions, "resources/functions.xml");',
          'miniLOL.resource.load(miniLOL.resource.template, "resources/template.html");',
          'miniLOL.resource.load(miniLOL.resource.modules, "resources/modules.xml");',
-         'document.body.innerHTML = miniLOL.template;',
         ].each(function(cmd) {
             try { eval(cmd); } catch (e) { miinLOL._error = true; }
 
@@ -82,11 +81,17 @@ var miniLOL = {
             }
         });
 
+        if (miniLOL._error) {
+            return false;
+        }
+
         new PeriodicalExecuter(miniLOL.refresh, miniLOL.config.refreshEvery)
 
-        miniLOL.menu.check('default');
+        if (miniLOL.menu.exists) {
+            $(miniLOL.config.menuNode).innerHTML = 'Loading...';
+        }
+
         $(miniLOL.config.contentNode).innerHTML = 'Initializing modules...';
-    
         var check = function () {
             ok = true;
             for (var i in miniLOL.modules.loading) {
@@ -99,8 +104,43 @@ var miniLOL = {
                 return false;
             }
 
-            miniLOL.go(/\/[#?].+/.test(location.href) ? location.href : "#"+miniLOL.config.homePage);
-        }; check(false);
+            $(miniLOL.config.contentNode).innerHTML = 'Checking dependencies tree...';
+            setTimeout(function () {
+                var result = new String;
+
+                var modules = miniLOL.modules.list;
+                var errors  = false;
+                for (var name in modules) {
+                    var dependencies = modules[name].dependencies;
+                    if (dependencies instanceof Array) {
+                        for (var i = 0; i < dependencies.length; i++) {
+                            if (!modules[dependencies[i]]) {
+                                result += "<b>#{0}</b> requires <b>#{1}</b><br/>".interpolate([
+                                    name, dependencies[i]
+                                ]);
+
+                                errors = true;
+                            }
+                        }
+                    }
+
+                    if (errors) {
+                        result += '<br/>';
+                    }
+
+                    errors = false;
+                }
+
+                if (result.empty()) {
+                    miniLOL.go(/\/[#?].+/.test(location.href) ? location.href : "#"+miniLOL.config.homePage);
+                }
+                else {
+                    $(miniLOL.config.contentNode).innerHTML
+                        = "Some modules failed to satisfy their dependencies:<br/><br/>"
+                        + result;
+                }
+            }, 1);
+        }; check();
     },
     
     refresh: function () {
@@ -289,7 +329,7 @@ var miniLOL = {
                     asynchronous: false,
         
                     onSuccess: function (http) {
-                        miniLOL.template = http.responseText;
+                        document.body.innerHTML = miniLOL.template = http.responseText;
                     },
                     
                     onFailure: function (http) {
@@ -609,8 +649,9 @@ var miniLOL = {
                 }
             }
 
+            var result;
             try {
-                miniLOL.modules.list[name].execute(vars);
+                result = miniLOL.modules.list[name].execute(vars);
             }
             catch (e) {
                 $(miniLOL.config.contentNode).innerHTML = (e.toString().empty())
@@ -624,7 +665,7 @@ var miniLOL = {
                 window.onGo();
             }
 
-            return true;
+            return result;
         },
 
         reload: function (name) {
