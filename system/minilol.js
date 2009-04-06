@@ -52,7 +52,7 @@ var miniLOL = {
             }
         
             for (var i = 0; i < this.functions.length; i++) {
-                this.functions[i]();
+                this.functions[i](arguments[0]);
             }
         
             return true;
@@ -420,7 +420,7 @@ var miniLOL = {
     },
 
     page: {
-        get: function (name, queries) {
+        get: function (name, queries, url) {
             $(miniLOL.config.contentNode).innerHTML = miniLOL.config.loadingMessage;
 
             var page = miniLOL.pages.dom.$(name);
@@ -541,10 +541,10 @@ var miniLOL = {
             }
 
             $(miniLOL.config.contentNode).innerHTML = output;
-            window.onGo();
+            window.onGo(url);
         },
 
-        load: function (path, queries) {
+        load: function (path, queries, url) {
             $(miniLOL.config.contentNode).innerHTML = miniLOL.config.loadingMessage;
 
             new Ajax.Request('data/'+path, {
@@ -560,7 +560,7 @@ var miniLOL = {
                     }
 
                     http.responseText.evalScripts();
-                    window.onGo();
+                    window.onGo(url);
                 },
         
                 onFailure: function (http) {
@@ -624,7 +624,7 @@ var miniLOL = {
 
             for (var func in obj) {
                 if (typeof obj[func] == 'function') {
-                    obj[func] = obj[func].bind(obj);
+                    obj[func] = obj[func].bind(obj)
                 }
             }
 
@@ -639,8 +639,8 @@ var miniLOL = {
             }
         },
 
-        execute: function (name, vars, onGo) {
-            if (onGo) {
+        execute: function (name, vars, url) {
+            if (url) {
                 $(miniLOL.config.contentNode).innerHTML = miniLOL.config.loadingMessage;
 
                 if (!miniLOL.modules.list[name]) {
@@ -661,8 +661,8 @@ var miniLOL = {
                 return false;
             }
 
-            if (onGo) {
-                window.onGo();
+            if (url) {
+                window.onGo(url);
             }
 
             return result;
@@ -678,21 +678,20 @@ var miniLOL = {
     },
 
     go: function (url) {
-        url = url.replace(/#/, '?');
-        var queries = parseQuery(url)
+        var queries = parseQuery(url.sub(/#/, '?'))
         var matches = /\?([^=]+)(&|$)/.exec(url);
 
         if (matches) {
             queries.page = matches[1];
-            return miniLOL.page.get(queries.page, queries);
+            return miniLOL.page.get(queries.page, queries, url);
         }
         else if (queries.module) {
             miniLOL.menu.check(queries.menu);
-            return miniLOL.module.execute(queries.module, queries, true);
+            return miniLOL.module.execute(queries.module, queries, url);
         }
         else if (queries.page) {
             miniLOL.menu.check(queries.menu);
-            return miniLOL.page.load(queries.page, queries);
+            return miniLOL.page.load(queries.page, queries, url);
         } 
         else {
             miniLOL.menu.check(queries.menu);
