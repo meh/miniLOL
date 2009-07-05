@@ -613,10 +613,10 @@ var miniLOL = {
 
             if (func == 'new') {
                 eval(attach);
+                return;
             }
 
-            try { if ((typeof place == 'function' && place('minilol') != 'win')
-                   || (typeof place == 'string'   && eval(place)('minilol') != 'win')) { eval(attach) };
+            try { if (eval(place)('minilol') != 'win') { eval(attach) };
             } catch (e) { eval(attach); }
             
             eval("#{0}('add', func);".interpolate([place]));
