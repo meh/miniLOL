@@ -382,6 +382,11 @@ var miniLOL = {
         get: function (name) {
             if (miniLOL.menu.exists) {
                 var menu = miniLOL.menus.$(name);
+
+                if (!menu) {
+                    document.body.innerHTML = "The menu `" + name + "` doesn't exist.";
+                }
+
                 return menu.firstChild.nodeValue;
             }
 
@@ -395,8 +400,10 @@ var miniLOL = {
                     this.eleName = miniLOL.menu.current;
                 }
 
-                var template =    miniLOL.menus.$(name).getAttribute('template')
-                               || miniLOL.menus.documentElement.getAttribute('template');
+                var element  = miniLOL.menus.$(name);
+                var template = miniLOL.menus.documentElement.getAttribute('template') || "#{menu}";
+
+                var template = (element) ? element.getAttribute('template') || template : template;
                 
                 $(miniLOL.config.menuNode).innerHTML = template.interpolate({
                     name: this.eleName,
@@ -493,7 +500,7 @@ var miniLOL = {
                         var text    = link.getAttribute('text'); link.removeAttribute('text');
                         var before  = link.getAttribute('before') || linksSymb || ''; link.removeAttribute('before');
                         var after   = link.getAttribute('after') || ''; link.removeAttribute('after');
-                        var domain  = link.getAttribute('domain'); link.removeAttribute('domain');
+                        var domain  = link.getAttribute('domain') || ''; link.removeAttribute('domain');
                         var args    = link.getAttribute('arguments') || linksArgs; link.removeAttribute('arguments');
                         var menu    = link.getAttribute('menu') || linksMenu; link.removeAttribute('menu');
         
@@ -514,7 +521,13 @@ var miniLOL = {
                         else {
                             var ltype = link.getAttribute('type') || linksType; link.removeAttribute('type');
         
-                            src   = domain == 'out' ? '#page='+src : '#'+src;
+                            if (domain == 'in' || src[0] == '#') {
+                                src = (src[0] == '#') ? src : '#' + src;
+                            }
+                            else {
+                                src   = '#page=' + src;
+                            }
+
                             args  = args ? '&'+args.replace(/[ ,]+/g, '&amp;') : '';
                             ltype = ltype ? '&type='+ltype : '';
                             menu  = miniLOL.menu.exists ? '&amp;menu='+menu : '';

@@ -27,7 +27,7 @@
         before      CDATA #IMPLIED
         after       CDATA #IMPLIED
         type        CDATA #IMPLIED
-        domain      CDATA "out"
+        domain      CDATA #IMPLIED
         menu        CDATA #IMPLIED
     >
 ]>
