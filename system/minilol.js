@@ -30,9 +30,7 @@ var miniLOL = {
             document.body.innerHTML
                 = '<center>miniLOL is a Javascript/XML based CMS thus, being in the XXI century, '+
                   'I pretend those two standards to be respected.<br/>'+
-                  'Get a real browser like '+
-                  '<a href="http://getfirefox.com">Firefox</a> or '+
-                  '<a href="http://www.opera.com/">Opera</a>.</center>';
+                  'Get a real browser like <a href="http://getfirefox.com">Firefox</a>';
 
             throw new Error("You fail at computar.");
         }
@@ -364,8 +362,12 @@ var miniLOL = {
                     onSuccess: function (http) { 
                         var modules = http.responseXML.documentElement.getElementsByTagName('module');
                         for (var i = 0; i < modules.length; i++) {
-                            include("js", "modules/"+modules[i].getAttribute("name")+"/main.js");
-                            miniLOL.modules.loading[modules[i].getAttribute("name")] = true;
+                            try {
+                                Import("js", "modules/"+modules[i].getAttribute("name")+"/main.js");
+                            }
+                            catch (e) {
+
+                            }
                         }
                     },
         
@@ -609,6 +611,10 @@ var miniLOL = {
         },
 
         addEvent: function (place, func) {
+            if (typeof place != 'string') {
+                throw new Error("The place has to be a string.");
+            }
+
             var attach = "#{0}=_clone(miniLOL.module.dispatcher);#{0}=#{0}.bind(#{0});".interpolate([place]);
 
             if (func == 'new') {
@@ -616,8 +622,15 @@ var miniLOL = {
                 return;
             }
 
-            try { if (eval(place)('minilol') != 'win') { eval(attach) };
-            } catch (e) { eval(attach); }
+            var check = eval(place);
+            if (typeof check == 'function') {
+                if (check('minilol') != 'win') {
+                    eval(attach)
+                }
+            }
+            else {
+                eval(attach);
+            }
             
             eval("#{0}('add', func);".interpolate([place]));
         },
@@ -669,7 +682,7 @@ var miniLOL = {
             catch (e) {
                 $(miniLOL.config.contentNode).innerHTML = (e.toString().empty())
                     ? "An error occurred while executing the module."
-                    : e.fileName + "@" + e.lineNumber + ":<br/>" + e.toString();
+                    : e.fileName + " @ " + e.lineNumber + ":<br/>" + e.toString();
 
                 return false;
             }
