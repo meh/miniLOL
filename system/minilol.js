@@ -23,7 +23,7 @@ function attrs(attributes){var text="";for(var i=0;i<attributes.length;i++){text
  ****************************************************************************/
 
 var miniLOL = {
-    version: '0.6',
+    version: '0.6.1',
 
     initialize: function () {
         if (Prototype.Browser.IE) {
@@ -336,6 +336,7 @@ var miniLOL = {
     menu: {
         get: function (name) {
             if (miniLOL.menu.exists) {
+                name = name || 'default';
                 var menu = miniLOL.menus.$(name);
 
                 if (!menu) {
@@ -485,7 +486,7 @@ var miniLOL = {
 
                             args  = args ? '&'+args.replace(/[ ,]+/g, '&amp;') : '';
                             ltype = ltype ? '&type='+ltype : '';
-                            menu  = miniLOL.menu.exists ? '&amp;menu='+menu : '';
+                            menu  = miniLOL.menu.exists && menu ? '&amp;menu='+menu : '';
     
                             output += '<a href="#{0}#{1}#{2}#{3}" #{4}>#{5}</a>#{6}'.interpolate(
                                       [src, args, ltype, menu, attrs(link.attributes), text, after]);

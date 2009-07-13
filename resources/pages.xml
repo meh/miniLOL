@@ -8,7 +8,7 @@
         id        ID    #REQUIRED
         type      CDATA #IMPLIED
         arguments CDATA ""
-        menu      CDATA "default"
+        menu      CDATA #IMPLIED
     >
 
     <!ELEMENT links (link+)>
