@@ -556,7 +556,7 @@ var miniLOL = {
                 if (dependencies) {
                     for (var i = 0; i < dependencies.length; i++) {
                         if (!miniLOL.modules.list[dependencies[i]]) {
-                            throw new Error(name + " requires " + dependencies[i]);
+                            throw new Error("`"+ name+"`" + " requires " + "`"+dependencies[i]+"`");
                         }
                     }
                 }
