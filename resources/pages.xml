@@ -9,9 +9,10 @@
         type      CDATA #IMPLIED
         arguments CDATA ""
         menu      CDATA #IMPLIED
+        alias     CDATA #IMPLIED
     >
 
-    <!ELEMENT links (link+)>
+    <!ELEMENT links (link*)>
     <!ATTLIST links
         class  CDATA "links"
         before CDATA #IMPLIED
@@ -60,9 +61,12 @@ The example below should be self explanatory.
         <links before="-&#160;">
             <link domain="in" src="stuff" text="Stuff" arguments="decoration=- times=40" after=" ~ Internal link"/>
             <link src="separated" text="Separated" after=" ~ Internal link but in data/"/>
+            <link src="#separated" text="Separated" after=" ~ Separated alias'd"/>
             <link src="http://lulz.thruhere.net" text="IN LULZ WE TRUST" after=" ~ External link"/>
         </links>
     </page>
+
+    <page id="separated" alias="#page=separated"/>
 
     <page id="stuff" menu="stuff" type="simple" arguments="decoration=~ times=20">
         <![CDATA[NIGGER NIGGER NIGGER NIGGER NIGGER NIGGER
