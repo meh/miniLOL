@@ -130,7 +130,7 @@ var miniLOL = {
             wrapper.calls = new Array;
 
             for (var i = 0; i < calls.length; i++) {
-                miniLOL.resource.load(wrapper, calls[i]);
+                miniLOL.resource.load.apply(window, [wrapper].concat(calls[i]));
             }
         },
     },
@@ -553,7 +553,7 @@ var miniLOL = {
                         $(miniLOL.config.contentNode).innerHTML = http.responseText;
                     }
 
-                    http.responseText.evalScripts();
+                    $(miniLOL.config.contentNode).innerHTML.evalScripts();
                     window.onGo(url);
                 },
         
