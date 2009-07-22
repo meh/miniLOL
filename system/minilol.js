@@ -23,14 +23,14 @@ function attrs(attributes){var text="";for(var i=0;i<attributes.length;i++){text
  ****************************************************************************/
 
 var miniLOL = {
-    version: '0.6.1',
+    version: '0.6.3',
 
     initialize: function () {
         if (Prototype.Browser.IE) {
             document.body.innerHTML
                 = '<center>miniLOL is a Javascript/XML based CMS thus, being in the XXI century, '+
                   'I pretend those two standards to be respected.<br/>'+
-                  'Get a real browser like <a href="http://getfirefox.com">Firefox</a>';
+                  'Get a real browser, get <a href="http://getfirefox.com">Firefox</a>';
 
             throw new Error("You fail at computar.");
         }
@@ -86,8 +86,17 @@ var miniLOL = {
             $(miniLOL.config.menuNode).innerHTML = 'Loading...';
         }
 
-        $(miniLOL.config.contentNode).innerHTML = 'Initializing modules...';
+        $(miniLOL.config.contentNode).innerHTML = 'Loading modules...';
         miniLOL.resource.load(miniLOL.resources.modules, "resources/modules.xml");
+
+        $(miniLOL.config.contentNode).innerHTML = 'Checking dependencies...';
+        try {
+            miniLOL.module.dependencies.check();
+        }
+        catch (e) {
+            miniLOL._error = true;
+            $(miniLOL.config.contentNode).innerHTML = "`#{name}` requires `#{require}`".interpolate(e);
+        }
 
         if (!miniLOL._error) {
             miniLOL.go(/\/[#?].+/.test(location.href) ? location.href : "#"+miniLOL.config.homePage);
@@ -173,7 +182,9 @@ var miniLOL = {
                         },
         
                         onFailure: function (http) {
-                            document.body.innerHTML = "Error while loading config.xml ("+http.status+")";
+                            document.body.innerHTML = "Error while loading config.xml (#{error})".interpolate({
+                                error: http.status,
+                            });
                             miniLOL._error = true;
                         }
                     });
@@ -242,7 +253,9 @@ var miniLOL = {
                     },
     
                     onFailure: function (http) {
-                        document.body.innerHTML = "Error while loading pages.xml ("+http.status+")";
+                        document.body.innerHTML = "Error while loading pages.xml (#{error})".interpolate({
+                            error: http.status,
+                        });
                         miniLOL._error = true;
                     }
                 });
@@ -269,12 +282,17 @@ var miniLOL = {
                         for (var i = 0; i < functions.length; i++) {
                             try {
                                 miniLOL.functions[functions[i].getAttribute('name')]
-                                    = new Function("var text = arguments[0]; var args = arguments[1];"+functions[i].firstChild.nodeValue+";return text;");
+                                    = new Function("var text = arguments[0]; var args = arguments[1]; #{code}; return text;".interpolate({
+                                        code: functions[i].firstChild.nodeValue,
+                                    }));
                             }
                             catch (e) {
                                 document.body.innerHTML
-                                    = "Error while creating `"+functions[i].getAttribute("name")+"` "+
-                                      "wrapper from "+path+":<br/><br/>"+ e.toString();
+                                    = "Error while creating `#{name}` wrapper from #{path}:<br/><br/>#{error}".interpolate({
+                                        name: functions[i].getAttribute("name"),
+                                        path: path,
+                                        error: e.toString(),
+                                    });
 
                                 miniLOL._error = true;
                                 return;
@@ -283,7 +301,9 @@ var miniLOL = {
                     },
         
                     onFailure: function (http) {
-                        document.body.innerHTML = "Error while loading functions.xml ("+http.status+")";
+                        document.body.innerHTML = "Error while loading functions.xml (#{error})".interpolate({
+                            error: http.status,
+                        });
                         miniLOL._error = true;
                     }
                 });
@@ -303,7 +323,9 @@ var miniLOL = {
                     },
                     
                     onFailure: function (http) {
-                        document.body.innerHTML = "Error while loading template.html ("+http.status+")";
+                        document.body.innerHTML = "Error while loading template.html (#{error})".interpolate({
+                            error: http.status,
+                        });
                         miniLOL._error = true;
                     }
                 });
@@ -334,6 +356,10 @@ var miniLOL = {
                     onSuccess: function (http) { 
                         var modules = http.responseXML.documentElement.getElementsByTagName('module');
                         for (var i = 0; i < modules.length; i++) {
+                            $(miniLOL.config.contentNode).innerHTML = "Loading `#{name}`...".interpolate({
+                                name: modules[i].getAttribute("name"),
+                            });
+
                             if (!miniLOL.module.load(modules[i].getAttribute("name"))) {
                                 miniLOL._error = true;
                                 break;
@@ -342,7 +368,9 @@ var miniLOL = {
                     },
         
                     onFailure: function (http) {
-                        document.body.innerHTML = "Error while loading modules.xml ("+http.status+")";
+                        document.body.innerHTML = "Error while loading modules.xml (#{error})".interpolate({
+                            error: http.status,
+                        });
                         miniLOL._error = true;
                     }
                 });
@@ -357,7 +385,9 @@ var miniLOL = {
                 var menu = miniLOL.menus.$(name);
 
                 if (!menu) {
-                    document.body.innerHTML = "The menu `" + name + "` doesn't exist.";
+                    document.body.innerHTML = "The menu `#{name}` doesn't exist.".interpolate({
+                        name: name,
+                    });
                 }
 
                 return menu.firstChild.nodeValue;
@@ -404,16 +434,15 @@ var miniLOL = {
             $(miniLOL.config.contentNode).innerHTML = miniLOL.config.loadingMessage;
 
             var page = miniLOL.pages.dom.$(name);
-
-            if (page.getAttribute("alias")) {
-                miniLOL.go(page.getAttribute("alias"));
-            }
-
             var type = queries.type;
         
             if (page == null) {
                 $(miniLOL.config.contentNode).innerHTML = "404 - Not Found";
                 return false;
+            }
+
+            if (page.getAttribute("alias")) {
+                miniLOL.go(page.getAttribute("alias"));
             }
 
             if (type == null) {
@@ -451,7 +480,7 @@ var miniLOL = {
 
                 $(miniLOL.config.contentNode).innerHTML.evalScripts();
 
-                window.onGo();
+                window.onGo(url);
                 return true;
             }
     
@@ -573,28 +602,50 @@ var miniLOL = {
                 Import("modules/" + name + "/main.js", window, true);
 
                 if (!miniLOL.modules.list[name]) {
-                    throw new Error("Something went wrong while loading the module `" + name + "`.");
-                }
-
-                var dependencies = miniLOL.modules.list[name].dependencies;
-
-                if (dependencies) {
-                    for (var i = 0; i < dependencies.length; i++) {
-                        if (!miniLOL.modules.list[dependencies[i]]) {
-                            throw new Error("`"+ name+"`" + " requires " + "`"+dependencies[i]+"`");
-                        }
-                    }
+                    throw new Error("Something went wrong while loading the module `#{name}`.".interpolate({
+                        name: name,
+                    }));
                 }
 
                 return true;
             }
             catch (e) {
                 $(miniLOL.config.contentNode).innerHTML = 
-                      "An error occurred while loading the module `" + name + "`<br/><br/>"
-                    + e.fileName + " @ " + e.lineNumber + ":<br/>" + e.toString();
+                    "An error occurred while loading the module `#{name}`<br/><br/>#{file} @ #{line}:<br/>#{error}".interpolate({
+                        name:  name,
+                        file:  e.fileName,
+                        line:  e.lineNumber,
+                        error: e.toString(),
+                    });
 
                 return false;
             }
+        },
+
+        dependencies: {
+            check: function () {
+                for (var module in miniLOL.modules.list) {
+                    var dependencies = miniLOL.modules.list[module].dependencies;
+                    if (dependencies) {
+                        for (var i = 0; i < dependencies.length; i++) {
+                            if (!miniLOL.modules.list[dependencies[i]]) {
+                                throw { module: name, require: dependencies[i] };
+                            }
+                        }
+                    }
+                }
+
+                return true;
+            },
+
+            needs: function (name, callback, context, wait) {
+                if (miniLOL.modules.list[name]) {
+                    callback.call(context || window);
+                }
+                else {
+                    setTimeout(wait || 10, function(){ miniLOL.module.dependencies.needs(name, callback, context); });
+                }
+            },
         },
 
         dispatcher: function () {
@@ -654,7 +705,7 @@ var miniLOL = {
                     }
                 }
                 catch (e) {
-                    e.fileName = "modules/" + name + "/main.js";
+                    e.fileName = "modules/#{name}/main.js".interpolate({ name: name });
                     throw e;
                 }
             }
@@ -699,8 +750,12 @@ var miniLOL = {
                 e.fileName = "modules/" + name + "/main.js";
 
                 $(miniLOL.config.contentNode).innerHTML = 
-                      "An error occurred while executing the module `" + name +"`<br/><br/>"
-                    + e.fileName + " @ " + e.lineNumber + ":<br/>" + e.toString();
+                    "An error occurred while executing the module `#{name}`<br/><br/>#{file} @ #{line}:<br/>#{errro}".interpolate({
+                        name:  name,
+                        file:  e.fileName,
+                        line:  e.lineNumber,
+                        error: e.toString(),
+                    });
 
                 return false;
             }
