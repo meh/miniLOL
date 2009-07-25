@@ -23,7 +23,7 @@ function attrs(attributes){var text="";for(var i=0;i<attributes.length;i++){text
  ****************************************************************************/
 
 var miniLOL = {
-    version: '0.6.3',
+    version: '0.6.4',
 
     initialize: function () {
         if (Prototype.Browser.IE) {
@@ -35,26 +35,8 @@ var miniLOL = {
             throw new Error("You fail at computar.");
         }
 
-        window.onGo = function () {
-            if (typeof(this.functions) == 'undefined') {
-                this.functions = new Array;
-            }
-        
-            switch (arguments[0]) {
-                case 'minilol':
-                return 'win';
-        
-                case 'add':
-                this.functions.push(arguments[1]);
-                return true;
-            }
-        
-            for (var i = 0; i < this.functions.length; i++) {
-                this.functions[i](arguments[0]);
-            }
-        
-            return true;
-        }; window.onGo = window.onGo.bind(window.onGo);
+        window.onGo     = _clone(miniLOL.module.dispatcher); window.onGo     = window.onGo.bind(window.onGo);
+        window.onAction = _clone(miniLOL.module.dispatcher); window.onAction = window.onAction.bind(window.onAction);
 
         miniLOL._error = false;
 
@@ -87,7 +69,7 @@ var miniLOL = {
         }
 
         $(miniLOL.config.contentNode).innerHTML = 'Loading modules...';
-        miniLOL.resource.load(miniLOL.resources.modules, "resources/modules.xml");
+        miniLOL.resource.load(miniLOL.resources.modules, "resources/modules.xml", true);
 
         $(miniLOL.config.contentNode).innerHTML = 'Checking dependencies...';
         try {
@@ -339,7 +321,7 @@ var miniLOL = {
                 list: {}
             },
 
-            load: function (path) {
+            load: function (path, output) {
                 if (this.res == null) {
                     this.res = {
                         loading: {},
@@ -356,9 +338,13 @@ var miniLOL = {
                     onSuccess: function (http) { 
                         var modules = http.responseXML.documentElement.getElementsByTagName('module');
                         for (var i = 0; i < modules.length; i++) {
-                            $(miniLOL.config.contentNode).innerHTML = "Loading `#{name}`...".interpolate({
-                                name: modules[i].getAttribute("name"),
-                            });
+                            if (output) {
+                                $(miniLOL.config.contentNode).innerHTML = "Loading `#{name}`... [#{n}/#{total}]".interpolate({
+                                    name:  modules[i].getAttribute("name"),
+                                    n:     i+1,
+                                    total: modules.length,
+                                });
+                            }
 
                             if (!miniLOL.module.load(modules[i].getAttribute("name"))) {
                                 miniLOL._error = true;
@@ -432,6 +418,7 @@ var miniLOL = {
     page: {
         get: function (name, queries, url) {
             $(miniLOL.config.contentNode).innerHTML = miniLOL.config.loadingMessage;
+            window.onAction('get', name, queries, url);
 
             var page = miniLOL.pages.dom.$(name);
             var type = queries.type;
@@ -569,6 +556,7 @@ var miniLOL = {
 
         load: function (path, queries, url) {
             $(miniLOL.config.contentNode).innerHTML = miniLOL.config.loadingMessage;
+            window.onAction('load', path, queries, url);
 
             new Ajax.Request('data/'+path, {
                 method: 'get',
@@ -598,6 +586,7 @@ var miniLOL = {
 
     module: {
         load: function (name) {
+            window.onAction('module', 'load', name);
             try {
                 Import("modules/" + name + "/main.js", window, true);
 
@@ -670,6 +659,8 @@ var miniLOL = {
         },
 
         addEvent: function (place, func) {
+            window.onAction('module', 'addEvent', place, func);
+
             if (typeof place != 'string') {
                 throw new Error("The place has to be a string.");
             }
@@ -695,6 +686,8 @@ var miniLOL = {
         },
 
         create: function (name, obj) {
+            window.onAction('module', 'create', name, obj);
+
             obj.name = name;
             obj.root = 'modules/'+name;
 
@@ -728,6 +721,8 @@ var miniLOL = {
         },
 
         execute: function (name, vars, url) {
+            window.onAction('module', 'execute', name, vars, url);
+
             if (!name) {
                 $(miniLOL.config.contentNode).innerHTML = "What module should be executed?";
                 return false;
@@ -768,6 +763,8 @@ var miniLOL = {
         },
 
         reload: function (name) {
+            window.onAction('module', 'reload', name);
+
             if (miniLOL.modules.list[name]) {
                 if (miniLOL.modules.list[name].onLoad) {
                     miniLOL.modules.list[name].onLoad();
@@ -777,6 +774,8 @@ var miniLOL = {
     },
 
     go: function (url) {
+        window.onAction('go', url);
+        
         var queries = parseQuery(url.sub(/#/, '?'))
         var matches = /#([^=]+)(&|$)/.exec(url);
 
