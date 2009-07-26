@@ -35,7 +35,7 @@ var miniLOL = {
             throw new Error("You fail at computar.");
         }
 
-        window.onGo = _clone(miniLOL.event.dispatcher); window.onGo     = window.onGo.bind(window.onGo);
+        miniLOL.event.add('window.onGo');
 
         miniLOL._error = false;
 
@@ -777,7 +777,7 @@ var miniLOL = {
     
             var attach = "#{0}=_clone(miniLOL.event.dispatcher);#{0}=#{0}.bind(#{0});".interpolate([place]);
     
-            if (func == 'new') {
+            if (!func) {
                 eval(attach);
                 return;
             }
