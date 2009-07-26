@@ -72,7 +72,7 @@ var miniLOL = {
         miniLOL.resource.load(miniLOL.resources.modules, "resources/modules.xml", true);
 
         if (miniLOL._error) {
-            return true;
+            return false;
         }
 
         miniLOL.content.set('Checking dependencies...');
