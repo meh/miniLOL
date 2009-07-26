@@ -35,8 +35,7 @@ var miniLOL = {
             throw new Error("You fail at computar.");
         }
 
-        window.onGo     = _clone(miniLOL.event.dispatcher); window.onGo     = window.onGo.bind(window.onGo);
-        window.onAction = _clone(miniLOL.event.dispatcher); window.onAction = window.onAction.bind(window.onAction);
+        window.onGo = _clone(miniLOL.event.dispatcher); window.onGo     = window.onGo.bind(window.onGo);
 
         miniLOL._error = false;
 
@@ -85,13 +84,11 @@ var miniLOL = {
         }
 
         if (!miniLOL._error) {
-            miniLOL.go(/\/[#?].+/.test(location.href) ? location.href : "#"+miniLOL.config['core'].homePage);
+            miniLOL.go(/\/[#?].+/.test(location.href) ? location.href.replace(/^.*[#?]/, '#') : "#"+miniLOL.config['core'].homePage);
         }
     },
     
     refresh: function () {
-        window.onAction(0, 'refresh');
-
         miniLOL.resource.reload(miniLOL.resources.config)
         miniLOL.resource.reload(miniLOL.resources.menus);
         miniLOL.resource.reload(miniLOL.resources.pages);
@@ -110,8 +107,6 @@ var miniLOL = {
 
     resource: {
         load: function (wrapper) {
-            window.onAction(1, 'resource', 'load', wrapper);
-
             if (!wrapper) {
                 miniLOL.content.set('What wrapper should be loaded?');
                 return false;
@@ -139,8 +134,6 @@ var miniLOL = {
         },
 
         reload: function (wrapper) {
-            window.onAction(1, 'resource', 'reload', wrapper);
-
             if (!wrapper) {
                 miniLOL.content.set('What wrapper should be reloaded?');
                 return false;
@@ -470,7 +463,6 @@ var miniLOL = {
     page: {
         get: function (name, queries, url) {
             miniLOL.content.set(miniLOL.config['core'].loadingMessage);
-            window.onAction(50, 'page', 'get', name, queries, url);
 
             var page = miniLOL.pages.dom.$(name);
             var type = queries.type;
@@ -606,7 +598,6 @@ var miniLOL = {
 
         load: function (path, queries, url) {
             miniLOL.content.set(miniLOL.config['core'].loadingMessage);
-            window.onAction(50, 'page', 'load', path, queries, url);
 
             new Ajax.Request('data/'+path, {
                 method: 'get',
@@ -635,8 +626,6 @@ var miniLOL = {
 
     module: {
         create: function (name, obj) {
-            window.onAction(10, 'create', name, obj);
-
             obj.name = name;
             obj.root = 'modules/'+name;
 
@@ -671,16 +660,14 @@ var miniLOL = {
             if (obj.onGo) {
                 window.onGo('add', obj.onGo);
             }
-            if (obj.onAction) {
-                window.onAction('add', obj.onAction);
-            }
         },
 
         execute: function (name, vars, url) {
-            window.onAction((miniLOL.modules[name].type == 'passive' ? 30 : 100), 'module', 'execute', miniLOL.modules[name].type, name, vars, url);
-
             if (!name) {
-                miniLOL.content.set("What module should be executed?");
+                if (url) {
+                    miniLOL.content.set("What module should be executed?");
+                }
+
                 return false;
             }
 
@@ -693,9 +680,11 @@ var miniLOL = {
                 }
             }
 
+            vars = (vars instanceof Array) ? vars : [vars];
+
             var result;
             try {
-                result = miniLOL.modules[name].execute(vars);
+                result = miniLOL.modules[name].execute.apply(miniLOL.modules[name], vars);
             }
             catch (e) {
                 e.fileName = "modules/" + name + "/main.js";
@@ -720,7 +709,6 @@ var miniLOL = {
         },
 
         load: function (name) {
-            window.onAction(5, 'module', 'load', name);
             try {
                 Import("modules/" + name + "/main.js", window, true);
 
@@ -747,8 +735,6 @@ var miniLOL = {
         },
 
         reload: function (name) {
-            window.onAction(2, 'module', 'reload', name);
-
             if (miniLOL.modules[name]) {
                 if (miniLOL.modules[name].onLoad) {
                     miniLOL.modules[name].onLoad();
@@ -785,8 +771,6 @@ var miniLOL = {
 
     event: {
         add: function (place, func) {
-            window.onAction(0, 'event', 'add', place, func);
-    
             if (typeof place != 'string') {
                 throw new Error("The place has to be a string.");
             }
@@ -826,7 +810,7 @@ var miniLOL = {
             }
 
             for (var i = 0; i < this.functions.length; i++) {
-                this.functions[i]($A(arguments));
+                this.functions[i].apply(null, $A(arguments));
             }
 
             return true;
