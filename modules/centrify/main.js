@@ -6,7 +6,7 @@
 miniLOL.module.create("centrify", {
     onLoad: function () {
         this.execute();
-        miniLOL.module.addEvent('window.onresize', this.execute);
+        miniLOL.event.add('window.onresize', this.execute);
     },
 
     execute: function () {

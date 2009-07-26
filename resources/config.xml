@@ -11,7 +11,7 @@ things to be set and those configurations will go here.
 
 -->
 
-<configuration>
+<configuration domain="core">
     <refreshEvery>360</refreshEvery>
     <siteTitle>miniLOL</siteTitle>
     <homePage>home</homePage>
