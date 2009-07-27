@@ -61,7 +61,7 @@ var miniLOL = {
             return false;
         }
 
-        new PeriodicalExecuter(miniLOL.refresh, miniLOL.config['core'].refreshEvery)
+        new PeriodicalExecuter(miniLOL.refresh, miniLOL.config['core'].refreshEvery || 360)
 
         if (miniLOL.menu.exists) {
             miniLOL.content.set('Loading...');
@@ -161,14 +161,14 @@ var miniLOL = {
                 }
 
                 var result = {};
-                for (var i = 0; i < obj.children.length; i++) {
-                    var piece = this.parse(obj.children[i]);
+                for (var i = 0; i < obj.childNodes.length; i++) {
+                    var piece = this.parse(obj.childNodes[i]);
 
                     if (typeof piece == 'string' && piece.replace(/^\s*$/, '')) {
-                        result[obj.children[i].nodeName] = piece;
+                        result[obj.childNodes[i].nodeName] = piece;
                     }
                     else {
-                        result[obj.children[i].nodeName] = piece;
+                        result[obj.childNodes[i].nodeName] = piece;
                     }
                 }
 
@@ -191,7 +191,7 @@ var miniLOL = {
         
                         onSuccess: function (http) {
                             var domain = http.responseXML.documentElement.getAttribute('domain');
-                            var confs  = http.responseXML.documentElement.children;
+                            var confs  = http.responseXML.documentElement.childNodes;
     
                             if (!miniLOL.config[domain]) {
                                 miniLOL.config[domain] = {};
