@@ -23,7 +23,7 @@ function attrs(attributes){var text="";for(var i=0;i<attributes.length;i++){text
  ****************************************************************************/
 
 var miniLOL = {
-    version: '0.7',
+    version: '0.7.1',
 
     initialize: function () {
         if (Prototype.Browser.IE) {
@@ -80,7 +80,7 @@ var miniLOL = {
         }
         catch (e) {
             miniLOL._error = true;
-            miniLOL.content.set("`#{name}` requires `#{require}`".interpolate(e));
+            miniLOL.content.set("`#{module}` requires `#{require}`".interpolate(e));
         }
 
         if (!miniLOL._error) {
@@ -148,6 +148,18 @@ var miniLOL = {
                 miniLOL.resource.load.apply(window, [wrapper].concat(calls[i]));
             }
         },
+
+        check: function (xml) {
+            if (!xml) {
+                return "There's a syntax error.";
+            }
+
+            if (xml.documentElement.nodeName == "parsererror") {
+                return xml.documentElement.textContent;
+            }
+
+            return false;
+        },
     },
 
     resources: {
@@ -190,6 +202,16 @@ var miniLOL = {
                         asynchronous: false,
         
                         onSuccess: function (http) {
+                            var error = miniLOL.resource.check(http.responseXML);
+                            if (error) {
+                                document.body.innerHTML = "Error while parsing config.xml<br/><br/>#{error}".interpolate({
+                                    error: error.replace(/\n/g, '<br/>').replace(/ /g, '&nbsp;'),
+                                });
+    
+                                miniLOL._error = true;
+                                return;
+                            }
+
                             var domain = http.responseXML.documentElement.getAttribute('domain');
                             var confs  = http.responseXML.documentElement.childNodes;
     
@@ -231,6 +253,16 @@ var miniLOL = {
                     asynchronous: false,
 
                     onSuccess: function (http) {
+                        var error = miniLOL.resource.check(http.responseXML);
+                        if (error) {
+                            document.body.innerHTML = "Error while parsing menus.xml<br/><br/>#{error}".interpolate({
+                                error: error.replace(/\n/g, '<br/>').replace(/ /g, '&nbsp;'),
+                            });
+
+                            miniLOL._error = true;
+                            return;
+                        }
+
                         http.responseXML.$ = _$;
                         if (http.responseXML.$('default')) {
                             miniLOL.menus = http.responseXML;
@@ -266,6 +298,16 @@ var miniLOL = {
                     asynchronous: false,
     
                     onSuccess: function (http) {
+                        var error = miniLOL.resource.check(http.responseXML);
+                        if (error) {
+                            document.body.innerHTML = "Error while parsing pages.xml<br/><br/>#{error}".interpolate({
+                                error: error.replace(/\n/g, '<br/>').replace(/ /g, '&nbsp;'),
+                            });
+
+                            miniLOL._error = true;
+                            return;
+                        }
+
                         http.responseXML.$ = _$;
                         miniLOL.pages.dom = http.responseXML;
 
@@ -300,6 +342,16 @@ var miniLOL = {
                     asynchronous: false,
         
                     onSuccess: function (http) {
+                        var error = miniLOL.resource.check(http.responseXML);
+                        if (error) {
+                            document.body.innerHTML = "Error while parsing functions.xml<br/><br/>#{error}".interpolate({
+                                error: error.replace(/\n/g, '<br/>').replace(/ /g, '&nbsp;'),
+                            });
+
+                            miniLOL._error = true;
+                            return;
+                        }
+
                         var functions = http.responseXML.documentElement.getElementsByTagName('function');
         
                         for (var i = 0; i < functions.length; i++) {
@@ -377,6 +429,16 @@ var miniLOL = {
                     asynchronous: false,
         
                     onSuccess: function (http) { 
+                        var error = miniLOL.resource.check(http.responseXML);
+                        if (error) {
+                            miniLOL.content.set("Error while parsing modules.xml<br/><br/>#{error}".interpolate({
+                                error: error.replace(/\n/g, '<br/>').replace(/ /g, '&nbsp;'),
+                            }));
+
+                            miniLOL._error = true;
+                            return;
+                        }
+
                         var modules = http.responseXML.documentElement.getElementsByTagName('module');
                         for (var i = 0; i < modules.length; i++) {
                             if (output) {
@@ -389,15 +451,18 @@ var miniLOL = {
 
                             if (!miniLOL.module.load(modules[i].getAttribute("name"))) {
                                 miniLOL._error = true;
+                            }
+
+                            if (miniLOL._error) {
                                 break;
                             }
                         }
                     },
         
                     onFailure: function (http) {
-                        document.body.innerHTML = "Error while loading modules.xml (#{error})".interpolate({
+                        miniLOL.content.set("Error while loading modules.xml (#{error})".interpolate({
                             error: http.status,
-                        });
+                        }));
                         miniLOL._error = true;
                     }
                 });
@@ -473,7 +538,7 @@ var miniLOL = {
             }
 
             if (page.getAttribute("alias")) {
-                miniLOL.go(page.getAttribute("alias"));
+                return miniLOL.go(page.getAttribute("alias"));
             }
 
             if (type == null) {
@@ -594,6 +659,8 @@ var miniLOL = {
 
             miniLOL.content.set(output);
             window.onGo(url);
+
+            return true;
         },
 
         load: function (path, queries, url) {
@@ -668,16 +735,21 @@ var miniLOL = {
                     miniLOL.content.set("What module should be executed?");
                 }
 
+                miniLOL._error = true;
                 return false;
             }
 
             if (url) {
                 miniLOL.content.set(miniLOL.config['core'].loadingMessage);
+            }
 
-                if (!miniLOL.modules[name]) {
+            if (!miniLOL.modules[name]) {
+                if (url) {
                     miniLOL.content.set("The module isn't loaded.");
-                    return false;
+                    miniLOL.error = true;
                 }
+
+                return false;
             }
 
             vars = (vars instanceof Array) ? vars : [vars];
@@ -690,7 +762,7 @@ var miniLOL = {
                 e.fileName = "modules/" + name + "/main.js";
 
                 miniLOL.content.set(
-                    "An error occurred while executing the module `#{name}`<br/><br/>#{file} @ #{line}:<br/>#{errro}".interpolate({
+                    "An error occurred while executing the module `#{name}`<br/><br/>#{file} @ #{line}:<br/>#{error}".interpolate({
                         name:  name,
                         file:  e.fileName,
                         line:  e.lineNumber,
@@ -749,7 +821,7 @@ var miniLOL = {
                     if (dependencies) {
                         for (var i = 0; i < dependencies.length; i++) {
                             if (!miniLOL.modules[dependencies[i]]) {
-                                throw { module: name, require: dependencies[i] };
+                                throw { module: module, require: dependencies[i] };
                             }
                         }
                     }
