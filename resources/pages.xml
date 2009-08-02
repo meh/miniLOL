@@ -12,7 +12,12 @@
         alias     CDATA #IMPLIED
     >
 
-    <!ELEMENT links (link*)>
+    <!ELEMENT nest ANY>
+    <!ATTLIST nest
+        class   CDATA "nest"
+    >
+
+    <!ELEMENT links (link*, nest*)>
     <!ATTLIST links
         class  CDATA "links"
         before CDATA #IMPLIED

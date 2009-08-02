@@ -526,58 +526,7 @@ var miniLOL = {
     },
 
     page: {
-        get: function (name, queries, url) {
-            miniLOL.content.set(miniLOL.config['core'].loadingMessage);
-
-            var page = miniLOL.pages.dom.$(name);
-            var type = queries.type;
-        
-            if (page == null) {
-                miniLOL.content.set("404 - Not Found");
-                return false;
-            }
-
-            if (page.getAttribute("alias")) {
-                return miniLOL.go(page.getAttribute("alias"));
-            }
-
-            if (type == null) {
-                type = page.getAttribute('type');
-            }
-        
-            if (miniLOL.menu.exists) {
-                miniLOL.menu.current = queries.menu || page.getAttribute('menu');
-
-                if (miniLOL.menu.current == 'default') {
-                    miniLOL.menu.set(miniLOL.menu.get(miniLOL.menu.current));
-                }
-                else {
-                    miniLOL.menu.change(miniLOL.menu.current);
-                }
-            }
-        
-            var pageArguments = page.getAttribute('arguments').replace(/[ ,]+/g, '&amp;').toQueryParams();
-            for (var key in pageArguments) {
-                if (queries[key] == null) {
-                    queries[key] = pageArguments[key];
-                }
-            }
-        
-            if (miniLOL.pages.cache[name]) {
-                if (miniLOL.functions[type]) {
-                    miniLOL.content.set(miniLOL.functions[type](miniLOL.pages.cache[name], queries));
-                    
-                }
-                else {
-                    miniLOL.content.set(miniLOL.pages.cache[name]);
-                }
-
-                miniLOL.content.get().evalScripts();
-
-                window.onGo(url);
-                return true;
-            }
-    
+        parse: function (page) {
             var output = "";
             var contents = page.childNodes;
             for (var i = 0; i < contents.length; i++) {
@@ -648,6 +597,63 @@ var miniLOL = {
                     break;
                 }
             }
+
+            return output;
+        },
+
+        get: function (name, queries, url) {
+            miniLOL.content.set(miniLOL.config['core'].loadingMessage);
+
+            var page = miniLOL.pages.dom.$(name);
+            var type = queries.type;
+        
+            if (page == null) {
+                miniLOL.content.set("404 - Not Found");
+                return false;
+            }
+
+            if (page.getAttribute("alias")) {
+                return miniLOL.go(page.getAttribute("alias"));
+            }
+
+            if (type == null) {
+                type = page.getAttribute('type');
+            }
+        
+            if (miniLOL.menu.exists) {
+                miniLOL.menu.current = queries.menu || page.getAttribute('menu');
+
+                if (miniLOL.menu.current == 'default' || !miniLOL.menu.current) {
+                    miniLOL.menu.set(miniLOL.menu.get(miniLOL.menu.current));
+                }
+                else {
+                    miniLOL.menu.change(miniLOL.menu.current);
+                }
+            }
+        
+            if (miniLOL.pages.cache[name]) {
+                if (miniLOL.functions[type]) {
+                    miniLOL.content.set(miniLOL.functions[type](miniLOL.pages.cache[name], queries));
+                    
+                }
+                else {
+                    miniLOL.content.set(miniLOL.pages.cache[name]);
+                }
+
+                miniLOL.content.get().evalScripts();
+
+                window.onGo(url);
+                return true;
+            }
+
+            var pageArguments = page.getAttribute('arguments').replace(/[ ,]+/g, '&amp;').toQueryParams();
+            for (var key in pageArguments) {
+                if (queries[key] == null) {
+                    queries[key] = pageArguments[key];
+                }
+            }
+        
+            var output = miniLOL.page.parse(page);
 
             miniLOL.pages.cache[name] = output;
 
