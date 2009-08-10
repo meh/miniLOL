@@ -32,6 +32,8 @@ Wrappers are useful if you are going to use a module like syntax highlighting.
         text = text.replace(/>/g,  '&gt;');
         text = text.replace(/\n/g, '<br/>');
 
-        text = args.decoration.times(parseInt(args.times)||10)+'<br/>'+text+args.decoration.times(parseInt(args.times)||10)+'<br/>';
+        var decoration = args.decoration.stripScripts(); /* Idiots are idiots :) */
+
+        text = decoration.times(parseInt(args.times)||10)+'<br/>'+text+decoration.times(parseInt(args.times)||10)+'<br/>';
     ]]></function>
 </functions>
