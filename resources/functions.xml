@@ -32,7 +32,8 @@ Wrappers are useful if you are going to use a module like syntax highlighting.
         text = text.replace(/>/g,  '&gt;');
         text = text.replace(/\n/g, '<br/>');
 
-        var decoration = args.decoration.stripScripts(); /* Idiots are idiots :) */
+        /* Here was a not permanent XSS, that obviously on a standard miniLOL does nothing. */
+        var decoration = args.decoration.escapeHTML();
 
         text = decoration.times(parseInt(args.times)||10)+'<br/>'+text+decoration.times(parseInt(args.times)||10)+'<br/>';
     ]]></function>
