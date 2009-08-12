@@ -613,7 +613,13 @@ var miniLOL = {
             }
 
             if (page.getAttribute("alias")) {
-                return miniLOL.go(page.getAttribute("alias"));
+                if (typeof queries[name] != 'string') {
+                    delete queries[name];
+                }
+                delete queries.page;
+
+                var queries = objectToQuery(queries);
+                return miniLOL.go(page.getAttribute("alias")+(queries ? "&"+queries : ''));
             }
 
             if (type == null) {
