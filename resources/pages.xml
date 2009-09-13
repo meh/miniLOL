@@ -12,15 +12,11 @@
         alias     CDATA #IMPLIED
     >
 
-    <!ELEMENT nest ANY>
-    <!ATTLIST nest
-        class   CDATA "nest"
-    >
-
-    <!ELEMENT links (link*, nest*)>
-    <!ATTLIST links
+    <!ELEMENT list (link*, nest*, list*)>
+    <!ATTLIST list
         class  CDATA "links"
         before CDATA #IMPLIED
+        after  CDATA #IMPLIED
         type   CDATA #IMPLIED
     >
 
@@ -29,12 +25,17 @@
         class       CDATA "link"
         id          CDATA ""
         src         CDATA #REQUIRED
-        text        CDATA #REQUIRED
+        text        CDATA #IMPLIED
         before      CDATA #IMPLIED
         after       CDATA #IMPLIED
         type        CDATA #IMPLIED
         domain      CDATA #IMPLIED
         menu        CDATA #IMPLIED
+    >
+
+    <!ELEMENT nest ANY>
+    <!ATTLIST nest
+        class   CDATA "nest"
     >
 ]>
 
@@ -63,12 +64,12 @@ The example below should be self explanatory.
         <![CDATA[
             This is a links collection:<br/>
         ]]>
-        <links before="-&#160;">
+        <list before="-&#160;">
             <link domain="in" src="stuff" text="Stuff" arguments="decoration=- times=40" after=" ~ Internal link"/>
             <link src="separated" text="Separated" after=" ~ Internal link but in data/"/>
             <link src="#separated" text="Separated" after=" ~ Separated alias'd"/>
             <link src="http://lulz.thruhere.net" text="IN LULZ WE TRUST" after=" ~ External link"/>
-        </links>
+        </list>
     </page>
 
     <page id="separated" alias="#page=separated"/>

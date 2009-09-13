@@ -527,68 +527,95 @@ var miniLOL = {
 
     page: {
         parse: function (page) {
-            var output = "";
+            var output   = "";
             var contents = page.childNodes;
+
             for (var i = 0; i < contents.length; i++) {
                 switch (contents[i].nodeType) {
                     case 1:
-                    var ele = contents[i].cloneNode(false);
-                    if (ele.nodeName != 'links') {
+                    if (contents[i].nodeName != 'list') {
                         continue;
                     }
+
+                    var ele = contents[i].cloneNode(false);
                     
-                    var links     = contents[i].getElementsByTagName('link');
-                    var linksSymb = ele.getAttribute('before'); ele.removeAttribute('before');
-                    var linksArgs = ele.getAttribute('arguments'); ele.removeAttribute('arguments');
-                    var linksType = ele.getAttribute('type'); ele.removeAttribute('type');
-                    var linksMenu = ele.getAttribute('menu') || miniLOL.menu.current; ele.removeAttribute('menu');
+                    var list       = contents[i].childNodes;
+                    var listBefore = ele.getAttribute('before'); ele.removeAttribute('before');
+                    var listAfter  = ele.getAttribute('after'); ele.removeAttribute('after');
+                    var listArgs   = ele.getAttribute('arguments'); ele.removeAttribute('arguments');
+                    var listType   = ele.getAttribute('type'); ele.removeAttribute('type');
+                    var listMenu   = ele.getAttribute('menu') || miniLOL.menu.current; ele.removeAttribute('menu');
         
                     output += '<div #{attributes}>'.interpolate({attributes: attrs(ele.attributes)});
-                    for (var h = 0; h < links.length; h++) {
-                        var link = links[h].cloneNode(true);
-        
-                        var src     = link.getAttribute('src'); link.removeAttribute('src');
-                        var target  = link.getAttribute('target'); link.removeAttribute('target');
-                        var text    = link.getAttribute('text'); link.removeAttribute('text');
-                        var before  = link.getAttribute('before') || linksSymb || ''; link.removeAttribute('before');
-                        var after   = link.getAttribute('after') || ''; link.removeAttribute('after');
-                        var domain  = link.getAttribute('domain') || ''; link.removeAttribute('domain');
-                        var args    = link.getAttribute('arguments') || linksArgs; link.removeAttribute('arguments');
-                        var menu    = link.getAttribute('menu') || linksMenu; link.removeAttribute('menu');
-        
-                        var out = src.match(/^(\w+:\/\/|mailto:)/);
-        
-                        var linkClass = link.getAttribute('class'); link.removeAttribute('class');
-                        var linkId    = link.getAttribute('id'); link.removeAttribute('id');
-        
-                        output += '<div class="#{0}" id="#{1}">#{2}'.interpolate(
-                                  [linkClass, linkId, before]);
-                        if (target || out) {
-                            src = !out ? 'data/'+src : src;
-                            target = target || '_blank';
-    
-                            output += '<a href="#{0}" target="#{1}" #{2}>#{3}</a>#{4}'.interpolate(
-                                      [src, target, attrs(link.attributes), text, after]);
-                        }
-                        else {
-                            var ltype = link.getAttribute('type') || linksType; link.removeAttribute('type');
-        
-                            if (domain == 'in' || src[0] == '#') {
-                                src = (src[0] == '#') ? src : '#' + src;
-                            }
-                            else {
-                                src   = '#page=' + src;
-                            }
+                    for (var h = 0; h < list.length; h++) {
+                        if (list[h].nodeType == 1) {
+                            if (list[h].nodeName == 'link') {
+                                var link = list[h].cloneNode(true);
+                
+                                var src     = link.getAttribute('src'); link.removeAttribute('src');
+                                var target  = link.getAttribute('target'); link.removeAttribute('target');
+                                var text    = link.getAttribute('text'); link.removeAttribute('text');
+                                var before  = link.getAttribute('before') || listBefore || ''; link.removeAttribute('before');
+                                var after   = link.getAttribute('after') || listAfter || ''; link.removeAttribute('after');
+                                var domain  = link.getAttribute('domain') || ''; link.removeAttribute('domain');
+                                var args    = link.getAttribute('arguments') || listArgs; link.removeAttribute('arguments');
+                                var menu    = link.getAttribute('menu') || listMenu; link.removeAttribute('menu');
+                
+                                var out = src.match(/^(\w+:\/\/|mailto:)/);
+                
+                                var linkClass = link.getAttribute('class'); link.removeAttribute('class');
+                                var linkId    = link.getAttribute('id'); link.removeAttribute('id');
+                
+                                output += '<div class="#{0}" id="#{1}">#{2}'.interpolate(
+                                          [linkClass, linkId, before]);
+                                if (target || out) {
+                                    src    = (!out) ? 'data/'+src : src;
+                                    target = target || '_blank';
+                                    text   = text || src;
+            
+                                    output += '<a href="#{0}" target="#{1}" #{2}>#{3}</a>#{4}'.interpolate(
+                                              [src, target, attrs(link.attributes), text, after]);
+                                }
+                                else {
+                                    var ltype = link.getAttribute('type') || listType; link.removeAttribute('type');
+                
+                                    if (domain == 'in' || src[0] == '#') {
+                                        src = (src[0] == '#') ? src : '#' + src;
+                                    }
+                                    else {
+                                        src = '#page=' + src;
+                                    }
 
-                            args  = args ? '&'+args.replace(/[ ,]+/g, '&amp;') : '';
-                            ltype = ltype ? '&type='+ltype : '';
-                            menu  = miniLOL.menu.exists && menu ? '&amp;menu='+menu : '';
-    
-                            output += '<a href="#{0}#{1}#{2}#{3}" #{4}>#{5}</a>#{6}'.interpolate(
-                                      [src, args, ltype, menu, attrs(link.attributes), text, after]);
+                                    text = text || src;
+        
+                                    args  = args ? '&'+args.replace(/[ ,]+/g, '&amp;') : '';
+                                    ltype = ltype ? '&type='+ltype : '';
+                                    menu  = miniLOL.menu.exists && menu ? '&amp;menu='+menu : '';
+            
+                                    output += '<a href="#{0}#{1}#{2}#{3}" #{4}>#{5}</a>#{6}'.interpolate(
+                                              [src, args, ltype, menu, attrs(link.attributes), text, after]);
+                                }
+                                output += '</div>';
+                            }
+                            else if (list[h].nodeName == 'list') {
+                                output += miniLOL.page.parse({ childNodes: [list[h]] })
+                            }
+                            else if (list[h].nodeName == 'nest') {
+                                var toParse = document.createElement('page');
+                                toParse.innerHTML = list[h].firstChil.nodeValue;
+
+                                output += "<div class='#{0}'>#{1}</div>".interpolate([
+                                    list[h].getAttribute('class'), miniLOL.page.parse(toParse)
+                                ]);
+                            }
                         }
-                        output += '</div>';
+                        else if (list[h].nodeType == 4) {
+                            output += "<div class='data'>#{0}#{1}#{2}</div>".interpolate([
+                                listBefore, list[h].nodeValue, listAfter
+                            ]);
+                        }
                     }
+
                     output += '</div>';
                     break;
         
