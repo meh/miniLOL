@@ -83,6 +83,10 @@ var miniLOL = {
             miniLOL.content.set("`#{module}` requires `#{require}`".interpolate(e));
         }
 
+        if (miniLOL.config["core"].init) {
+            eval(miniLOL.config["core"].init);
+        }
+
         if (!miniLOL._error) {
             miniLOL.go(/\/[#?].+/.test(location.href) ? location.href.replace(/^.*[#?]/, '#') : "#"+miniLOL.config['core'].homePage);
         }

@@ -1,5 +1,6 @@
-@ 0.8
-    + links tag replaced by list tag, will break everything
-    + nest element in list tags (pages.xml)
-    + nested list elements
-    = moved some code to miniLOL.page.parse function
+0.8
+  + links tag replaced by list tag, will break everything
+  + nest element in list tags (pages.xml)
+  + nested list elements
+  + init function after the initialization of everything, put it in the core config.xml as init.
+  = moved some code to miniLOL.page.parse function
