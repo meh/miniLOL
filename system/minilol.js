@@ -934,7 +934,7 @@ var miniLOL = {
 
     go: function (url) {
         var queries = parseQuery(url.sub(/#/, '?'))
-        var matches = /#([^=]+)(&|$)/.exec(url);
+        var matches = /#([^=]+?)(&|$)/.exec(url);
 
         if (matches) {
             queries.page = matches[1];
