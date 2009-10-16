@@ -39,7 +39,6 @@ var miniLOL = {
 
         miniLOL._error = false;
 
-        miniLOL.menu.exists  = true;
         miniLOL.menu.current = null;
 
         ['miniLOL.resource.load(miniLOL.resources.config, "resources/config.xml");',
@@ -59,6 +58,10 @@ var miniLOL = {
 
         if (miniLOL._error) {
             return false;
+        }
+
+        if (miniLOL.menu.exists && !miniLOL.config["core"].menuNode) {
+            miniLOL.menu.exists = false
         }
 
         new PeriodicalExecuter(miniLOL.refresh, miniLOL.config['core'].refreshEvery || 360)
@@ -476,7 +479,9 @@ var miniLOL = {
 
     menu: {
         set: function (data) {
-            $(miniLOL.config['core'].menuNode).innerHTML = data;
+            if (miniLOL.menu.exists) {
+                $(miniLOL.config['core'].menuNode).innerHTML = data;
+            }
         },
 
         get: function (name) {
