@@ -121,22 +121,22 @@ var miniLOL = {
 
             for (var func in wrapper) {
                 if (typeof wrapper[func] == 'function') {
-                    if (wrapper[func].parent == wrapper) {
+                    if (wrapper[func]._parent == wrapper) {
                         break;
                     }
 
-                    wrapper[func]        = wrapper[func].bind(wrapper)
-                    wrapper[func].parent = wrapper;
+                    wrapper[func]         = wrapper[func].bind(wrapper)
+                    wrapper[func]._parent = wrapper;
                 }
             }
 
             var args = $A(arguments).slice(1);
 
-            if (!wrapper.calls) {
-                wrapper.calls = new Array;
+            if (!wrapper._calls) {
+                wrapper._calls = new Array;
             }
 
-            wrapper.calls.push(args);
+            wrapper._calls.push(args);
             wrapper.load.apply(wrapper, args);
         },
 
@@ -148,8 +148,8 @@ var miniLOL = {
 
             wrapper.res = null;
 
-            var calls     = wrapper.calls;
-            wrapper.calls = new Array;
+            var calls      = wrapper._calls;
+            wrapper._calls = new Array;
 
             for (var i = 0; i < calls.length; i++) {
                 miniLOL.resource.load.apply(window, [wrapper].concat(calls[i]));
@@ -174,20 +174,31 @@ var miniLOL = {
             name: 'config',
             res: null,
 
+            parseValue: function (obj) {
+
+            },
+
             parse: function (obj) {
-                if (obj.firstChild.nodeType == 4 || obj.firstChild.nodeType == 3) {
-                    return obj.firstChild.nodeValue;
+                if (obj.nodeType == Node.CDATA_SECTION_NODE || obj.nodeType == Node.TEXT_NODE) {
+                    if (obj.nodeValue.match(/^[\s\n]*$/m)) {
+                        return null;
+                    }
+
+                    return obj.nodeValue;
                 }
 
-                var result = {};
-                for (var i = 0; i < obj.childNodes.length; i++) {
-                    var piece = this.parse(obj.childNodes[i]);
+                var result = new Object;
 
-                    if (typeof piece == 'string' && piece.replace(/^\s*$/, '')) {
-                        result[obj.childNodes[i].nodeName] = piece;
+                for (var i = 0; i < obj.childNodes.length; i++) {
+                    if (obj.childNodes[i].getElementsByTagName("*").length == 0) {
+                        result[obj.childNodes[i].nodeName] = this.parseValue(obj.childNodes[i]);
                     }
                     else {
-                        result[obj.childNodes[i].nodeName] = piece;
+                        var piece = this.parse(obj.childNodes[i]);
+
+                        if (piece) {
+                            result[obj.childNodes[i].nodeName] = piece;
+                        }
                     }
                 }
 
@@ -202,6 +213,8 @@ var miniLOL = {
                 miniLOL.config = this.res;
 
                 var paths = $A(arguments);
+
+                var This = this;
                 
                 for (var i = 0; i < paths.length; i++) {
                     new Ajax.Request(paths[i], {
@@ -209,7 +222,7 @@ var miniLOL = {
                         asynchronous: false,
         
                         onSuccess: function (http) {
-                            var error = miniLOL.resource.check(http.responseXML);
+                            var error = miniLOL.resource.check(_fix(http.responseXML));
                             if (error) {
                                 document.body.innerHTML = "Error while parsing config.xml<br/><br/>#{error}".interpolate({
                                     error: error.replace(/\n/g, '<br/>').replace(/ /g, '&nbsp;'),
@@ -220,17 +233,13 @@ var miniLOL = {
                             }
 
                             var domain = http.responseXML.documentElement.getAttribute('domain');
-                            var confs  = http.responseXML.documentElement.childNodes;
-    
-                            if (!miniLOL.config[domain]) {
-                                miniLOL.config[domain] = {};
-                            }
-    
-                            for (var i = 0; i < confs.length; i++) {
-                                if (confs[i].nodeType == 1) {
-                                    miniLOL.config[domain][confs[i].nodeName] = miniLOL.resources.config.parse(confs[i]);
-                                }
-                            }
+                            var config = miniLOL.config[domain] || new Object;
+
+                            miniLOL.config[domain]
+                                = Object.extend(config, This.parse(http.responseXML.documentElement));
+
+                            alert(Object.toJSON(miniLOL.config[domain]));
+                            sdfghj;
                         },
         
                         onFailure: function (http) {
@@ -541,7 +550,7 @@ var miniLOL = {
 
             for (var i = 0; i < contents.length; i++) {
                 switch (contents[i].nodeType) {
-                    case 1:
+                    case Node.ELEMENT_NODe:
                     if (contents[i].nodeName != 'list') {
                         continue;
                     }
@@ -557,7 +566,7 @@ var miniLOL = {
         
                     output += '<div #{attributes}>'.interpolate({attributes: attrs(ele.attributes)});
                     for (var h = 0; h < list.length; h++) {
-                        if (list[h].nodeType == 1) {
+                        if (list[h].nodeType == Node.ELEMENT_NODE) {
                             if (list[h].nodeName == 'link') {
                                 var link = list[h].cloneNode(true);
                 
@@ -618,7 +627,7 @@ var miniLOL = {
                                 ]);
                             }
                         }
-                        else if (list[h].nodeType == 4) {
+                        else if (list[h].nodeType == Node.CDATA_SECTION_NODE) {
                             output += "<div class='data'>#{0}#{1}#{2}</div>".interpolate([
                                 listBefore, list[h].nodeValue, listAfter
                             ]);
@@ -628,7 +637,7 @@ var miniLOL = {
                     output += '</div>';
                     break;
         
-                    case 4:
+                    case Node.CDATA_SECTION_NODE:
                     output += contents[i].nodeValue;
                     break;
                 }
@@ -939,10 +948,10 @@ var miniLOL = {
 
     go: function (url) {
         var queries = parseQuery(url.sub(/#/, '?'))
-        var matches = /#([^=]+?)(&|$)/.exec(url);
+        var matches = /#(([^=&]*)&|([^=&]*)$)/.exec(url);
 
         if (matches) {
-            queries.page = matches[1];
+            queries.page = matches[2];
             return miniLOL.page.get(queries.page, queries, url);
         }
         else if (queries.module) {
