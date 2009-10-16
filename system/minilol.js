@@ -253,9 +253,6 @@ var miniLOL = {
 
                             miniLOL.config[domain]
                                 = Object.extend(config, This.parse(http.responseXML.documentElement));
-
-                            alert(Object.toJSON(miniLOL.config[domain]));
-                            sdfghj;
                         },
         
                         onFailure: function (http) {
