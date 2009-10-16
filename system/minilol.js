@@ -174,31 +174,47 @@ var miniLOL = {
             name: 'config',
             res: null,
 
-            parseValue: function (obj) {
+            parse: function (obj, text) {
+                if (text) {
+                    var result = "";
 
-            },
+                    for (var i = 0; i < obj.childNodes.length; i++) {
+                        var text = obj.childNodes[i];
 
-            parse: function (obj) {
-                if (obj.nodeType == Node.CDATA_SECTION_NODE || obj.nodeType == Node.TEXT_NODE) {
-                    if (obj.nodeValue.match(/^[\s\n]*$/m)) {
-                        return null;
+                        if (text.nodeType != Node.CDATA_SECTION_NODE && text.nodeType != Node.TEXT_NODE) {
+                            continue;
+                        }
+
+                        text = text.nodeValue;
+
+                        if (text.match(/^[\s\n]*$/m)) {
+                            continue;
+                        }
+                        
+                        result += text;
                     }
 
-                    return obj.nodeValue;
+                    return result;
+                }
+
+                if (obj.nodeType != Node.ELEMENT_NODE) {
+                    return null;
                 }
 
                 var result = new Object;
 
                 for (var i = 0; i < obj.childNodes.length; i++) {
-                    if (obj.childNodes[i].getElementsByTagName("*").length == 0) {
-                        result[obj.childNodes[i].nodeName] = this.parseValue(obj.childNodes[i]);
+                    var node = obj.childNodes[i];
+
+                    if (node.nodeType != Node.ELEMENT_NODE) {
+                        continue;
+                    }
+
+                    if (node.getElementsByTagName("*").length == 0) {
+                        result[node.nodeName] = this.parse(node, true);
                     }
                     else {
-                        var piece = this.parse(obj.childNodes[i]);
-
-                        if (piece) {
-                            result[obj.childNodes[i].nodeName] = piece;
-                        }
+                        result[node.nodeName] = this.parse(node);
                     }
                 }
 
