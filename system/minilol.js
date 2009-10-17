@@ -947,7 +947,9 @@ var miniLOL = {
                 return 'win';
 
                 case 'add':
-                this.functions.push(arguments[1]);
+                if (this.functions.indexOf(arguments[1]) < 0) {
+                    this.functions.push(arguments[1]);
+                }
                 return true;
             }
 
