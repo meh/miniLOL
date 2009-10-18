@@ -564,7 +564,7 @@ var miniLOL = {
 
             for (var i = 0; i < contents.length; i++) {
                 switch (contents[i].nodeType) {
-                    case Node.ELEMENT_NODe:
+                    case Node.ELEMENT_NODE:
                     if (contents[i].nodeName != 'list') {
                         continue;
                     }
