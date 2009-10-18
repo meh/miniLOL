@@ -23,7 +23,7 @@ function attrs(attributes){var text="";for(var i=0;i<attributes.length;i++){text
  ****************************************************************************/
 
 var miniLOL = {
-    version: '0.8.1',
+    version: '0.8.2',
 
     initialize: function () {
         if (Prototype.Browser.IE) {
@@ -966,7 +966,7 @@ var miniLOL = {
         var matches = /#(([^=&]*)&|([^=&]*)$)/.exec(url);
 
         if (matches) {
-            queries.page = matches[2];
+            queries.page = matches[2] || matches[3];
             return miniLOL.page.get(queries.page, queries, url);
         }
         else if (queries.module) {
