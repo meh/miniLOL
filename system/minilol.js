@@ -294,7 +294,8 @@ var miniLOL = {
 
                         _fix(http.responseXML);
                         if (http.responseXML.getElementById('default')) {
-                            miniLOL.menus = http.responseXML;
+                            miniLOL.menus       = http.responseXML;
+                            miniLOL.menu.exists = true;
                         }
                         else {
                             miniLOL.menu.exists = false;
