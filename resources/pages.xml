@@ -36,6 +36,7 @@
     <!ELEMENT nest ANY>
     <!ATTLIST nest
         class   CDATA "nest"
+        style   CDATA "margin-left: 10px;"
     >
 ]>
 

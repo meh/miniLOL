@@ -558,7 +558,7 @@ var miniLOL = {
     },
 
     page: {
-        parse: function (page) {
+        parse: function (page, data) {
             var output   = "";
             var contents = page.childNodes;
 
@@ -570,13 +570,17 @@ var miniLOL = {
                     }
 
                     var ele = contents[i].cloneNode(false);
+
+                    if (!data) {
+                        data = [ele];
+                    }
                     
                     var list       = contents[i].childNodes;
-                    var listBefore = ele.getAttribute('before'); ele.removeAttribute('before');
-                    var listAfter  = ele.getAttribute('after'); ele.removeAttribute('after');
-                    var listArgs   = ele.getAttribute('arguments'); ele.removeAttribute('arguments');
-                    var listType   = ele.getAttribute('type'); ele.removeAttribute('type');
-                    var listMenu   = ele.getAttribute('menu') || miniLOL.menu.current; ele.removeAttribute('menu');
+                    var listBefore = ele.getAttribute('before') || data[0].getAttribute('before'); ele.removeAttribute('before');
+                    var listAfter  = ele.getAttribute('after') || data[0].getAttribute('after'); ele.removeAttribute('after');
+                    var listArgs   = ele.getAttribute('arguments') || data[0].getAttribute('arguments'); ele.removeAttribute('arguments');
+                    var listType   = ele.getAttribute('type') || data[0].getAttribute('type'); ele.removeAttribute('type');
+                    var listMenu   = ele.getAttribute('menu') || data[0].getAttribute('menu') || miniLOL.menu.current; ele.removeAttribute('menu');
         
                     output += '<div #{attributes}>'.interpolate({attributes: attrs(ele.attributes)});
                     for (var h = 0; h < list.length; h++) {
@@ -630,14 +634,13 @@ var miniLOL = {
                                 output += '</div>';
                             }
                             else if (list[h].nodeName == 'list') {
-                                output += miniLOL.page.parse({ childNodes: [list[h]] })
+                                output += miniLOL.page.parse({ childNodes: [list[h]] }, [contents[i]]);
                             }
                             else if (list[h].nodeName == 'nest') {
-                                var toParse = document.createElement('page');
-                                toParse.innerHTML = list[h].firstChil.nodeValue;
+                                toParse = list[h].cloneNode(true);
 
-                                output += "<div class='#{0}'>#{1}</div>".interpolate([
-                                    list[h].getAttribute('class'), miniLOL.page.parse(toParse)
+                                output += "<div class='#{0}' style='#{1}'>#{2}</div>".interpolate([
+                                    list[h].getAttribute('class'), list[h].getAttribute('style'), miniLOL.page.parse(toParse, [contents[i]])
                                 ]);
                             }
                         }
