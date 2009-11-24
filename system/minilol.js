@@ -23,7 +23,7 @@ function attrs(attributes){var text="";for(var i=0;i<attributes.length;i++){text
  ****************************************************************************/
 
 var miniLOL = {
-    version: '0.8.2',
+    version: '0.8.3',
 
     initialize: function () {
         if (Prototype.Browser.IE) {
