@@ -103,9 +103,16 @@ var miniLOL = {
     },
 
     content: {
-        set: function (data) {
+        set: function (data, evaluate) {
+            if (evaluate === undefined) {
+                evaluate = true;
+            }
+
             $(miniLOL.config['core'].contentNode).innerHTML = data;
-            data.evalScripts();
+
+            if (evaluate) {
+                data.evalScripts();
+            }
         },
 
         get: function () {
