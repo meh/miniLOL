@@ -2,6 +2,9 @@
 
 <!DOCTYPE modules [
     <!ELEMENT modules (module*)>
+    <!ATTLIST modules
+        path CDATA #REQUIRED
+    >
 
     <!ELEMENT module EMPTY>
     <!ATTLIST module
@@ -11,10 +14,10 @@
 
 <!--
 
-This file contains the used modules, the module name isn't required.
+This file contains the enabled modules.
 
 -->
 
-<modules>
+<modules path="modules">
     <module name="centrify"/>
 </modules>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!DOCTYPE theme [
+    <!ELEMENT theme (file*)>
+    <!ATTLIST theme
+        name   CDATA #REQUIRED
+        author CDATA #REQUIRED
+    >
+]>
+
+<theme name="original" author="meh.">
+    <file name="core"/>
+</theme>

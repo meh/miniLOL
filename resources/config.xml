@@ -20,4 +20,9 @@ things to be set and those configurations will go here.
     <menuNode>menu</menuNode>
 
     <loadingMessage><![CDATA[<center>Loading...</center>]]></loadingMessage>
+
+    <theme>
+        <path>themes</path>
+        <name>original</name>
+    </theme>
 </configuration>

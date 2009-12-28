@@ -3,7 +3,7 @@ var Prototype={Version:"1.6.0.3",Browser:{IE:!!(window.attachEvent&&navigator.us
 // unFocus.History, version2.0 (Beta 2) (2007/09/10) | Copyright: 2005-2007, Kevin Newman (http://www.unfocus.com/Projects/HistoryKeeper/) | License: http://www.gnu.org/licenses/lgpl.html
 eval(function(p,a,c,k,e,r){e=function(c){return(c<a?'':e(parseInt(c/a)))+((c=c%a)>35?String.fromCharCode(c+29):c.toString(36))};if(!''.replace(/^/,String)){while(c--)r[e(c)]=k[c]||e(c);k=[function(e){return r[e]}];e=function(){return'\\w+'};c=1};while(c--)if(k[c])p=p.replace(new RegExp('\\b'+e(c)+'\\b','g'),k[c]);return p}('8 o={};o.Q=2(){h.j={};B(8 i=0;i<18.l;i++){h.j[18[i]]=[]}};o.Q.W={12:2(a,b){B(8 i=0;i<h.j[a].l;i++)4(h.j[a][i]==b)7;h.j[a].1Z(b)},1V:2(a,b){B(8 i=0;i<h.j[a].l;i++){4(h.j[a][i]==b){h.j.1S(i,1);7}}},p:2(a,b){B(8 i=0;i<h.j[a].l;i++)h.j[a][i](b)}};o.14=(2(){2 C(){8 c=h,E=1E,v,3;8 d=2(){7 1p.1k.23(1)};3=d();8 e=2(a){z.1p.1k=a};2 1f(){8 a=d();4(3!=a){3=a;c.p("n",a)}}4(O)v=O(1f,E);2 r(a){4(!1c(a)){8 b;4(/1b/.19(A.17)&&!z.16)b=6.w(\'<a G="\'+a+\'">\'+a+"</a>");u b=6.w("a");b.t("G",a);Z(b.D){V="U";1D="1A";1d=s()+"R";1v=1t()+"R"}6.k.L(b,6.k.P)}}2 1c(a){4(6.24(a).l>0)7 q}4(1i 1h.1g=="22"){2 s(){7 1h.1g}}u 4(6.N&&6.N.M){2 s(){7 6.N.M}}u 4(6.k){2 s(){7 6.k.M}}21(20(s).1X().1e(/1W/g,"1U").1e(/Y/g,"X"));c.1T=2(){7 3};2 9(a){4(3!=a){r(a);3=a;e(a);c.p("n",a)}7 q}c.9=2(a){r(3);c.9=9;7 c.9(a)};4(/1a\\/\\d+/.19(A.1n)&&A.1n.1o(/1a\\/(\\d+)/)[1]<1R){8 f=H.l,x={},m,y=15;2 S(){m=6.w("1O");m.13="1N";m.1M="1L";6.k.L(m,6.k.P)}e=2(a){x[f]=a;m.1K="#"+d();m.1J()};d=2(){7 x[f]};x[f]=3;2 T(a){4(3!=a){r(a);3=a;f=H.l+1;y=q;e(a);c.p("n",a);y=15}7 q}c.9=2(a){r(3);S();c.9=T;7 c.9(a)};2 10(){4(!y){8 a=H.l;4(a!=f){f=a;8 b=d();4(3!=b){3=b;c.p("n",b)}}}};1I(v);v=O(10,E)}u 4(1i 1H!="1G"&&z.1F&&!z.16&&A.17.1o(/1b (\\d\\.\\d)/)[1]>=5.5){8 g,F;2 11(){8 a="1C";g=6.w("1B");g.t("G",a);g.t("13",a);g.t("1P",\'1Q:;\');g.D.V="U";g.D.1d="-1z";6.k.L(g,6.k.P);F=1y[a];J(3,q)}2 J(a){Z(F.6){1x("1w/I");1u("<I><1q></1q><k 1s",\'1Y="1r.o.14.K(\\\'\'+a+\'\\\');">\',a+"</k></I>");25()}}2 1m(a){3=a;c.p("n",a)}c.K=2(){c.K=1m};2 1l(a){4(3!=a){3=a;J(a)}7 q};c.9=2(a){11();c.9=1l;7 c.9(a)};c.12("n",2(a){e(a)})}}C.W=1j o.Q("n");7 1j C()})();',62,130,'||function|_currentHash|if||document|return|var|addHistory||||||||this||_listeners|body|length|_form|historyChange|unFocus|notifyListeners|true|_createAnchor|getScrollY|setAttribute|else|_intervalID|createElement|_historyStates|_recentlyAdded|window|navigator|for|Keeper|style|_pollInterval|_historyFrameRef|name|history|html|_createHistoryHTML|_updateFromHistory|insertBefore|scrollTop|documentElement|setInterval|firstChild|EventManager|px|_createSafariSetHashForm|addHistorySafari|absolute|position|prototype|||with|_watchHistoryLength|_createHistoryFrame|addEventListener|id|History|false|opera|userAgent|arguments|test|WebKit|MSIE|_checkAnchorExists|top|replace|_watchHash|pageYOffset|self|typeof|new|hash|addHistoryIE|updateFromHistory|appVersion|match|location|head|parent|onl|getScrollX|write|left|text|open|frames|900px|block|iframe|unFocusHistoryFrame|display|200|print|undefined|ActiveXObject|clearInterval|submit|action|get|method|unFocusHistoryForm|form|src|javascript|420|splice|getCurrent|Left|removeEventListener|Top|toString|oad|push|String|eval|number|substring|getElementsByName|close'.split('|'),0,{}));unFocus.History.addEventListener('historyChange', function(historyHash){miniLOL.go('#'+(historyHash?historyHash:miniLOL.config['core'].homePage)); $(miniLOL.config['core'].contentNode).scrollTop = 0;})
 // Workaround functions 
-function attrs(attributes){var text="";for(var i=0;i<attributes.length;i++){text+=attributes.item(i).nodeName+'="'+attributes.item(i).nodeValue+'" ';}return text;};function _$(id){var e=this.getElementsByTagName('*');for(var i=0;i<e.length;i++){if(e[i].getAttribute('id')==id)return e[i];}}function _fix(obj){if(!Prototype.Browser.Gecko&&!Prototype.Browser.Opera){obj.getElementById=_$;}return obj}function include(type,filename){var head=document.getElementsByTagName('head')[0];switch(type){case "js":var script=document.createElement('script');script.setAttribute('src', filename);script.setAttribute('type','text/javascript');head.appendChild(script);break;case "css":var link=document.createElement('link');link.setAttribute('rel','stylesheet');link.setAttribute('href',filename);link.setAttribute('type','text/css');head.appendChild(link);break;}};function _clone(f){f=f.toString();return new Function(f.substring(f.indexOf("{")+1,f.lastIndexOf("}")));};function parseQuery(url){var result=new Object;var matches=url.match(/\?(.*)$/);if(!matches){return result;}var blocks=matches[1].split(/&/);for(var i=0;i<blocks.length;i++){var parts=blocks[i].split(/=/);if(parts[1]){result[parts[0]]=parts[1];}else{result[parts[0]]=true;}}return result;};function Import(path,context,exception){context=context||window;var result;var error;new Ajax.Request(path,{method:'get',asynchronous:false,evalJS:false,onSuccess:function(http){try{eval.call(context,http.responseText);result=context;}catch(e){if(exception){error=e;error.fileName=path;error.lineNumber-=5;}result=null;}},onFailure:function(){result=null;}});if(error){throw error;}return result;};function objectToQuery(obj){var result='';for(var name in obj){result+="#{name}=#{value}&".interpolate({name:name,value:obj[name]});}return result.substr(0,result.length-1);}
+function attrs(attributes){var text="";for(var i=0;i<attributes.length;i++){text+=attributes.item(i).nodeName+'="'+attributes.item(i).nodeValue+'" ';}return text;};function _$(id){var e=this.getElementsByTagName('*');for(var i=0;i<e.length;i++){if(e[i].getAttribute('id')==id)return e[i];}}function _fix(obj){if(!Prototype.Browser.Gecko&&!Prototype.Browser.Opera){obj.getElementById=_$;}return obj}function _clone(f){f=f.toString();return new Function(f.substring(f.indexOf("{")+1,f.lastIndexOf("}")));};function parseQuery(url){var result=new Object;var matches=url.match(/\?(.*)$/);if(!matches){return result;}var blocks=matches[1].split(/&/);for(var i=0;i<blocks.length;i++){var parts=blocks[i].split(/=/);if(parts[1]){result[parts[0]]=parts[1];}else{result[parts[0]]=true;}}return result;};function Import(path,context,exception){context=context||window;var result;var error;new Ajax.Request(path,{method:'get',asynchronous:false,evalJS:false,onSuccess:function(http){try{eval.call(context,http.responseText);result=context;}catch(e){if(exception){error=e;error.fileName=path;error.lineNumber-=5;}result=null;}},onFailure:function(){result=null;}});if(error){throw error;}return result;};function objectToQuery(obj){var result='';for(var name in obj){result+="#{name}=#{value}&".interpolate({name:name,value:obj[name]});}return result.substr(0,result.length-1);}
 
 /****************************************************************************
  * Copyleft meh. [http://meh.doesntexist.org | meh.ffff@gmail.com]          *
@@ -23,14 +23,14 @@ function attrs(attributes){var text="";for(var i=0;i<attributes.length;i++){text
  ****************************************************************************/
 
 var miniLOL = {
-    version: '0.8.4',
+    version: '0.9',
 
     initialize: function () {
         if (Prototype.Browser.IE) {
             document.body.innerHTML
                 = '<center>miniLOL is a Javascript/XML based CMS thus, being in the XXI century, '+
                   'I pretend those two standards to be respected.<br/>'+
-                  'Get a real browser, get <a href="http://getfirefox.com">Firefox</a>';
+                  'Get a real browser, get <a href="http://getfirefox.com">Firefox</a>.';
 
             throw new Error("You fail at computar.");
         }
@@ -47,7 +47,8 @@ var miniLOL = {
          'miniLOL.resource.load(miniLOL.resources.menus, "resources/menus.xml");',
          'miniLOL.resource.load(miniLOL.resources.pages, "resources/pages.xml");',
          'miniLOL.resource.load(miniLOL.resources.functions, "resources/functions.xml");',
-         'miniLOL.resource.load(miniLOL.resources.template, "resources/template.html");',
+         'miniLOL.theme.path = miniLOL.config["core"].theme.path;',
+         'miniLOL._error = !miniLOL.theme.load(miniLOL.config["core"].theme.name);',
         ].each(function(cmd) {
             try { eval(cmd); } catch (e) { miniLOL._error = true; }
 
@@ -423,28 +424,6 @@ var miniLOL = {
             }
         },
     
-        template: {
-            name: 'template',
-
-            load: function (path) {
-                new Ajax.Request(path, {
-                    method: 'get',
-                    asynchronous: false,
-        
-                    onSuccess: function (http) {
-                        document.body.innerHTML = miniLOL.template = http.responseText;
-                    },
-                    
-                    onFailure: function (http) {
-                        document.body.innerHTML = "Error while loading template.html (#{error})".interpolate({
-                            error: http.status,
-                        });
-                        miniLOL._error = true;
-                    }
-                });
-            }
-        },
-    
         modules: {
             name: 'modules',
             res: {
@@ -477,6 +456,8 @@ var miniLOL = {
                             return;
                         }
 
+                        miniLOL.module.path = http.responseXML.documentElement.getAttribute("path");
+
                         var modules = http.responseXML.documentElement.getElementsByTagName('module');
                         for (var i = 0; i < modules.length; i++) {
                             if (output) {
@@ -505,6 +486,97 @@ var miniLOL = {
                     }
                 });
             }
+        }
+    },
+
+    theme: {
+        file: {
+            list: {},
+
+            load: function (name, path, overload) {
+                path = path || "#{0}/#{1}".interpolate([miniLOL.theme.path, miniLOL.theme.name]);
+
+                if (miniLOL.theme.file.exists(name) && overload) {
+                    miniLOL.theme.file.unload(miniLOL.theme.file.list[name]);
+                }
+
+                var link = document.createElement('link');
+                link.setAttribute('rel', 'stylesheet');
+                link.setAttribute('href', "#{0}/#{1}.css".interpolate([path, name]));
+                link.setAttribute('type','text/css');
+
+                document.getElementsByTagName('head')[0].appendChild(link);
+
+                miniLOL.theme.file.list[name] = link;
+            },
+
+            unload: function (name) {
+                miniLOL.theme.file.list[name].parentNode.removeChild(miniLOL.theme.list[name]);
+                delete miniLOL.theme.file.list[name];
+            },
+
+            exists: function (name) {
+                return Boolean(miniLOL.theme.file.list[name]);
+            }
+        },
+
+        load: function (name) {
+            var result         = true;
+            miniLOL.theme.name = name;
+
+            // get the informations about the theme and parse the needed data
+            new Ajax.Request("#{0}/#{1}/theme.xml".interpolate([miniLOL.theme.path, name]), {
+                method: 'get',
+                asynchronous: false,
+                
+                onSuccess: function (http) {
+                    var info = miniLOL.theme.informations = {};
+                    var doc  = _fix(http.responseXML);
+
+                    info.name   = doc.documentElement.getAttribute("name");
+                    info.author = doc.documentElement.getAttribute("author");
+
+                    info.files = new Array;
+                    var  files = doc.getElementsByTagName("file");
+                    for (var i = 0; i < files.length; i++) {
+                        info.files.push(files[i].getAttribute("name"));
+                    }
+                },
+
+                onFailure: function () {
+                    result = false;
+                }
+            });
+
+            if (result == false) {
+                document.body.innerHTML = "Error while loading theme's informations.";
+                return false;
+            }
+
+            // get the html layout and set it
+            new Ajax.Request("#{0}/#{1}/template.html".interpolate([miniLOL.theme.path, name]), {
+                method: 'get',
+                asynchronous: false,
+                
+                onSuccess: function (http) {
+                    document.body.innerHTML = miniLOL.template = http.responseText;
+                },
+
+                onFailure: function () {
+                    result = false;
+                }
+            });
+
+            if (result == false) {
+                document.body.innerHTML = "Error while loading the layout.";
+                return false;
+            }
+
+            for (var i = 0; i < miniLOL.theme.informations.files.length; i++) {
+                miniLOL.theme.file.load(miniLOL.theme.informations.files[i], false, true);
+            }
+
+            return true;
         }
     },
 
@@ -771,7 +843,7 @@ var miniLOL = {
     module: {
         create: function (name, obj) {
             obj.name = name;
-            obj.root = 'modules/'+name;
+            obj.root = "#{0}/#{1}".interpolate([miniLOL.module.path, name]);
 
             if (!obj.type) {
                 obj.type = 'active';
@@ -784,7 +856,7 @@ var miniLOL = {
                     }
                 }
                 catch (e) {
-                    e.fileName = "modules/#{name}/main.js".interpolate({ name: name });
+                    e.fileName = "#{0}/#{1}/main.js".interpolate([miniLOL.module.path, name]);
                     throw e;
                 }
             }
@@ -836,7 +908,7 @@ var miniLOL = {
                 result = miniLOL.modules[name].execute.apply(miniLOL.modules[name], vars);
             }
             catch (e) {
-                e.fileName = "modules/" + name + "/main.js";
+                e.fileName = "#{0}/#{1}/main.js".interpolate([miniLOL.module.path, name]);
 
                 miniLOL.content.set(
                     "An error occurred while executing the module `#{name}`<br/><br/>#{file} @ #{line}:<br/>#{error}".interpolate({
@@ -859,7 +931,7 @@ var miniLOL = {
 
         load: function (name) {
             try {
-                Import("modules/" + name + "/main.js", window, true);
+                Import("#{0}/#{1}/main.js".interpolate([miniLOL.module.path, name]), window, true);
 
                 if (!miniLOL.modules[name]) {
                     throw new Error("Something went wrong while loading the module `#{name}`.".interpolate({
@@ -974,10 +1046,10 @@ var miniLOL = {
 
     go: function (url) {
         var queries = parseQuery(url.sub(/#/, '?'))
-        var matches = /#(([^=&]*)&|([^=&]*)$)/.exec(url);
+        var matches = /#([^=]+?)(&|$)/.exec(url);
 
         if (matches) {
-            queries.page = matches[2] || matches[3];
+            queries.page = matches[1];
             return miniLOL.page.get(queries.page, queries, url);
         }
         else if (queries.module) {
