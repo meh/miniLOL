@@ -19,5 +19,5 @@ This file contains the enabled modules.
 -->
 
 <modules path="modules">
-    <module name="centrify"/>
+    <!-- <module name="centrify"/> -->
 </modules>

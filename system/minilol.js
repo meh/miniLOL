@@ -490,14 +490,19 @@ var miniLOL = {
     },
 
     theme: {
-        file: {
+        style: {
             list: {},
 
             load: function (name, path, overload) {
                 path = path || "#{0}/#{1}".interpolate([miniLOL.theme.path, miniLOL.theme.name]);
 
-                if (miniLOL.theme.file.exists(name) && overload) {
-                    miniLOL.theme.file.unload(miniLOL.theme.file.list[name]);
+                if (miniLOL.theme.file.exists(name)) {
+                    if (overload) {
+                        miniLOL.theme.file.unload(miniLOL.theme.file.list[name]);
+                    }
+                    else {
+                        return true;
+                    }
                 }
 
                 var link = document.createElement('link');
@@ -520,6 +525,29 @@ var miniLOL = {
             }
         },
 
+        template: {
+            load: function (name, path) {
+                var result;
+
+                path = path || "#{0}/#{1}".interpolate([miniLOL.theme.path, miniLOL.theme.name]);
+
+                new Ajax.Request("#{0}/#{1}.html".interpolate([path, name]), {
+                    method: 'get',
+                    asynchronous: false,
+                
+                    onSuccess: function (http) {
+                        result = http.responseText;
+                    },
+                });
+
+                return result;
+            },
+
+            exists: function (name) {
+                return miniLOL.theme.informations.templates.indexOf(name) >= 0;
+            }
+        },
+
         load: function (name) {
             var result         = true;
             miniLOL.theme.name = name;
@@ -536,10 +564,16 @@ var miniLOL = {
                     info.name   = doc.documentElement.getAttribute("name");
                     info.author = doc.documentElement.getAttribute("author");
 
-                    info.files = new Array;
-                    var  files = doc.getElementsByTagName("file");
-                    for (var i = 0; i < files.length; i++) {
-                        info.files.push(files[i].getAttribute("name"));
+                    info.styles = new Array;
+                    var  styles = doc.getElementsByTagName("style");
+                    for (var i = 0; i < styles.length; i++) {
+                        info.styles.push(styles[i].getAttribute("name"));
+                    }
+
+                    info.templates = new Array;
+                    var  templates = doc.getElementsByTagName("template");
+                    for (var i = 0; i < templates.length; i++) {
+                        info.templates.push(templates[i].getAttribute("name"));
                     }
                 },
 
@@ -572,8 +606,8 @@ var miniLOL = {
                 return false;
             }
 
-            for (var i = 0; i < miniLOL.theme.informations.files.length; i++) {
-                miniLOL.theme.file.load(miniLOL.theme.informations.files[i], false, true);
+            for (var i = 0; i < miniLOL.theme.informations.styles.length; i++) {
+                miniLOL.theme.style.load(miniLOL.theme.informations.styles[i], false, true);
             }
 
             return true;

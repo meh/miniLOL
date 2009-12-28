@@ -23,6 +23,6 @@ things to be set and those configurations will go here.
 
     <theme>
         <path>themes</path>
-        <name>original</name>
+        <name>thinlight</name>
     </theme>
 </configuration>
