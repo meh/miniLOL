@@ -27,10 +27,11 @@ var miniLOL = {
 
     initialize: function () {
         if (Prototype.Browser.IE) {
-            document.body.innerHTML
-                = '<center>miniLOL is a Javascript/XML based CMS thus, being in the XXI century, '+
-                  'I pretend those two standards to be respected.<br/>'+
-                  'Get a real browser, get <a href="http://getfirefox.com">Firefox</a>.';
+            miniLOL.error(
+                '<center>miniLOL is a Javascript/XML based CMS thus, being in the XXI century, '+
+                'I pretend those two standards to be respected.<br/>'+
+                'Get a real browser, get <a href="http://getfirefox.com">Firefox</a>.'
+            );
 
             throw new Error("You fail at computar.");
         }
@@ -95,12 +96,10 @@ var miniLOL = {
             miniLOL.go(/\/[#?].+/.test(location.href) ? location.href.replace(/^.*[#?]/, '#') : "#"+miniLOL.config['core'].homePage);
         }
     },
-    
-    refresh: function () {
-        miniLOL.resource.reload(miniLOL.resources.config)
-        miniLOL.resource.reload(miniLOL.resources.menus);
-        miniLOL.resource.reload(miniLOL.resources.pages);
-        miniLOL.resource.reload(miniLOL.resources.functions);
+
+    error: function (text) {
+        document.body.innerHTML = text;
+        miniLOL._error          = true;
     },
 
     content: {
@@ -178,6 +177,13 @@ var miniLOL = {
         },
     },
 
+    refresh: function () {
+        miniLOL.resource.reload(miniLOL.resources.config)
+        miniLOL.resource.reload(miniLOL.resources.menus);
+        miniLOL.resource.reload(miniLOL.resources.pages);
+        miniLOL.resource.reload(miniLOL.resources.functions);
+    },
+
     resources: {
         config: {
             name: 'config',
@@ -249,11 +255,9 @@ var miniLOL = {
                         onSuccess: function (http) {
                             var error = miniLOL.resource.check(_fix(http.responseXML));
                             if (error) {
-                                document.body.innerHTML = "Error while parsing config.xml<br/><br/>#{error}".interpolate({
+                                miniLOL.error("Error while parsing config.xml<br/><br/>#{error}".interpolate({
                                     error: error.replace(/\n/g, '<br/>').replace(/ /g, '&nbsp;'),
-                                });
-    
-                                miniLOL._error = true;
+                                }));
                                 return;
                             }
 
@@ -265,10 +269,9 @@ var miniLOL = {
                         },
         
                         onFailure: function (http) {
-                            document.body.innerHTML = "Error while loading config.xml (#{error})".interpolate({
+                            miniLOL.error("Error while loading config.xml (#{error})".interpolate({
                                 error: http.status,
-                            });
-                            miniLOL._error = true;
+                            }));
                         }
                     });
                 }
@@ -293,11 +296,9 @@ var miniLOL = {
                     onSuccess: function (http) {
                         var error = miniLOL.resource.check(http.responseXML);
                         if (error) {
-                            document.body.innerHTML = "Error while parsing menus.xml<br/><br/>#{error}".interpolate({
+                            miniLOL.error("Error while parsing menus.xml<br/><br/>#{error}".interpolate({
                                 error: error.replace(/\n/g, '<br/>').replace(/ /g, '&nbsp;'),
-                            });
-
-                            miniLOL._error = true;
+                            }));
                             return;
                         }
 
@@ -339,11 +340,9 @@ var miniLOL = {
                     onSuccess: function (http) {
                         var error = miniLOL.resource.check(http.responseXML);
                         if (error) {
-                            document.body.innerHTML = "Error while parsing pages.xml<br/><br/>#{error}".interpolate({
+                            miniLOL.error("Error while parsing pages.xml<br/><br/>#{error}".interpolate({
                                 error: error.replace(/\n/g, '<br/>').replace(/ /g, '&nbsp;'),
-                            });
-
-                            miniLOL._error = true;
+                            }));
                             return;
                         }
 
@@ -357,10 +356,9 @@ var miniLOL = {
                     },
     
                     onFailure: function (http) {
-                        document.body.innerHTML = "Error while loading pages.xml (#{error})".interpolate({
+                        miniLOL.error("Error while loading pages.xml (#{error})".interpolate({
                             error: http.status,
-                        });
-                        miniLOL._error = true;
+                        }));
                     }
                 });
             }
@@ -383,11 +381,9 @@ var miniLOL = {
                     onSuccess: function (http) {
                         var error = miniLOL.resource.check(http.responseXML);
                         if (error) {
-                            document.body.innerHTML = "Error while parsing functions.xml<br/><br/>#{error}".interpolate({
+                            miniLOL.error("Error while parsing functions.xml<br/><br/>#{error}".interpolate({
                                 error: error.replace(/\n/g, '<br/>').replace(/ /g, '&nbsp;'),
-                            });
-
-                            miniLOL._error = true;
+                            }));
                             return;
                         }
 
@@ -401,24 +397,22 @@ var miniLOL = {
                                     }));
                             }
                             catch (e) {
-                                document.body.innerHTML
-                                    = "Error while creating `#{name}` wrapper from #{path}:<br/><br/>#{error}".interpolate({
+                                miniLOL.error(
+                                    "Error while creating `#{name}` wrapper from #{path}:<br/><br/>#{error}".interpolate({
                                         name: functions[i].getAttribute("name"),
                                         path: path,
                                         error: e.toString(),
-                                    });
-
-                                miniLOL._error = true;
+                                    })
+                                );
                                 return;
                             }
                         }
                     },
         
                     onFailure: function (http) {
-                        document.body.innerHTML = "Error while loading functions.xml (#{error})".interpolate({
+                        miniLOL.error("Error while loading functions.xml (#{error})".interpolate({
                             error: http.status,
-                        });
-                        miniLOL._error = true;
+                        }));
                     }
                 });
             }
@@ -496,9 +490,9 @@ var miniLOL = {
             load: function (name, path, overload) {
                 path = path || "#{0}/#{1}".interpolate([miniLOL.theme.path, miniLOL.theme.name]);
 
-                if (miniLOL.theme.file.exists(name)) {
+                if (miniLOL.theme.style.exists(name)) {
                     if (overload) {
-                        miniLOL.theme.file.unload(miniLOL.theme.file.list[name]);
+                        miniLOL.theme.style.unload(miniLOL.theme.style.list[name]);
                     }
                     else {
                         return true;
@@ -512,16 +506,16 @@ var miniLOL = {
 
                 document.getElementsByTagName('head')[0].appendChild(link);
 
-                miniLOL.theme.file.list[name] = link;
+                miniLOL.theme.style.list[name] = link;
             },
 
             unload: function (name) {
-                miniLOL.theme.file.list[name].parentNode.removeChild(miniLOL.theme.list[name]);
-                delete miniLOL.theme.file.list[name];
+                miniLOL.theme.style.list[name].parentNode.removeChild(miniLOL.theme.list[name]);
+                delete miniLOL.theme.style.list[name];
             },
 
             exists: function (name) {
-                return Boolean(miniLOL.theme.file.list[name]);
+                return Boolean(miniLOL.theme.style.list[name]);
             }
         },
 
@@ -531,13 +525,17 @@ var miniLOL = {
 
                 path = path || "#{0}/#{1}".interpolate([miniLOL.theme.path, miniLOL.theme.name]);
 
-                new Ajax.Request("#{0}/#{1}.html".interpolate([path, name]), {
+                new Ajax.Request("#{0}/#{1}.xml".interpolate([path, name]), {
                     method: 'get',
                     asynchronous: false,
                 
                     onSuccess: function (http) {
-                        result = http.responseText;
+                        result = _fix(http.responseXML);
                     },
+
+                    onFailure: function () {
+                        result = false;
+                    }
                 });
 
                 return result;
@@ -583,7 +581,7 @@ var miniLOL = {
             });
 
             if (result == false) {
-                document.body.innerHTML = "Error while loading theme's informations.";
+                miniLOL.error("Error while loading theme's informations.");
                 return false;
             }
 
@@ -602,7 +600,7 @@ var miniLOL = {
             });
 
             if (result == false) {
-                document.body.innerHTML = "Error while loading the layout.";
+                miniLOL.error("Error while loading the layout.");
                 return false;
             }
 
@@ -627,9 +625,9 @@ var miniLOL = {
                 var menu = miniLOL.menus.getElementById(name);
 
                 if (!menu) {
-                    document.body.innerHTML = "The menu `#{name}` doesn't exist.".interpolate({
+                    miniLOL.error("The menu `#{name}` doesn't exist.".interpolate({
                         name: name,
-                    });
+                    }));
                 }
 
                 return menu.firstChild.nodeValue;
