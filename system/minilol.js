@@ -36,7 +36,7 @@ var miniLOL = {
             throw new Error("You fail at computar.");
         }
 
-        miniLOL.event.add('window.onGo');
+        miniLOL.event.add('window.ongo');
 
         miniLOL._error = false;
 
@@ -48,8 +48,8 @@ var miniLOL = {
          'miniLOL.resource.load(miniLOL.resources.menus, "resources/menus.xml");',
          'miniLOL.resource.load(miniLOL.resources.pages, "resources/pages.xml");',
          'miniLOL.resource.load(miniLOL.resources.functions, "resources/functions.xml");',
-         'miniLOL.theme.path = miniLOL.config["core"].theme.path;',
-         'miniLOL._error = !miniLOL.theme.load(miniLOL.config["core"].theme.name);',
+         'var path = miniLOL.config["core"].theme.match(/^(.+?):(.*)$/); if (path) { miniLOL.theme.path = path[1]; miniLOL.config["core"].theme = path[2]; } else { miniLOL.theme.path = "themes"; }',
+         'miniLOL._error = !miniLOL.theme.load(miniLOL.config["core"].theme);',
         ].each(function(cmd) {
             try { eval(cmd); } catch (e) { miniLOL._error = true; }
 
@@ -874,7 +874,7 @@ var miniLOL = {
                     miniLOL.content.set(miniLOL.pages.cache[name]);
                 }
 
-                window.onGo(url);
+                window.ongo(url);
                 return true;
             }
 
@@ -894,7 +894,7 @@ var miniLOL = {
             }
 
             miniLOL.content.set(output);
-            window.onGo(url);
+            window.ongo(url);
 
             return true;
         },
@@ -913,7 +913,7 @@ var miniLOL = {
                         miniLOL.content.set(http.responseText);
                     }
 
-                    window.onGo(url);
+                    window.ongo(url);
                 },
         
                 onFailure: function (http) {
@@ -960,7 +960,7 @@ var miniLOL = {
             miniLOL.modules[name] = obj;
 
             if (obj.onGo) {
-                window.onGo('add', obj.onGo);
+                window.ongo('add', obj.onGo);
             }
         },
 
@@ -1009,7 +1009,7 @@ var miniLOL = {
             }
 
             if (url) {
-                window.onGo(url);
+                window.ongo(url);
             }
 
             return result;

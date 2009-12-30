@@ -61,6 +61,15 @@ a {
     padding: 4px;
 }
 
+.link .url {
+    float: left;
+}
+
+.link .description {
+    margin-left: 7px;
+    float: left;
+}
+
 .project > div {
     border: 1px solid #DDE;
     margin: 4px 0px;
@@ -90,4 +99,10 @@ a {
     -webkit-border-top-right-radius: 5px;
     -webkit-border-bottom-left-radius: 5px;
     -webkit-border-bottom-right-radius: 5px;
+}
+
+.nigguz {
+    background: black;
+    color: white;
+    font-weight: bold;
 }

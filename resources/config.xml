@@ -21,8 +21,5 @@ things to be set and those configurations will go here.
 
     <loadingMessage><![CDATA[<center>Loading...</center>]]></loadingMessage>
 
-    <theme>
-        <path>themes</path>
-        <name>thinlight</name>
-    </theme>
+    <theme>original</theme>
 </configuration>
