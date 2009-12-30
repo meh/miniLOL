@@ -9,14 +9,11 @@ miniLOL.module.create("wordfilter", {
     },
 
     onLoad: function () {
-        console.log(this);
         miniLOL.event.add('window.ongo', this.execute);
     },
 
     execute: function () {
         var content = miniLOL.content.get();
-
-        console.log(this);
 
         for (var word in this.words) {
             content = content.replace(eval(word), this.words[word]);
