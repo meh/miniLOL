@@ -8,6 +8,8 @@
     >
 ]>
 
-<theme name="original" author="meh.">
-    <file name="core"/>
+<theme name="original" author="meh. &amp; yeat">
+    <styles>
+        <style name="core"/>
+    </styles>
 </theme>

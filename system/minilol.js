@@ -516,7 +516,7 @@ var miniLOL = {
 
             exists: function (name) {
                 return Boolean(miniLOL.theme.style.list[name]);
-            }
+            },
         },
 
         template: {
@@ -543,7 +543,7 @@ var miniLOL = {
 
             exists: function (name) {
                 return miniLOL.theme.informations.templates.indexOf(name) >= 0;
-            }
+            },
         },
 
         load: function (name) {
@@ -559,8 +559,8 @@ var miniLOL = {
                     var info = miniLOL.theme.informations = {};
                     var doc  = _fix(http.responseXML);
 
-                    info.name   = doc.documentElement.getAttribute("name");
-                    info.author = doc.documentElement.getAttribute("author");
+                    info.name   = doc.documentElement.getAttribute("name")   || "Unknown";
+                    info.author = doc.documentElement.getAttribute("author") || "Anonymous";
 
                     info.styles = new Array;
                     var  styles = doc.getElementsByTagName("style");
@@ -572,6 +572,47 @@ var miniLOL = {
                     var  templates = doc.getElementsByTagName("template");
                     for (var i = 0; i < templates.length; i++) {
                         info.templates.push(templates[i].getAttribute("name"));
+                    }
+
+                    miniLOL.theme.template.list = {
+                        global: "<div #{attributes}>#{data}</div>",
+
+                        before: "#{data}",
+                        after:  "#{data}",
+
+                        link: "<div class='#{class}' id='#{id}'>#{before}<a href='#{url}' target='#{target}' #{attributes}>#{text}</a>#{after}</div>",
+                        nest: "<div class='#{class}' style='#{1}'>#{data}</div>",
+                        data: "<div class='data'>#{before}#{data}#{after}</div>",
+                    };
+
+                    var list = doc.getElementsByTagName("list");
+                    if (list.length) {
+                        list = list[0];
+
+                        var current;
+                        if ((current = list.getElementsByTagName("global")).length) {
+                            miniLOL.theme.template.list.global = current[0].firstChild.nodeValue;
+                        }
+
+                        if ((current = list.getElementsByTagName("before")).length) {
+                            miniLOL.theme.template.list.before = current[0].firstChild.nodeValue;
+                        }
+
+                        if ((current = list.getElementsByTagName("after")).length) {
+                            miniLOL.theme.template.list.after = current[0].firstChild.nodeValue;
+                        }
+
+                        if ((current = list.getElementsByTagName("link")).length) {
+                            miniLOL.theme.template.list.link = current[0].firstChild.nodeValue;
+                        }
+
+                        if ((current = list.getElementsByTagName("nest")).length) {
+                            miniLOL.theme.template.list.nest = current[0].firstChild.nodeValue;
+                        }
+
+                        if ((current = list.getElementsByTagName("data")).length) {
+                            miniLOL.theme.template.list.data = current[0].firstChild.nodeValue;
+                        }
                     }
                 },
 
@@ -694,7 +735,7 @@ var miniLOL = {
                     var listType   = ele.getAttribute('type') || data[0].getAttribute('type'); ele.removeAttribute('type');
                     var listMenu   = ele.getAttribute('menu') || data[0].getAttribute('menu') || miniLOL.menu.current; ele.removeAttribute('menu');
         
-                    output += '<div #{attributes}>'.interpolate({attributes: attrs(ele.attributes)});
+                    var listOutput = "";
                     for (var h = 0; h < list.length; h++) {
                         if (list[h].nodeType == Node.ELEMENT_NODE) {
                             if (list[h].nodeName == 'link') {
@@ -713,16 +754,11 @@ var miniLOL = {
                 
                                 var linkClass = link.getAttribute('class'); link.removeAttribute('class');
                                 var linkId    = link.getAttribute('id'); link.removeAttribute('id');
-                
-                                output += '<div class="#{0}" id="#{1}">#{2}'.interpolate(
-                                          [linkClass, linkId, before]);
+
                                 if (target || out) {
                                     src    = (!out) ? 'data/'+src : src;
                                     target = target || '_blank';
                                     text   = text || src;
-            
-                                    output += '<a href="#{0}" target="#{1}" #{2}>#{3}</a>#{4}'.interpolate(
-                                              [src, target, attrs(link.attributes), text, after]);
                                 }
                                 else {
                                     var ltype = link.getAttribute('type') || listType; link.removeAttribute('type');
@@ -736,34 +772,52 @@ var miniLOL = {
 
                                     text = text || src;
         
-                                    args  = args ? '&'+args.replace(/[ ,]+/g, '&amp;') : '';
-                                    ltype = ltype ? '&type='+ltype : '';
-                                    menu  = miniLOL.menu.exists && menu ? '&amp;menu='+menu : '';
-            
-                                    output += '<a href="#{0}#{1}#{2}#{3}" #{4}>#{5}</a>#{6}'.interpolate(
-                                              [src, args, ltype, menu, attrs(link.attributes), text, after]);
+                                    args   = args ? '&'+args.replace(/[ ,]+/g, '&amp;') : '';
+                                    ltype  = ltype ? '&type='+ltype : '';
+                                    menu   = miniLOL.menu.exists && menu ? '&amp;menu='+menu : '';
+                                    src    = src + args + ltype + menu;
+                                    target = "";
                                 }
-                                output += '</div>';
+
+                                listOutput += miniLOL.theme.template.list.link.interpolate({
+                                    class:      linkClass,
+                                    id:         linkId,
+                                    attributes: attrs(link.attributes),
+                                    before:     miniLOL.theme.template.list.before.interpolate({ data: before }),
+                                    after:      miniLOL.theme.template.list.after.interpolate({ data: after }),
+                                    url:        src,
+                                    target:     target,
+                                    text:       text
+                                });
                             }
                             else if (list[h].nodeName == 'list') {
-                                output += miniLOL.page.parse({ childNodes: [list[h]] }, [contents[i]]);
+                                listOutput += miniLOL.page.parse({ childNodes: [list[h]] }, [contents[i]]);
                             }
                             else if (list[h].nodeName == 'nest') {
                                 toParse = list[h].cloneNode(true);
 
-                                output += "<div class='#{0}' style='#{1}'>#{2}</div>".interpolate([
-                                    list[h].getAttribute('class'), list[h].getAttribute('style'), miniLOL.page.parse(toParse, [contents[i]])
-                                ]);
+                                listOutput += miniLOL.theme.template.list.nest.interpolate({
+                                    class:  list[h].getAttribute("class"),
+                                    style:  list[h].getAttribute("style"),
+                                    before: miniLOL.theme.template.list.before.interpolate({ data: before }),
+                                    after:  miniLOL.theme.template.list.after.interpolate({ data: after }),
+                                    data:   miniLOL.page.parse(toParse, [contents[i]]),
+                                });
                             }
                         }
                         else if (list[h].nodeType == Node.CDATA_SECTION_NODE) {
-                            output += "<div class='data'>#{0}#{1}#{2}</div>".interpolate([
-                                listBefore, list[h].nodeValue, listAfter
-                            ]);
+                            listOutput += miniLOL.theme.template.list.data.interpolate({
+                                before: miniLOL.theme.template.list.before.interpolate({ data: before }),
+                                after:  miniLOL.theme.template.listafter.interpolate({ data: after }),
+                                data:  list[h].nodeValue,
+                            });
                         }
                     }
 
-                    output += '</div>';
+                    output += miniLOL.theme.template.list.global.interpolate({
+                        attributes: attrs(ele.attributes),
+                        data: listOutput,
+                    });
                     break;
         
                     case Node.CDATA_SECTION_NODE:
