@@ -935,6 +935,16 @@ var miniLOL = {
                 obj.type = 'active';
             }
 
+            if (!obj.execute) {
+                obj.execute = new Function;
+            }
+
+            for (var func in obj) {
+                if (typeof obj[func] == 'function') {
+                    obj[func] = obj[func].bind(obj)
+                }
+            }
+
             if (obj.onLoad) {
                 try {
                     if (obj.onLoad.bind(obj)() == false) {
@@ -944,16 +954,6 @@ var miniLOL = {
                 catch (e) {
                     e.fileName = "#{0}/#{1}/main.js".interpolate([miniLOL.module.path, name]);
                     throw e;
-                }
-            }
-
-            if (!obj.execute) {
-                obj.execute = new Function;
-            }
-
-            for (var func in obj) {
-                if (typeof obj[func] == 'function') {
-                    obj[func] = obj[func].bind(obj)
                 }
             }
 

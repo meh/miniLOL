@@ -45,8 +45,9 @@ body
 
 #container
 {
-    position: absolute;
-    top: 50px;
+    margin-top: 9%;
+    margin-left: auto;
+    margin-right: auto;
     border: solid 1px #222222;
     width: 500px;
     padding: 10px;
@@ -96,4 +97,10 @@ body
 div.introduction
 {
     margin-bottom: 10px;
+}
+
+.nigguz {
+    background: white;
+    color: black;
+    font-weight: bold;
 }
