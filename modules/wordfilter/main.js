@@ -16,7 +16,11 @@ miniLOL.module.create("wordfilter", {
         var content = miniLOL.content.get();
 
         for (var word in this.words) {
-            content = content.replace(eval(word), this.words[word]);
+            try {
+                content = content.replace(eval(word), this.words[word]);
+            }
+            catch (e) {
+            }
         }
 
         miniLOL.content.set(content);
