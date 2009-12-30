@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!DOCTYPE editors [
+    <!ELEMENT editors (editor*)>
+
+    <!ELEMENT editor (#PCDATA)>
+    <!ATTLIST editor
+        type CDATA #REQUIRED
+    >
+]>
+
+<editors>
+    <editor type="simple"><![CDATA[
+        <textarea id="editor"></textarea>
+    ]]></editor>
+</editors>

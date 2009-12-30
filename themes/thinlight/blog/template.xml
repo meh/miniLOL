@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!DOCTYPE blog [
+    <!ELEMENT template (posts, post)>
+]>
+
+<template>
+    <blog><![CDATA[
+        <div class="blog">
+            #{content}
+        </div>
+    ]]></blog>
+
+    <posts><![CDATA[
+        <div class="page">
+            #{posts}
+            #{pager}
+        </div>
+        ]]>
+    
+        <pager><![CDATA[
+            <div class="pager">
+                #{previous}
+                #{numbers}
+                #{next}
+            </div>
+            ]]>
+            <previous><![CDATA[<div class="previous"><a href="#{link}">&lt;=</a></div>]]></previous>
+            <numbers length="5"><![CDATA[
+                    <div class="numbers">#{content}</div>
+                ]]>
+                <first><![CDATA[
+                    <div class="first"><a href="#{link}">#{number}</a></div>
+                ]]></first>
+                <inner><![CDATA[
+                    <div class="inner"><a href="#{link}">#{number}</a></div>
+                ]]></inner>
+                <current><![CDATA[
+                    <div class="current">#{number}</div>
+                ]]></current>
+                <last><![CDATA[
+                    <div class="last"><a href="#{link}">#{number}</a></div>
+                ]]></last>
+            </numbers>
+            <next><![CDATA[<div class="next"><a href="#{link}">=&gt;</a></div>]]></next>
+        </pager>
+    </posts>
+
+    <post><![CDATA[
+        <div id="#{id}" class="post">
+            <div class="header">
+                <div class="title"><a href="#{link}">#{title}</a></div> <div style="float: right">#{admin}</div>
+                <div class="date">#{date}</div>
+            </div>
+            <div class="content">#{content}</div>
+
+            #{comments_show}
+
+            #{pager}
+        </div>
+        ]]>
+
+        <pager><![CDATA[
+            <div class="pager">
+                #{previous}
+                #{numbers}
+                #{next}
+            </div>
+            ]]>
+            <previous><![CDATA[
+                <div class="previous"><a href="#{link}">previous</a></div>
+            ]]></previous>
+            <numbers length="5"><![CDATA[
+                    <div class="numbers">#{content}</div>
+                ]]>
+                <first><![CDATA[
+                    <div class="first"><a href="#{link}">#{number}</a></div>
+                ]]></first>
+                <inner><![CDATA[
+                    <div class="inner"><a href="#{link}">#{number}</a></div>
+                ]]></inner>
+                <current><![CDATA[
+                    <div class="current">#{number}</div>
+                ]]></current>
+                <last><![CDATA[
+                    <div class="last"><a href="#{link}">#{number}</a></div>
+                ]]></last>
+            </numbers>
+            <next><![CDATA[
+                <div class="next"><a href="#{link}">next</a></div>
+            ]]></next>
+        </pager>       
+    </post>
+
+    <comments>
+        <show><![CDATA[
+            <div>
+                <a onclick="$(this.parentNode.getElementsByTagName('div')[0]).toggle()">Show comments (#{comment_number})</a>
+                <div style="display: none">
+                #{comments}
+                </div>
+            </div>
+        ]]></show>
+
+        <comments><![CDATA[
+            
+        ]]></comments>
+    </comments>
+
+    <manage>
+        <admin><![CDATA[
+            {[<a href="#module=blog&edit&id=#{post_id}">edit</a>] [<a href="#module=blog&delete&do&id=#{post_id}">delete</a>]}
+        ]]></admin>
+
+        <post><![CDATA[
+            <form>
+                <table>
+                    <tr><td>Title:</td><td><input type="text" id="title"/></td></tr>
+                    <tr><td>Author:</td><td><input type="text" id="author" value="#{author}"/></td>
+                </table><br/>
+                Content:<br/>
+                #{editor}
+                <br/><br/><input type="button" value="Post" onclick="miniLOL.module.execute('blog', { post: true, do: true, title: encodeURIComponent($('title').value), author: encodeURIComponent($('author').value), date: encodeURIComponent(new Date().toString()), content: encodeURIComponent($('editor').value) });"/>
+            </form>
+
+            <script>
+            $('editor').setStyle({ height: (($('body').getHeight() - 150)) + 'px' });
+            </script>
+        ]]></post>
+
+        <edit><![CDATA[
+            <form>
+                <table>
+                    <tr><td>Title:</td><td><input type="text" id="title" value="#{title}"/></td></tr>
+                    <tr><td>Author:</td><td><input type="text" id="author" value="#{author}"/></td>
+                </table><br/>
+                Content:<br/>
+                #{editor}
+                <input type="hidden" id="post_id" value="#{post_id}"/>
+                <input type="hidden" id="date" value="#{date}"/>
+                <br/><br/><input type="button" value="Post" onclick="miniLOL.module.execute('blog', { edit: true, do: true, id: $('post_id').value, title: encodeURIComponent($('title').value), author: encodeURIComponent($('author').value), date: encodeURIComponent($('date').value), content: encodeURIComponent($('editor').value) });"/>
+            </form>
+
+            <script>
+            $('editor').setStyle({ height: (($('body').getHeight() - 150)) + 'px' });
+            $('editor').value = miniLOL.modules.blog.data.getElementById("#{post_id}").firstChild.nodeValue;
+            </script>
+        ]]></edit>
+    </manage>
+</template>

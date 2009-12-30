@@ -61,20 +61,24 @@ a {
     padding: 4px;
 }
 
-div.project {
+.project > div {
     border: 1px solid #DDE;
     margin: 4px 0px;
     padding: 4px;
 }
 
-div.project:hover {
+.project > div:hover {
     background-color: #EEF;
 }
 
-div.project div.name {
+.project .url a {
     color: #35A;
     font-size: 13px;
     font-weight: 700;
+}
+
+.project .url {
+    margin-bottom: 15px;
 }
 
 .round {
