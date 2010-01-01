@@ -5,7 +5,7 @@
 miniLOL.module.create("wordfilter", {
     words: {
         "/NIGGER/gi": "<span style='color: white; font-weight: bold;'>NIGGER</span>",
-        "/vagina/gi": "<span style='color: magenta; font-weight: bold;'>vagina</span>",
+        "/vagina/gi": "<span style='color: magenta; font-weight: bold;'>vagina</span>"
     },
 
     onLoad: function () {
