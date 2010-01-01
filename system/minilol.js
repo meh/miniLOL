@@ -1074,7 +1074,7 @@ var miniLOL = {
                     callback.call(context || window);
                 }
                 else {
-                    setTimeout(wait || 10, function(){ miniLOL.module.dependencies.needs(name, callback, context); });
+                    setTimeout((function () { miniLOL.module.dependencies.needs(name, callback, context); }), wait || 10);
                 }
             },
         },

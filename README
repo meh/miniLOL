@@ -2,7 +2,7 @@ miniLOL is just a mini CMS-like application that uses only javascript and xml
 so the server doesn't require any special capability like CGI stuff.
 
 The configuration is really easy and adding pages and files is simple, just
-read the XML files in resources/ and the comment will introduce you to the
+read the XML files in resources/ and the comments will introduce you to the
 aims of the file.
 
 If you want to add content put it in the data/ folder.
