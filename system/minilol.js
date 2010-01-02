@@ -1132,7 +1132,7 @@ miniLOL = {
                 throw new Error("The place has to be a string.");
             }
     
-            var attach = "#{0}=_clone(miniLOL.event.dispatcher);#{0}=#{0}.bind(#{0});".interpolate([place]);
+            var attach = "#{0}=miniLOL.event.dispatcher.clone();#{0}=#{0}.bind(#{0});".interpolate([place]);
     
             if (!func) {
                 eval(attach);
