@@ -21,8 +21,8 @@ eval(function(p,a,c,k,e,r){e=function(c){return(c<a?'':e(parseInt(c/a)))+((c=c%a
  ****************************************************************************/
 
 // Previous inizializations and improvements
-Function.prototype.clone = function (func) {
-    func = func.toString();
+Function.prototype.clone = function () {
+    var func = this.toString();
     
     return new Function(func.substring(func.indexOf("{") + 1, func.lastIndexOf("}")));
 };
