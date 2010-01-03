@@ -20,40 +20,34 @@ eval(function(p,a,c,k,e,r){e=function(c){return(c<a?'':e(parseInt(c/a)))+((c=c%a
  * along with miniLOL program.  If not, see <http://www.gnu.org/licenses/>. *
  ****************************************************************************/
 
+/*
+ * miniLOL is a Javascript/XML based CMS thus, being in the XXI century,
+ * I pretend those two standards to be respected.
+ *
+ * Get a real browser, get Firefox.
+ */
+
 // Previous inizializations and improvements
 Function.prototype.clone = function () {
-    var func = this.toString();
-    
-    return new Function(func.substring(func.indexOf("{") + 1, func.lastIndexOf("}")));
+    return eval("("+this.toString().replace(/^function .*?\(/, 'function (')+")");
 };
-
 
 if (Prototype.Browser.IE) {
     Error.prototype.toString = function () {
         return "#{name}: #{description}".interpolate(this);
     }
-
-    if (false) {
-        miniLOL.error(
-            '<center>miniLOL is a Javascript/XML based CMS thus, being in the XXI century, '+
-            'I pretend those two standards to be respected.<br/>'+
-            'Get a real browser, get <a href="http://getfirefox.com">Firefox</a>.'
-        );
-
-        throw new Error("You fail at computar.");
+}
+else if (Prototype.Browser.Opera) {
+    Error.prototype.toString = function () {
+        return "#{name}: #{message}".interpolate(this);
     }
 }
-
 
 miniLOL = {
     version: '1.0',
 
     initialize: function () {
         miniLOL.event.add('window.ongo');
-
-        miniLOL._error = false;
-
-        miniLOL.menu.current = null;
 
         ['miniLOL.resource.load(miniLOL.resources.config, "resources/config.xml");',
          'document.title = miniLOL.config["core"].siteTitle;',
@@ -1060,10 +1054,10 @@ miniLOL = {
 
         load: function (name) {
             try {
-                miniLOL.utils.import("#{path}/#{module}/main.js".interpolate({
+                miniLOL.utils.require("#{path}/#{module}/main.js".interpolate({
                     path: miniLOL.module.path,
                     module: name
-                }), window, true);
+                }));
 
                 if (!miniLOL.modules[name]) {
                     throw new Error("Something went wrong while loading the module `#{name}`.".interpolate({
@@ -1200,7 +1194,7 @@ miniLOL = {
     },
 
     utils: {
-        attributes: function (attr) {
+        attributes: function (attributes) {
             var text = "";
             
             for (var i = 0; i < attributes.length; i++) {
@@ -1266,10 +1260,38 @@ miniLOL = {
                 });
             }
             
-            return result.substr(0,result.length-1);
+            return result.substr(0, result.length - 1);
         },
 
-        import: function (path, context, exception) {
+        include: function (path, context) {
+            context = context || window;
+            
+            var result;
+            
+            new Ajax.Request(path, {
+                method: 'get',
+                asynchronous: false,
+                evalJS: false,
+                
+                onSuccess: function (http) {
+                    try {
+                        eval.call(context, http.responseText);
+                        result = context;
+                    }
+                    catch (e) {
+                        result = null;
+                    }
+                },
+                
+                onFailure: function () {
+                    result = null;
+                }
+            });
+            
+            return result;
+        },
+
+        require: function (path, context) {
             context = context || window;
             
             var result;
@@ -1282,7 +1304,7 @@ miniLOL = {
                 
                 onSuccess: function (http) {
                     try {
-                        eval.call(context,http.responseText);
+                        eval.call(context, http.responseText);
                         result = context;
                     }
                     catch (e) {
@@ -1297,7 +1319,12 @@ miniLOL = {
                 },
                 
                 onFailure: function () {
-                    result = null;
+                    error  = {
+                        name:       "Error",
+                        message:    "Couldn't find the file.",
+                        fileName:   path,
+                        lineNumber: 0
+                    };
                 }
             });
             
