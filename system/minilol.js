@@ -1285,7 +1285,7 @@ miniLOL = {
                 
                 onSuccess: function (http) {
                     try {
-                        eval.call(context, http.responseText);
+                        window.eval.call(context, http.responseText);
                         result = context;
                     }
                     catch (e) {
@@ -1314,17 +1314,13 @@ miniLOL = {
                 
                 onSuccess: function (http) {
                     try {
-                        eval.call(context, http.responseText);
+                        window.eval.call(context, http.responseText);
                         result = context;
                     }
                     catch (e) {
-                        if (exception) {
-                            error             = e;
-                            error.fileName    = path;
-                            error.lineNumber -= 5;
-                        }
-                        
-                        result = null;
+                        error             = e;
+                        error.fileName    = path;
+                        error.lineNumber -= 5;
                     }
                 },
                 
@@ -1337,7 +1333,7 @@ miniLOL = {
                     };
                 }
             });
-            
+
             if (error) {
                 throw error;
             }

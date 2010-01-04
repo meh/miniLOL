@@ -3,7 +3,7 @@
 <!DOCTYPE modules [
     <!ELEMENT modules (module*)>
     <!ATTLIST modules
-        path CDATA #REQUIRED
+        path CDATA "modules"
     >
 
     <!ELEMENT module EMPTY>
@@ -18,6 +18,6 @@ This file contains the enabled modules.
 
 -->
 
-<modules path="modules">
+<modules>
     <module name="wordfilter"/>
 </modules>
