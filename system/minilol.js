@@ -21,7 +21,7 @@ eval(function(p,a,c,k,e,r){e=function(c){return(c<a?'':e(parseInt(c/a)))+((c=c%a
  ****************************************************************************/
 
 /*
- * miniLOL is a Javascript/XML based CMS thus, being in the XXI century,
+ * miniLOL is a Javascript/XML based CMS, thus, being in the XXI century,
  * I pretend those two standards to be respected.
  *
  * Get a real browser, get Firefox.
@@ -53,8 +53,6 @@ miniLOL = {
     version: '1.0',
 
     initialize: function () {
-        miniLOL.event.add('window.ongo');
-
         ['miniLOL.resource.load(miniLOL.resources.config, "resources/config.xml");',
          'document.title = miniLOL.config["core"].siteTitle;',
          'document.body.innerHTML = miniLOL.config["core"].loadingMessage;',
@@ -919,7 +917,7 @@ miniLOL = {
                     miniLOL.content.set(miniLOL.pages.cache[name]);
                 }
 
-                window.ongo(url);
+                Event.fire(window, ':go', url);
                 return true;
             }
 
@@ -939,7 +937,7 @@ miniLOL = {
             }
 
             miniLOL.content.set(output);
-            window.ongo(url);
+            Event.fire(window, ':go', url);
 
             return true;
         },
@@ -958,7 +956,7 @@ miniLOL = {
                         miniLOL.content.set(http.responseText);
                     }
 
-                    window.ongo(url);
+                    Event.fire(window, ':go', url);
                 },
         
                 onFailure: function (http) {
@@ -1012,7 +1010,7 @@ miniLOL = {
             miniLOL.modules[name] = obj;
 
             if (obj.onGo) {
-                window.ongo('add', obj.onGo);
+                Event.fire(window, ':go', 'add', obj.onGo);
             }
         },
 
@@ -1062,7 +1060,7 @@ miniLOL = {
             }
 
             if (url) {
-                window.ongo(url);
+                Event.fire(window, ':go', url);
             }
 
             return result;
@@ -1126,45 +1124,6 @@ miniLOL = {
         }
     },
 
-    event: {
-        add: function (place, func) {
-            if (typeof place != 'string') {
-                throw new Error("The place has to be a string.");
-            }
-    
-            var attach = ("#{0}            = miniLOL.event.dispatcher.clone();" +
-                          "var _tmp        = #{0};" +
-                          "#{0}            = #{0}.bind(#{0});" +
-                          "#{0}._reference = _tmp;" +
-                          "#{0}.miniLOL    = true;").interpolate([place]);
-    
-            var check = window.eval.call(window, place);
-            if (!check || !check.miniLOL || !func) {
-                window.eval.call(window, attach);
-            }
-
-            if (!func) {
-                return;
-            }
-
-            place = window.eval.call(window, place);
-
-            if (!place._reference.functions) {
-                place._reference.functions = new Array;
-            }
-
-            if (place._reference.functions.indexOf(func) < 0) {
-                place._reference.functions.push(func);
-            }
-        },
-
-        dispatcher: function () {
-            for (var i = 0; i < this.functions.length; i++) {
-                this.functions[i].apply(null, $A(arguments));
-            }
-        }
-    },
-
     go: function (url) {
         var queries = miniLOL.utils.parseQuery(url.sub(/#/, '?'))
         var matches = /#([^=]+?)(&|$)/.exec(url);
@@ -1215,14 +1174,11 @@ miniLOL = {
         },
 
         fixDOM: function (obj) {
-            if (!obj) {
+            if (!obj || (Prototype.Browser.Gecko || Prototype.Browser.Opera)) {
                 return obj;
             }
 
-            if (Prototype.Browser.Gecko || Prototype.Browser.Opera) {
-                return obj;
-            }
-            else if (Prototype.Browser.IE) {
+            if (Prototype.Browser.IE) {
                 var tmp = obj;
 
                 obj                 = {};

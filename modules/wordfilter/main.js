@@ -9,8 +9,7 @@ miniLOL.module.create("wordfilter", {
     },
 
     initialize: function () {
-        try { miniLOL.event.add('window.ongo', this.execute); }
-        catch (e) { alert(e); }
+        Event.observe(window, ':go', this.execute);
     },
 
     execute: function () {
