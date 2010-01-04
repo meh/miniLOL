@@ -1088,14 +1088,6 @@ miniLOL = {
             }
         },
 
-        reload: function (name) {
-            if (miniLOL.modules[name]) {
-                if (miniLOL.modules[name].initialize) {
-                    miniLOL.modules[name].initialize(true);
-                }
-            }
-        },
-
         exists: function (name) {
             return new Boolean(miniLOL.modules[name]);
         },
