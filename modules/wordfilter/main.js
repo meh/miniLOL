@@ -8,8 +8,9 @@ miniLOL.module.create("wordfilter", {
         "/vagina/gi": "<span style='color: magenta; font-weight: bold;'>vagina</span>"
     },
 
-    onLoad: function () {
-        miniLOL.event.add('window.ongo', this.execute);
+    initialize: function () {
+        try { miniLOL.event.add('window.ongo', this.execute); }
+        catch (e) { alert(e); }
     },
 
     execute: function () {

@@ -35,7 +35,13 @@ Function.prototype.clone = function () {
 if (Prototype.Browser.IE) {
     Error.prototype.toString = function () {
         return "#{name}: #{description}".interpolate(this);
-    }
+    };
+
+    Function.prototype.clone = function () {
+        var func = this.toString();
+
+        return new Function(func.substring(func.indexOf("{") + 1, func.lastIndexOf("}")));
+    };
 }
 else if (Prototype.Browser.Opera) {
     Error.prototype.toString = function () {
@@ -119,6 +125,10 @@ miniLOL = {
     error: function (text, element) {
         if (!text) {
             return miniLOL._error;
+        }
+
+        if (text === true || text === false) {
+            return miniLOL._error = text;
         }
 
         element = element || document.body;
@@ -329,9 +339,9 @@ miniLOL = {
                             return;
                         }
 
-                        miniLOL.utils.fixDOM(http.responseXML);
-                        if (http.responseXML.getElementById('default')) {
-                            miniLOL.menus       = http.responseXML;
+                        var response = miniLOL.utils.fixDOM(http.responseXML);
+                        if (response.getElementById('default')) {
+                            miniLOL.menus       = response;
                             miniLOL.menu.exists = true;
                         }
                         else {
@@ -374,8 +384,7 @@ miniLOL = {
                             return;
                         }
 
-                        miniLOL.utils.fixDOM(http.responseXML);
-                        miniLOL.pages.dom = http.responseXML;
+                        miniLOL.pages.dom = miniLOL.utils.fixDOM(http.responseXML);
 
                         var pages = http.responseXML.documentElement.getElementsByTagName('page');
                         for (var i = 0; i < pages.length; i++) {
@@ -490,10 +499,10 @@ miniLOL = {
                             }
 
                             if (!miniLOL.module.load(modules[i].getAttribute("name"))) {
-                                miniLOL._error = true;
+                                miniLOL.error(true);
                             }
 
-                            if (miniLOL._error) {
+                            if (miniLOL.error()) {
                                 break;
                             }
                         }
@@ -977,9 +986,9 @@ miniLOL = {
                 }
             }
 
-            if (obj.onLoad) {
+            if (obj.initialize) {
                 try {
-                    if (obj.onLoad.bind(obj)() == false) {
+                    if (obj.initialize() === false) {
                         throw new Error("An error occurred while initializing the module.");
                     }
                 }
@@ -1068,14 +1077,12 @@ miniLOL = {
                 return true;
             }
             catch (e) {
-                miniLOL.content.set(
-                    "An error occurred while loading the module `#{name}`<br/><br/>#{file} @ #{line}:<br/>#{error}".interpolate({
-                        name:  name,
-                        file:  e.fileName,
-                        line:  e.lineNumber,
-                        error: e.toString()
-                    })
-                );
+                miniLOL.error("An error occurred while loading the module `#{name}`<br/><br/>#{file} @ #{line}:<br/>#{error}".interpolate({
+                    name:  name,
+                    file:  e.fileName,
+                    line:  e.lineNumber,
+                    error: e.toString()
+                }), $(miniLOL.config['core'].contentNode));
 
                 return false;
             }
@@ -1083,8 +1090,8 @@ miniLOL = {
 
         reload: function (name) {
             if (miniLOL.modules[name]) {
-                if (miniLOL.modules[name].onLoad) {
-                    miniLOL.modules[name].onLoad(true);
+                if (miniLOL.modules[name].initialize) {
+                    miniLOL.modules[name].initialize(true);
                 }
             }
         },
@@ -1126,47 +1133,36 @@ miniLOL = {
                 throw new Error("The place has to be a string.");
             }
     
-            var attach = "#{0}=miniLOL.event.dispatcher.clone();#{0}=#{0}.bind(#{0});".interpolate([place]);
+            var attach = ("#{0}            = miniLOL.event.dispatcher.clone();" +
+                          "var _tmp        = #{0};" +
+                          "#{0}            = #{0}.bind(#{0});" +
+                          "#{0}._reference = _tmp;" +
+                          "#{0}.miniLOL    = true;").interpolate([place]);
     
+            var check = window.eval.call(window, place);
+            if (!check || !check.miniLOL || !func) {
+                window.eval.call(window, attach);
+            }
+
             if (!func) {
-                eval(attach);
                 return;
             }
-    
-            var check = eval(place);
-            if (typeof check == 'function') {
-                if (check('minilol') != 'win') {
-                    eval(attach)
-                }
+
+            place = window.eval.call(window, place);
+
+            if (!place._reference.functions) {
+                place._reference.functions = new Array;
             }
-            else {
-                eval(attach);
+
+            if (place._reference.functions.indexOf(func) < 0) {
+                place._reference.functions.push(func);
             }
-            
-            eval("#{0}('add', func);".interpolate([place]));
         },
 
         dispatcher: function () {
-            if (typeof(this.functions) == 'undefined') {
-                this.functions = new Array;
-            }
-
-            switch (arguments[0]) {
-                case 'minilol':
-                return 'win';
-
-                case 'add':
-                if (this.functions.indexOf(arguments[1]) < 0) {
-                    this.functions.push(arguments[1]);
-                }
-                return true;
-            }
-
             for (var i = 0; i < this.functions.length; i++) {
                 this.functions[i].apply(null, $A(arguments));
             }
-
-            return true;
         }
     },
 
@@ -1220,10 +1216,32 @@ miniLOL = {
         },
 
         fixDOM: function (obj) {
-            if (!(Prototype.Browser.Gecko || Prototype.Browser.Opera) && obj) {
+            if (!obj) {
+                return obj;
+            }
+
+            if (Prototype.Browser.Gecko || Prototype.Browser.Opera) {
+                return obj;
+            }
+            else if (Prototype.Browser.IE) {
+                var tmp = obj;
+
+                obj                 = {};
+                obj._real           = tmp;
+                obj.documentElement = tmp.documentElement;
+                
+                obj.getElementsByTagName = function (name) {
+                    return this._real.getElementsByTagName(name);
+                };
+
+                obj.getElementById = function (id) {
+                    return miniLOL.utils.getElementById.call(this._real, id);
+                }
+            }
+            else {
                 obj.getElementById = miniLOL.utils.getElementById;
             }
-            
+
             return obj;
         },
 
