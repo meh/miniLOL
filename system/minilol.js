@@ -525,9 +525,9 @@ miniLOL = {
             load: function (name, path, overload) {
                 path = path || "#{path}/#{theme}".interpolate({ path: miniLOL.theme.path, theme: miniLOL.theme.name });
 
-                if (miniLOL.theme.style.exists(name)) {
+                if (miniLOL.theme.style.exists(name, path)) {
                     if (overload) {
-                        miniLOL.theme.style.unload(miniLOL.theme.style.list[name]);
+                        miniLOL.theme.style.unload(miniLOL.theme.style.list[name], path);
                     }
                     else {
                         return true;
@@ -541,16 +541,23 @@ miniLOL = {
 
                 document.getElementsByTagName('head')[0].appendChild(link);
 
-                miniLOL.theme.style.list[name] = link;
+                miniLOL.theme.style.list["#{path}/#{style}.css".interpolate({ path: path, style: name })] = link;
             },
 
-            unload: function (name) {
-                miniLOL.theme.style.list[name].parentNode.removeChild(miniLOL.theme.list[name]);
-                delete miniLOL.theme.style.list[name];
+            unload: function (name, path) {
+                path = path || "#{path}/#{theme}".interpolate({ path: miniLOL.theme.path, theme: miniLOL.theme.name });
+
+                var name = "#{path}/#{style}.css".interpolate({ path: path, style: name });
+                if (miniLOL.theme.style.list[name]) {
+                    miniLOL.theme.style.list[name].parentNode.removeChild(miniLOL.theme.style.list[name]);
+                    delete miniLOL.theme.style.list[name];
+                }
             },
 
-            exists: function (name) {
-                return Boolean(miniLOL.theme.style.list[name]);
+            exists: function (name, path) {
+                path = path || "#{path}/#{theme}".interpolate({ path: miniLOL.theme.path, theme: miniLOL.theme.name });
+
+                return Boolean(miniLOL.theme.style.list["#{path}/#{style}.css".interpolate({ path: path, style: name })]);
             }
         },
 
