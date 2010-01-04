@@ -853,7 +853,7 @@ miniLOL = {
                         else if (list[h].nodeType == Node.CDATA_SECTION_NODE) {
                             listOutput += miniLOL.theme.template.list.data.interpolate({
                                 before: miniLOL.theme.template.list.before.interpolate({ data: before }),
-                                after:  miniLOL.theme.template.listafter.interpolate({ data: after }),
+                                after:  miniLOL.theme.template.list.after.interpolate({ data: after }),
                                 data:  list[h].nodeValue
                             });
                         }
@@ -1332,12 +1332,9 @@ miniLOL = {
                 },
                 
                 onFailure: function () {
-                    error  = {
-                        name:       "Error",
-                        message:    "Couldn't find the file.",
-                        fileName:   path,
-                        lineNumber: 0
-                    };
+                    error            = new Error("Couldn't find the file.");
+                    error.fileName   = path;
+                    error.lineNumber = 0;
                 }
             });
 
