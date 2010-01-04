@@ -1010,7 +1010,7 @@ miniLOL = {
             miniLOL.modules[name] = obj;
 
             if (obj.onGo) {
-                Event.fire(window, ':go', 'add', obj.onGo);
+                Event.observe(window, ':go', obj.onGo);
             }
         },
 
