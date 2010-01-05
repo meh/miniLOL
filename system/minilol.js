@@ -23,6 +23,17 @@
  */
 
 // Previous inizializations and improvements
+unFocus.History.addEventListener('historyChange', function (historyHash) {
+    if (historyHash) {
+        miniLOL.go('#' + historyHash);
+    }
+    else {
+        miniLOL.go('#' + miniLOL.config['core'].homePage);
+    }
+    
+    $(miniLOL.config['core'].contentNode).scrollTop = 0;
+});
+
 Function.prototype.clone = function () {
     return eval("("+this.toString().replace(/^function .*?\(/, 'function (')+")");
 };
