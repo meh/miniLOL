@@ -924,7 +924,7 @@ miniLOL = {
                     miniLOL.content.set(miniLOL.pages.cache[name]);
                 }
 
-                Event.fire(window, ':go', url);
+                Event.fire(document, ':go', url);
                 return true;
             }
 
@@ -944,7 +944,7 @@ miniLOL = {
             }
 
             miniLOL.content.set(output);
-            Event.fire(window, ':go', url);
+            Event.fire(document, ':go', url);
 
             return true;
         },
@@ -963,7 +963,7 @@ miniLOL = {
                         miniLOL.content.set(http.responseText);
                     }
 
-                    Event.fire(window, ':go', url);
+                    Event.fire(document, ':go', url);
                 },
         
                 onFailure: function (http) {
@@ -1017,7 +1017,7 @@ miniLOL = {
             miniLOL.modules[name] = obj;
 
             if (obj.onGo) {
-                Event.observe(window, ':go', obj.onGo);
+                Event.observe(document, ':go', obj.onGo);
             }
         },
 
@@ -1067,7 +1067,7 @@ miniLOL = {
             }
 
             if (url) {
-                Event.fire(window, ':go', url);
+                Event.fire(document, ':go', url);
             }
 
             return result;
