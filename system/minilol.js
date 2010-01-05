@@ -23,6 +23,7 @@
  */
 
 // Previous inizializations and improvements
+
 unFocus.History.addEventListener('historyChange', function (historyHash) {
     if (historyHash) {
         miniLOL.go('#' + historyHash);

@@ -1,9 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <title></title>
+    <title>miniLOL 1.0</title>
+
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
-    <script src="system/minilol.js" type="text/javascript"></script>
 
     <script type="text/javascript" src="system/unFocus-History.js"></script>
 
@@ -17,18 +17,26 @@
     
     <!-- internal libraries -->
     <script type="text/javascript" src="system/prototype.js"></script>
+    <!-- Uncomment this if you need scriptaculous support, it's really doubling the files to get loaded
     <script type="text/javascript" src="system/scriptaculous/scriptaculous.js"></script>
+    -->
     
     <!-- Google libraries
     <script type="text/javascript" src="http://www.google.com/jsapi"></script>
     <script type="text/javascript">// <![CDATA[
+
     google.load("prototype", "1.6"); // this is needed by the core
-    google.load("scriptaculous", "1.8.3"); // this can be commented out but it's used by some modules
+
+    // Uncomment this if you need scriptaculous support, it's really doubling the files to get loaded
+    // google.load("scriptaculous", "1.8.3");
+
     // ]]></script>
     -->
+
+    <script src="system/minilol.js" type="text/javascript"></script>
 </head> 
 <body onload="miniLOL.initialize();">
-    <center>Enable javascript please, you know, this is a javascript CMS.</center>
+    <div style="width: 100%; text-align: center;">Enable javascript please, you know, this is a javascript CMS.</div>
     <script type="text/javascript">document.body.innerHTML = '';</script>
 </body>
 </html>
