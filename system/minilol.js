@@ -125,6 +125,8 @@ miniLOL = {
         if (!miniLOL.error()) {
             miniLOL.go(/\/[#?].+/.test(location.href) ? location.href.replace(/^.*[#?]/, '#') : "#"+miniLOL.config['core'].homePage);
         }
+
+        Event.fire(document, ':initialized');
     },
 
     error: function (text, element) {
