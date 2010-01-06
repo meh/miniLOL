@@ -1176,7 +1176,7 @@ miniLOL = {
 
     go: function (url) {
         var queries = miniLOL.utils.parseQuery(url.sub(/#/, '?'))
-        var matches = /#([^=]+?)(&|$)/.exec(url);
+        var matches = /#(([^=&]*)&|([^=&]*)$)/.exec(url); // hate WebKit so much.
 
         if (matches) {
             queries.page = matches[1];
@@ -1258,7 +1258,7 @@ miniLOL = {
                 return result;
             }
             
-            var blocks =matches[1].split(/&/);
+            var blocks = matches[1].split(/&/);
             for (var i = 0; i < blocks.length; i++) {
                 var parts = blocks[i].split(/=/);
                 
