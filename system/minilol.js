@@ -610,6 +610,8 @@ miniLOL = {
         },
 
         load: function (name) {
+            miniLOL.theme.unload();
+
             var result         = true;
             miniLOL.theme.name = name;
 
@@ -653,8 +655,6 @@ miniLOL = {
                         info.templates.push(templates[i].getAttribute("name"));
                     }
 
-                    miniLOL.theme.template.list = miniLOL.theme.template.defaultList();
-
                     var list = doc.getElementsByTagName("list");
                     if (list.length) {
                         list = list[0];
@@ -684,7 +684,6 @@ miniLOL = {
                             miniLOL.theme.template.list.data = current[0].firstChild.nodeValue;
                         }
                     }
-
                 },
 
                 onFailure: function () {
@@ -726,6 +725,8 @@ miniLOL = {
         },
 
         unload: function () {
+            miniLOL.theme.template.list = miniLOL.theme.template.defaultList();
+
             if (!miniLOL.theme.name) {
                 return;
             }
