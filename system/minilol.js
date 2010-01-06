@@ -593,6 +593,19 @@ miniLOL = {
 
             exists: function (name) {
                 return miniLOL.theme.informations.templates.indexOf(name) >= 0;
+            },
+
+            defaultList: function () {
+                return {
+                    global: "<div #{attributes}>#{data}</div>",
+
+                    before: "#{data}",
+                    after:  "#{data}",
+
+                    link: "<div class='#{class}' id='#{id}'>#{before}<a href='#{url}' target='#{target}' #{attributes}>#{text}</a>#{after}</div>",
+                    nest: "<div class='#{class}' style='#{1}'>#{data}</div>",
+                    data: "<div class='data'>#{before}#{data}#{after}</div>"
+                };
             }
         },
 
@@ -612,6 +625,22 @@ miniLOL = {
                     info.name   = doc.documentElement.getAttribute("name")   || "Unknown";
                     info.author = doc.documentElement.getAttribute("author") || "Anonymous";
 
+                    var initialize = doc.getElementsByTagName("initialize");
+                    if (initialize.length) {
+                        miniLOL.theme.initialize = new Function(initialize[0].firstChild.nodeValue);
+                    }
+                    else {
+                        miniLOL.theme.initialize = new Function;
+                    }
+
+                    var finalize = doc.getElementsByTagName("finalize");
+                    if (finalize.length) {
+                        miniLOL.theme.finalize = new Function(initialize[0].firstChild.nodeValue);
+                    }
+                    else {
+                        miniLOL.theme.finalize = new Function;
+                    }
+
                     info.styles = new Array;
                     var  styles = doc.getElementsByTagName("style");
                     for (var i = 0; i < styles.length; i++) {
@@ -624,16 +653,7 @@ miniLOL = {
                         info.templates.push(templates[i].getAttribute("name"));
                     }
 
-                    miniLOL.theme.template.list = {
-                        global: "<div #{attributes}>#{data}</div>",
-
-                        before: "#{data}",
-                        after:  "#{data}",
-
-                        link: "<div class='#{class}' id='#{id}'>#{before}<a href='#{url}' target='#{target}' #{attributes}>#{text}</a>#{after}</div>",
-                        nest: "<div class='#{class}' style='#{1}'>#{data}</div>",
-                        data: "<div class='data'>#{before}#{data}#{after}</div>"
-                    };
+                    miniLOL.theme.template.list = miniLOL.theme.template.defaultList();
 
                     var list = doc.getElementsByTagName("list");
                     if (list.length) {
@@ -664,6 +684,7 @@ miniLOL = {
                             miniLOL.theme.template.list.data = current[0].firstChild.nodeValue;
                         }
                     }
+
                 },
 
                 onFailure: function () {
@@ -699,7 +720,28 @@ miniLOL = {
                 miniLOL.theme.style.load(miniLOL.theme.informations.styles[i], false, true);
             }
 
+            miniLOL.theme.initialize();
+
             return true;
+        },
+
+        unload: function () {
+            if (!miniLOL.theme.name) {
+                return;
+            }
+
+            miniLOL.theme.finalize();
+
+            for (var style in miniLOL.theme.style.list) {
+                miniLOL.theme.style.unload(style);
+            }
+
+            delete miniLOL.theme.name;
+
+            delete miniLOL.theme.initialize;
+            delete miniLOL.theme.finalize;
+
+            delete miniLOL.theme.informations;
         }
     },
 
