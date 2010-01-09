@@ -350,12 +350,14 @@ miniLOL = {
                         }
 
                         var response = miniLOL.utils.fixDOM(http.responseXML);
-                        if (!response.getElementById('default')) {
+
+                        miniLOL.menu.default = response.getElementById('default');
+                        if (!miniLOL.menu.default) {
                             var menus = response.getElementsByTagName("menu");
 
                             for (var i = 0; i < menus.length; i++) {
                                 if (!menus[i].getAttribute("id")) {
-                                    menus[i].setAttribute("id", "default");
+                                    miniLOL.menu.default = menus[i];
                                     break;
                                 }
                             }
@@ -774,6 +776,10 @@ miniLOL = {
         parse: function (menu, layer) {
             layer = layer || 0;
 
+            if (menu.getElementsByTagName("item").length == 0) {
+                return "";
+            }
+
             var template = miniLOL.theme.template.menu();
             if (template) {
                 template = template.getElementById(layer) || template.getElementById("*");
@@ -860,7 +866,7 @@ miniLOL = {
                 return false;
             }
 
-            return miniLOL.menu.parse(miniLOL.menus.dom.getElementById(name))
+            return miniLOL.menu.parse(miniLOL.menus.dom.getElementById(name) || miniLOL.menu.default)
         },
 
         change: function (name) {
@@ -872,6 +878,10 @@ miniLOL = {
         },
 
         exists: function (name) {
+            if (name == 'default') {
+                return true;
+            }
+
             return Boolean(miniLOL.menus.dom.getElementById(name));
         }
     },
