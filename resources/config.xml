@@ -16,9 +16,6 @@ things to be set and those configurations will go here.
     <siteTitle>miniLOL</siteTitle>
     <homePage>home</homePage>
 
-    <contentNode>body</contentNode>
-    <menuNode>menu</menuNode>
-
     <loadingMessage><![CDATA[<center>Loading...</center>]]></loadingMessage>
 
     <theme>original</theme>

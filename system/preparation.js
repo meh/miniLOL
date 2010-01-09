@@ -32,9 +32,21 @@ Function.prototype.clone = function () {
     return eval("("+this.toString().replace(/^function .*?\(/, 'function (')+")");
 };
 
+if (navigator.userAgent.match(/Chrome/)) {
+    Prototype.Browser.Chrome = true;
+}
+
+if (navigator.vendor.match("Apple")) {
+    Prototype.Browser.Safari = true;
+}
+
 if (Prototype.Browser.IE) {
     Error.prototype.toString = function () {
-        return "#{name}: #{description}".interpolate(this);
+        return "#{name}: #{description}<br/><br/>#{stack}".interpolate({
+            name:    this.name,
+            message: this.message,
+            stack:   this.stack
+        });
     };
 
     Function.prototype.clone = function () {
@@ -67,4 +79,7 @@ else if (Prototype.Browser.Chrome) {
             stack:   this.stack.replace(/\n/g, "<br/>")
         });
     }
+}
+else if (Prototype.Browser.Safari) {
+
 }

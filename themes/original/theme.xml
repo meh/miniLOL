@@ -8,7 +8,25 @@
     >
 ]>
 
-<theme name="original" author="meh.">
+<theme name="original" author="meh." menu="menu" content="body">
+    <initialize><![CDATA[
+        miniLOL.theme.resize = function () {
+            $('container').setStyle({
+                top: ((document.viewport.getHeight() - $('container').getHeight())/2)+'px',
+                left: ((document.viewport.getWidth() - $('container').getWidth() )/2)+'px'
+            });
+        }
+
+        miniLOL.theme.resize();
+        Event.observe(window, 'resize', miniLOL.theme.resize);
+        Event.observe(document, ':initialized', miniLOL.theme.resize);
+    ]]></initialize>
+
+    <finalize><![CDATA[
+        Event.stopObserving(window, 'resize', miniLOL.theme.resize);
+        delete miniLOL.theme.resize;
+    ]]></finalize>
+
     <styles>
         <style name="core"/>
         <style name="menu"/>

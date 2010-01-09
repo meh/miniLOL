@@ -360,8 +360,10 @@ miniLOL = {
                                 }
                             }
 
-                            miniLOL.error("Error while analyzing menus.xml<br/><br/>No default menu was found.");
-                            return;
+                            if (i >= menus.length) {
+                                miniLOL.error("Error while analyzing menus.xml<br/><br/>No default menu was found.");
+                                return;
+                            }
                         }
 
                         miniLOL.menus.dom = response;
@@ -643,6 +645,9 @@ miniLOL = {
 
                     info.name   = doc.documentElement.getAttribute("name")   || "Unknown";
                     info.author = doc.documentElement.getAttribute("author") || "Anonymous";
+                    
+                    miniLOL.config["core"].menuNode    = doc.documentElement.getAttribute("menu") || "menu";
+                    miniLOL.config["core"].contentNode = doc.documentElement.getAttribute("content") || "body";
 
                     var initialize = doc.getElementsByTagName("initialize");
                     if (initialize.length) {
@@ -654,7 +659,7 @@ miniLOL = {
 
                     var finalize = doc.getElementsByTagName("finalize");
                     if (finalize.length) {
-                        miniLOL.theme.finalize = new Function(initialize[0].firstChild.nodeValue);
+                        miniLOL.theme.finalize = new Function(finalize[0].firstChild.nodeValue);
                     }
                     else {
                         miniLOL.theme.finalize = new Function;
@@ -802,13 +807,22 @@ miniLOL = {
             for (var i = 0; i < contents.length; i++) {
                 switch (contents[i].nodeType) {
                     case Node.ELEMENT_NODE:
+                    var item = contents[i].cloneNode(true);
+
                     var text = miniLOL.utils.getFirstTextNode(contents[i].childNodes);
                     var data = miniLOL.menu.parse(contents[i], layer + 1);
+
+                    var itemClass = item.getAttribute("class"); item.removeAttribute("class");
+                    var itemId    = item.getAttribute("id"); item.removeAttribute("id");
+                    var itemHref  = item.getAttribute("href"); item.removeAttribute("href");
                     
                     output += template.item.interpolate({
-                        href: contents[i].getAttribute("href"),
-                        text: text,
-                        data: data
+                        "class":    itemClass,
+                        id:         itemId,
+                        href:       itemHref,
+                        attributes: miniLOL.utils.attributes(item.attributes),
+                        text:       text,
+                        data:       data
                     });
                     break;
 
@@ -1227,7 +1241,9 @@ miniLOL = {
                     callback.call(context || window);
                 }
                 else {
-                    setTimeout((function () { miniLOL.module.dependencies.needs(name, callback, context); }), wait || 10);
+                    setTimeout(function () {
+                        miniLOL.module.dependencies.needs(name, callback, context);
+                    }, wait || 10);
                 }
             }
         }

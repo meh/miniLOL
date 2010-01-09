@@ -66,7 +66,7 @@ The example below should be self explanatory.
             This is a links collection:<br/>
         ]]>
         <list before="-&#160;">
-            <link domain="in" src="stuff" text="Stuff" arguments="decoration=- times=40" after=" ~ Internal link"/>
+            <link src="#stuff" text="Stuff" arguments="decoration=- times=40" after=" ~ Internal link"/>
             <link src="separated" text="Separated" after=" ~ Internal link but in data/"/>
             <link src="#separated" text="Separated" after=" ~ Separated alias'd"/>
             <link src="http://lulz.thruhere.net" text="IN LULZ WE TRUST" after=" ~ External link"/>

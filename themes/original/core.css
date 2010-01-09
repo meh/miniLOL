@@ -26,9 +26,7 @@ body {
 }
 
 #container {
-    margin-top: 9%;
-    margin-left: auto;
-    margin-right: auto;
+    position: absolute;
     border: solid 1px #222222;
     width: 500px;
     padding: 10px;
