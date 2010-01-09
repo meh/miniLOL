@@ -824,7 +824,13 @@ miniLOL = {
 
                     var itemClass = item.getAttribute("class"); item.removeAttribute("class");
                     var itemId    = item.getAttribute("id"); item.removeAttribute("id");
-                    var itemSrc   = item.getAttribute("src") || item.getAttribute("href"); item.removeAttribute("src"); item.removeAttribute("href");
+                    var itemSrc   = item.getAttribute("src")
+                                 || item.getAttribute("href")
+                                 || item.getAttribute("url");
+                    
+                    item.removeAttribute("src");
+                    item.removeAttribute("href");
+                    item.removeAttribute("url");
                     
                     output += template.item.interpolate({
                         "class":    itemClass,
@@ -923,14 +929,21 @@ miniLOL = {
                             if (list[h].nodeName == 'link') {
                                 var link = list[h].cloneNode(true);
                 
-                                var src     = link.getAttribute('src') || link.getAttribute("href"); link.removeAttribute('src'); link.removeAttribute("href");
-                                var target  = link.getAttribute('target'); link.removeAttribute('target');
-                                var text    = link.getAttribute('text'); link.removeAttribute('text');
-                                var before  = link.getAttribute('before') || listBefore || ''; link.removeAttribute('before');
-                                var after   = link.getAttribute('after') || listAfter || ''; link.removeAttribute('after');
-                                var domain  = link.getAttribute('domain') || ''; link.removeAttribute('domain');
-                                var args    = link.getAttribute('arguments') || listArgs; link.removeAttribute('arguments');
-                                var menu    = link.getAttribute('menu') || listMenu; link.removeAttribute('menu');
+                                var src = link.getAttribute('src')
+                                       || link.getAttribute("href")
+                                       || link.getAttribute("url");
+                                       
+                                link.removeAttribute('src');
+                                link.removeAttribute("href");
+                                link.removeAttribute("url");
+
+                                var target = link.getAttribute('target'); link.removeAttribute('target');
+                                var text   = link.getAttribute('text'); link.removeAttribute('text');
+                                var before = link.getAttribute('before') || listBefore || ''; link.removeAttribute('before');
+                                var after  = link.getAttribute('after') || listAfter || ''; link.removeAttribute('after');
+                                var domain = link.getAttribute('domain') || ''; link.removeAttribute('domain');
+                                var args   = link.getAttribute('arguments') || listArgs; link.removeAttribute('arguments');
+                                var menu   = link.getAttribute('menu') || listMenu; link.removeAttribute('menu');
                 
                                 var out = src.match(/^(\w+:\/\/|mailto:)/);
                 

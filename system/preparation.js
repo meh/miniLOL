@@ -25,7 +25,7 @@ unFocus.History.addEventListener('historyChange', function (query) {
         miniLOL.go('#' + miniLOL.config['core'].homePage);
     }
     
-    $(miniLOL.config['core'].contentNode).scrollTop = 0;
+    miniLOL.theme.content().scrollTop = 0;
 });
 
 Function.prototype.clone = function () {
