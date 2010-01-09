@@ -1,3 +1,17 @@
+#menu a
+{
+    color: #888888;
+    font-size: 13px;
+    text-decoration: none;
+    font-family: Courier New;
+    font-weight: bold;
+}
+
+#menu a:hover
+{
+    color: #E4E4E4;
+}
+
 #menu .item:before {
     content: " - ";
 }

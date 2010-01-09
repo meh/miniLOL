@@ -18,7 +18,7 @@
         ]]></menu>
 
         <item><![CDATA[
-            <div class="item"><a href="#{href}">#{text}</a></div>
+            <span class="item"><a href="#{href}">#{text}</a></span>
         ]]></item>
     </layer>
 </template>
