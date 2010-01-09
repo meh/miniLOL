@@ -32,11 +32,11 @@ Function.prototype.clone = function () {
     return eval("("+this.toString().replace(/^function .*?\(/, 'function (')+")");
 };
 
-if (navigator.userAgent.match(/Chrome/)) {
+if (navigator.userAgent && navigator.userAgent.match(/Chrome/)) {
     Prototype.Browser.Chrome = true;
 }
 
-if (navigator.vendor.match("Apple")) {
+if (navigator.vendor && navigator.vendor.match("Apple")) {
     Prototype.Browser.Safari = true;
 }
 

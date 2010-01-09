@@ -351,13 +351,13 @@ miniLOL = {
 
                         var response = miniLOL.utils.fixDOM(http.responseXML);
 
-                        miniLOL.menu.default = response.getElementById('default');
-                        if (!miniLOL.menu.default) {
+                        miniLOL.menu._default = response.getElementById('default');
+                        if (!miniLOL.menu._default) {
                             var menus = response.getElementsByTagName("menu");
 
                             for (var i = 0; i < menus.length; i++) {
                                 if (!menus[i].getAttribute("id")) {
-                                    miniLOL.menu.default = menus[i];
+                                    miniLOL.menu._default = menus[i];
                                     break;
                                 }
                             }
@@ -866,7 +866,7 @@ miniLOL = {
                 return false;
             }
 
-            return miniLOL.menu.parse(miniLOL.menus.dom.getElementById(name) || miniLOL.menu.default)
+            return miniLOL.menu.parse(miniLOL.menus.dom.getElementById(name) || miniLOL.menu._default)
         },
 
         change: function (name) {

@@ -12,7 +12,7 @@
     <initialize><![CDATA[
         miniLOL.theme.resize = function () {
             $('container').setStyle({
-                top: ((document.viewport.getHeight() - $('container').getHeight())/2)+'px',
+                top:  ((document.viewport.getHeight() - $('container').getHeight())/2)+'px',
                 left: ((document.viewport.getWidth() - $('container').getWidth() )/2)+'px'
             });
         }
