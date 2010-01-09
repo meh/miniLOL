@@ -75,7 +75,7 @@ The example below should be self explanatory.
 
     <page id="separated" alias="#page=separated"/>
 
-    <page id="stuff" menu="stuff" type="simple" arguments="decoration=~ times=20">
+    <page id="stuff" type="simple" arguments="decoration=~ times=20">
         <![CDATA[NIGGER NIGGER NIGGER NIGGER NIGGER NIGGER
              NIGGER NIGGER NIGGER NIGGER NIGGER NIGGER
              NIGGER NIGGER NIGGER NIGGER NIGGER NIGGER
