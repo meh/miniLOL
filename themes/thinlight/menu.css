@@ -1,0 +1,22 @@
+#menu {
+    height: 16px;
+    margin: 4px 0px;
+    border: 1px solid #DDE;
+    padding: 4px;
+    padding-bottom: 3px;
+    display: inline-block;
+}
+
+#menu .menu {
+    padding: 0 4px;
+    display: inline;
+}
+
+#menu a {
+    text-decoration: none;
+    cursor: pointer;
+}
+
+#menu a:hover {
+    text-decoration: underline;
+}

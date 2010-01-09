@@ -8,7 +8,7 @@
     >
 ]>
 
-<theme name="Thin Light" author="meh. &amp; blawl">
+<theme name="Thin Light" author="meh. &amp; blawl" menu="menu" content="body">
     <list>
         <link><![CDATA[<div class="#{class}" id="#{id}">#{before}<div class="url"><a href="#{url}" target="#{target}" #{attributes}>#{text}</a></div><div class="description">#{after}</div></div>]]></link>
     </list>
@@ -20,6 +20,8 @@
 
     <styles>
         <style name="core"/>
+        <style name="menu"/>
+
         <style name="blog/style"/>
     </styles>
 </theme>

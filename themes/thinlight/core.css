@@ -4,25 +4,16 @@
     position: relative;
 }
 
-body {
-    color: #444;
-    background: #FFF;
-    font-family: monospace;
-    font-size: 11px;
-}
-
 a {
     color: #000;
     text-decoration: underline;
 }
 
-#menu a {
-    text-decoration: none;
-    cursor: pointer;
-}
-
-#menu a:hover {
-    text-decoration: underline;
+body {
+    color: #444;
+    background: #FFF;
+    font-family: monospace;
+    font-size: 11px;
 }
 
 #container {
@@ -35,20 +26,6 @@ a {
     text-align: right;
 }
 
-#menu {
-    height: 16px;
-    margin: 4px 0px;
-    border: 1px solid #DDE;
-    padding: 4px;
-    padding-bottom: 3px;
-    display: inline-block;
-}
-
-#menu .menu {
-    padding: 0 4px;
-    display: inline;
-    list-style-type: none;
-}
 
 #body {
     padding: 8px;
