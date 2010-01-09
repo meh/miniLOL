@@ -24,9 +24,9 @@
 
 // Previous inizializations and improvements
 
-unFocus.History.addEventListener('historyChange', function (historyHash) {
-    if (historyHash) {
-        miniLOL.go('#' + historyHash);
+unFocus.History.addEventListener('historyChange', function (query) {
+    if (query) {
+        miniLOL.go('#' + query);
     }
     else {
         miniLOL.go('#' + miniLOL.config['core'].homePage);
@@ -62,8 +62,8 @@ miniLOL = {
     initialize: function () {
         [function () {
             miniLOL.resource.load(miniLOL.resources.config, "resources/config.xml");
-            document.title = miniLOL.config["core"].siteTitle;
-            document.body.innerHTML = miniLOL.config["core"].loadingMessage;
+            document.title          = miniLOL.config["core"].siteTitle || "miniLOL #{version}".interpolate({ version: miniLOL.version });
+            document.body.innerHTML = miniLOL.config["core"].loadingMessage || "Loading...";
         },
 
         function () {
@@ -138,7 +138,7 @@ miniLOL = {
             return false;
         }
 
-        miniLOL.go(/\/[#?].+/.test(location.href) ? location.href.replace(/^.*[#?]/, '#') : "#"+miniLOL.config['core'].homePage);
+        miniLOL.go(/[#?]./.test(location.href) ? location.href.replace(/^.*[#?]/, '#') : "#"+miniLOL.config['core'].homePage);
 
         if (miniLOL.config["core"].initialization) {
             eval(miniLOL.config["core"].initialization);
@@ -388,7 +388,7 @@ miniLOL = {
                         }
 
                         miniLOL.menus.dom = response;
-                    },
+                    }
                 });
             }
         },
@@ -528,10 +528,10 @@ miniLOL = {
                         var modules = http.responseXML.documentElement.getElementsByTagName('module');
                         for (var i = 0; i < modules.length; i++) {
                             if (output) {
-                                miniLOL.content.set("Loading `#{name}`... [#{n}/#{total}]".interpolate({
-                                    name:  modules[i].getAttribute("name"),
-                                    n:     i+1,
-                                    total: modules.length
+                                miniLOL.content.set("Loading `#{name}`... [#{number}/#{total}]".interpolate({
+                                    name:   modules[i].getAttribute("name"),
+                                    number: i + 1,
+                                    total:  modules.length
                                 }));
                             }
 
@@ -791,6 +791,12 @@ miniLOL = {
     menu: {
         parse: function (menu) {
             var template = miniLOL.theme.template.menu();
+
+            if (!template) {
+                return;
+            }
+
+            // TODO: it.
         },
 
         set: function (data) {
