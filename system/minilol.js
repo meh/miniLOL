@@ -72,7 +72,7 @@ miniLOL = {
         },
         
         function () {
-            if (!miniLOL.config["core"].menuNode) {
+            if (!miniLOL.theme.menu()) {
                 miniLOL.menus.dom = null;
             }
 
@@ -92,7 +92,7 @@ miniLOL = {
                 miniLOL.module.dependencies.check();
             }
             catch (e) {
-                miniLOL.error("`#{module}` requires `#{require}`".interpolate(e), $(miniLOL.config['core'].contentNode));
+                miniLOL.error("`#{module}` requires `#{require}`".interpolate(e), miniLOL.theme.content());
             }
         }].each(function (callback) {
             try {
@@ -151,15 +151,11 @@ miniLOL = {
                 evaluate = true;
             }
 
-            $(miniLOL.config['core'].contentNode).innerHTML = data;
-
-            if (evaluate) {
-                data.evalScripts();
-            }
+            miniLOL.theme.content().update(data);
         },
 
         get: function () {
-            return $(miniLOL.config['core'].contentNode).innerHTML;
+            return miniLOL.theme.content().innerHTML;
         }
     },
 
@@ -499,7 +495,7 @@ miniLOL = {
                         if (error) {
                             miniLOL.error("Error while parsing modules.xml<br/><br/>#{error}".interpolate({
                                 error: error.replace(/\n/g, '<br/>').replace(/ /g, '&nbsp;')
-                            }), $(miniLOL.config['core'].contentNode));
+                            }), miniLOL.theme.content());
 
                             return;
                         }
@@ -529,7 +525,7 @@ miniLOL = {
                     onFailure: function (http) {
                         miniLOL.error("Error while loading modules.xml (#{error})".interpolate({
                             error: http.status
-                        }), $(miniLOL.config['core'].contentNode));
+                        }), miniLOL.theme.content());
                     }
                 });
             }
@@ -648,8 +644,8 @@ miniLOL = {
                     info.name   = doc.documentElement.getAttribute("name")   || "Unknown";
                     info.author = doc.documentElement.getAttribute("author") || "Anonymous";
                     
-                    miniLOL.config["core"].menuNode    = doc.documentElement.getAttribute("menu") || "menu";
-                    miniLOL.config["core"].contentNode = doc.documentElement.getAttribute("content") || "body";
+                    miniLOL.theme.menu._node    = doc.documentElement.getAttribute("menu") || "menu";
+                    miniLOL.theme.content._node = doc.documentElement.getAttribute("content") || "body";
 
                     var initialize = doc.getElementsByTagName("initialize");
                     if (initialize.length) {
@@ -769,6 +765,14 @@ miniLOL = {
             delete miniLOL.theme.informations;
 
             delete miniLOL.theme.template.menu._cache;
+        },
+
+        content: function () {
+            return $(miniLOL.theme.content._node);
+        },
+
+        menu: function () {
+            return $(miniLOL.theme.menu._node);
         }
     },
 
@@ -850,7 +854,7 @@ miniLOL = {
                 return;
             }
 
-            $(miniLOL.config['core'].menuNode).innerHTML = data;
+            miniLOL.theme.menu().update(data);
         },
 
         get: function (name) {
@@ -1191,7 +1195,7 @@ miniLOL = {
                     file:  e.fileName,
                     line:  e.lineNumber,
                     error: e.toString()
-                }), $(miniLOL.config['core'].contentNode));
+                }), miniLOL.theme.content());
 
                 return false;
             }
@@ -1224,7 +1228,7 @@ miniLOL = {
                     file:  e.fileName,
                     line:  e.lineNumber,
                     error: e.toString()
-                }), $(miniLOL.config['core'].contentNode));
+                }), miniLOL.theme.content());
 
                 return false;
             }
