@@ -144,9 +144,13 @@ miniLOL = {
             eval(miniLOL.config["core"].initialization);
         }
 
-        Event.fire(document, ':initialized');
+        Event.observe(document, ':refresh', miniLOL.refresh);
 
-        new PeriodicalExecuter(miniLOL.refresh, miniLOL.config['core'].refreshEvery || 360)
+        new PeriodicalExecuter(function () {
+            Event.fire(document, ':refresh');
+        }, miniLOL.config['core'].refreshEvery || 360)
+
+        Event.fire(document, ':initialized');
     },
 
     error: function (text, element) {
@@ -158,20 +162,10 @@ miniLOL = {
             return miniLOL.error._value = text;
         }
 
-        else if (text === null) {
-            if (miniLOL.error()) {
-        
-                return false;
-            }
+        element = element || document.body;
 
-            return true;
-        }
-        else {
-            element = element || document.body;
-
-            element.innerHTML    = text;
-            miniLOL.error._value = true;
-        }
+        element.innerHTML    = text;
+        miniLOL.error._value = true;
     },
 
     content: {
