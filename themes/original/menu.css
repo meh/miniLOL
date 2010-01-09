@@ -1,0 +1,7 @@
+#menu .item:before {
+    content: " - ";
+}
+
+#menu .item:nth-child(1):before {
+    content: "";
+}

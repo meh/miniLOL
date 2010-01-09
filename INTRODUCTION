@@ -1,0 +1,135 @@
+miniLOL is a simple but powerful CMS.
+
+It's written in Javascript so the server doesn't require to support a server
+side language.
+
+The directory tree is quite simple:
+system/    - Contains the system scripts that have to be loaded before the
+             miniLOL's core.
+resources/ - Contains the website resources, configuration, pages, menus,
+             stylesheets, wrapper functions, modules to load.
+modules/   - Contains the modules files that are loaded following the
+             resources/modules.xml directives.
+data/      - The data that the site might need.
+
+Let's look deeper in the resources/ directory.
+
+It should contain the following files:
+resources/config.xml
+resources/pages.xml
+resources/menus.xml
+resources/functions.xml
+resources/modules.xml
+resources/style.css
+resources/template.html
+
+- resources/config.xml has the job of keeping the core's and modules'
+  configurations like the site title and content/menu nodes' id.
+
+  Its syntax is really simple so I guess I can avoid explaining it.
+
+- resources/pages.xml is a bit more complex as you can guess from the DTD.
+
+  The <page> element has some attributes. The main attribute is the id
+  attribute, it tells miniLOL what's the page's name, in this way:
+  ----
+  <page id="thepage">
+  ----
+  The URL will be #thepage, easy, isn't it?
+
+  There's also a menu attribute, it tells which menu the page will use, only
+  if you want a multi menu site, if you don't put the menu attribute it will
+  default to 'default'.
+
+  You can write the whole page in a CDATASection or use the list collection
+  utility that transforms the xml into a link list with the attributes that you
+  set.
+
+  The <list> is quite simple, it can have some basic attributes that are
+  inherited by the <link> tags inside it like before, type, menu and some
+  attributes of its own like class and id.
+
+  The <list> tag has some attributes:
+    type        - Tells miniLOL what function wrapper to use.
+
+    arguments   - The arguments to pass to the output wrapper, needed for some
+                  types of modules that needs to know what to do with the
+                  output.
+
+    domain      - Tells miniLOL if the link is inside the xml or outside, the
+                  default is out.
+
+    before      - The text before the element, it can be inherited from the
+                  parent tag.
+
+    after       - The text after the element.
+
+    type        - The wrapper to use to output the linked file, it can be
+                  inherited from the parent tag.
+
+    menu        - The menu that the external page will have.
+
+    class       - The class that the div will have.
+
+    id          - The id that the div will have.
+
+    src         - The complete or partial url of the link.
+
+    text        - The text of the link.
+
+    *           - All the other attributes are given to the <a> tag in this
+                  way you can add easily javascript events or other stuff.
+
+  Here's an example, if you want to create a link to a file in the data/
+  folder you just have to do something like this:
+
+  -------
+  <list>
+      <link src="file" text="A file in the data/ folder"/>
+  </list>
+  -------
+
+  Really easy, isn't it?
+
+  If you want to link to a domain outside the site you just have to put
+  http:// like you would normally.
+
+  To link to a page inside the pages.xml you have to put the domain="in"
+  attribute to the <link> element, in this way miniLOL will look into the
+  pages.xml.
+
+- resources/menus.xml is quite simple, the main attribute is the template, it
+  tells to miniLOL how to set the menu, each <menu> can have a template
+  attribute, if it's missing it template will be inherited from the root
+  element.
+  
+  The two template parameters are #{name} that is equal to
+  miniLOL.menu.current and #{menu} that's the actual content of <menu>.
+
+  The id is the menu name.
+
+- resources/functions.xml is the module system most important part, it gives
+  miniLOL a way to use a module.
+
+  The <function> tag has just a name attribute that equals to the type tag in
+  list. The content of a <function> tag is the function itself.
+
+  The function has 2 default parameters: text and args.
+  text is the raw output that would be outputted.
+  args are the arguments passed to the page.
+
+  The function automatically returns the text content, so you just have to
+  replace or work on that variable.
+
+  Remember that the text is evaluated by the javascript interpreter so it can
+  do anything that javascript can do.
+
+- resources/modules.xml is just a simple list of the modules that have to be
+  loaded, just put the file in modules/ and add the element with the module
+  name.
+
+- resources/style.css should be the main stylesheet file but you can have
+  multiple or none stylesheets, it's your choice.
+
+- resources/template.html is the html that's loaded in the body, so this is
+  one of the most important parts.

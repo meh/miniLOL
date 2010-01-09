@@ -1,18 +1,20 @@
 /****************************************************************************
  * Copyleft meh. [http://meh.doesntexist.org | meh.ffff@gmail.com]          *
  *                                                                          *
- * This program is free software: you can redistribute it and/or modify     *
+ * This file is part of miniLOL.                                            *
+ *                                                                          *
+ * miniLOL is free software: you can redistribute it and/or modify          *
  * it under the terms of the GNU General Public License as published by     *
  * the Free Software Foundation, either version 3 of the License, or        *
  * (at your option) any later version.                                      *
  *                                                                          *
- * This program is distributed in the hope that it will be useful,          *
+ * miniLOL is distributed in the hope that it will be useful,               *
  * but WITHOUT ANY WARRANTY; without even the implied warranty of           *
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            *
  * GNU General Public License for more details.                             *
  *                                                                          *
  * You should have received a copy of the GNU General Public License        *
- * along with miniLOL program.  If not, see <http://www.gnu.org/licenses/>. *
+ * along with miniLOL.  If not, see <http://www.gnu.org/licenses/>.         *
  ****************************************************************************/
 
 /*
@@ -22,48 +24,23 @@
  * Get a real browser, get Firefox.
  */
 
-// Previous inizializations and improvements
-
-unFocus.History.addEventListener('historyChange', function (query) {
-    if (query) {
-        miniLOL.go('#' + query);
-    }
-    else {
-        miniLOL.go('#' + miniLOL.config['core'].homePage);
-    }
-    
-    $(miniLOL.config['core'].contentNode).scrollTop = 0;
-});
-
-Function.prototype.clone = function () {
-    return eval("("+this.toString().replace(/^function .*?\(/, 'function (')+")");
-};
-
-if (Prototype.Browser.IE) {
-    Error.prototype.toString = function () {
-        return "#{name}: #{description}".interpolate(this);
-    };
-
-    Function.prototype.clone = function () {
-        var func = this.toString();
-
-        return new Function(func.substring(func.indexOf("{") + 1, func.lastIndexOf("}")));
-    };
-}
-else if (Prototype.Browser.Opera) {
-    Error.prototype.toString = function () {
-        return "#{name}: #{message}".interpolate(this);
-    }
-}
-
 miniLOL = {
     version: '1.0',
 
     initialize: function () {
         [function () {
             miniLOL.resource.load(miniLOL.resources.config, "resources/config.xml");
-            document.title          = miniLOL.config["core"].siteTitle || "miniLOL #{version}".interpolate({ version: miniLOL.version });
-            document.body.innerHTML = miniLOL.config["core"].loadingMessage || "Loading...";
+
+            if (!miniLOL.config["core"].siteTitle) {
+                 miniLOL.config["core"].siteTitle = "miniLOL #{version}".interpolate(miniLOL);
+            }
+
+            if (!miniLOL.config["core"].loadingMessage) {
+                miniLOL.config["core"].loadingMessage = "Loading...";
+            }
+                 
+            document.title          = miniLOL.config["core"].siteTitle;
+            document.body.innerHTML = miniLOL.config["core"].loadingMessage;
         },
 
         function () {
@@ -789,14 +766,61 @@ miniLOL = {
     },
 
     menu: {
-        parse: function (menu) {
-            var template = miniLOL.theme.template.menu();
+        parse: function (menu, layer) {
+            layer = layer || 0;
 
-            if (!template) {
-                return;
+            var template = miniLOL.theme.template.menu();
+            if (template) {
+                template = template.getElementById(layer) || template.getElementById("*");
             }
 
-            // TODO: it.
+            if (template) {
+                var tmp  = template;
+                template = {};
+
+                if (tmp.getElementsByTagName("menu").length) {
+                    template.menu = tmp.getElementsByTagName("menu")[0].firstChild.nodeValue;
+                }
+                else {
+                    template.menu = "";
+                }
+
+                if (tmp.getElementsByTagName("item").length) {
+                    template.item = tmp.getElementsByTagName("item")[0].firstChild.nodeValue;
+                }
+                else {
+                    template.item = "";
+                }
+            }
+            else {
+                return "";
+            }
+
+            var output   = "";
+            var contents = menu.childNodes;
+            
+            for (var i = 0; i < contents.length; i++) {
+                switch (contents[i].nodeType) {
+                    case Node.ELEMENT_NODE:
+                    var text = miniLOL.utils.getFirstTextNode(contents[i].childNodes);
+                    var data = miniLOL.menu.parse(contents[i], layer + 1);
+                    
+                    output += template.item.interpolate({
+                        href: contents[i].getAttribute("href"),
+                        text: text,
+                        data: data
+                    });
+                    break;
+
+                    case Node.CDATA_SECTION_NODE:
+                    output += contents[i].nodeValue;
+                    break;
+                }
+            }
+
+            return template.menu.interpolate({
+                data: output
+            });
         },
 
         set: function (data) {
@@ -1282,6 +1306,18 @@ miniLOL = {
             return obj;
         },
 
+        getFirstTextNode: function (elements) {
+            for (var i = 0; i < elements.length; i++) {
+                if (elements[i].nodeType == Node.ELEMENT_NODE) {
+                    return "";
+                }
+
+                if (elements[i].nodeType == Node.TEXT_NODE && elements[i].nodeValue.replace(/[\s\n]/g, '')) {
+                    return elements[i].nodeValue;
+                }
+            }
+        },
+
         parseQuery: function (url) {
             var result  = new Object;
             var matches = url.match(/\?(.*)$/);
@@ -1384,3 +1420,5 @@ miniLOL = {
         }
     }
 }
+
+miniLOL.utils.require("system/preparation.js");

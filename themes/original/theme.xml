@@ -11,5 +11,6 @@
 <theme name="original" author="meh.">
     <styles>
         <style name="core"/>
+        <style name="menu"/>
     </styles>
 </theme>
