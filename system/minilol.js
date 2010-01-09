@@ -60,15 +60,66 @@ miniLOL = {
     version: '1.0',
 
     initialize: function () {
-        ['miniLOL.resource.load(miniLOL.resources.config, "resources/config.xml");',
-         'document.title = miniLOL.config["core"].siteTitle;',
-         'document.body.innerHTML = miniLOL.config["core"].loadingMessage;',
-         'miniLOL.resource.load(miniLOL.resources.menus, "resources/menus.xml");',
-         'miniLOL.resource.load(miniLOL.resources.pages, "resources/pages.xml");',
-         'miniLOL.resource.load(miniLOL.resources.functions, "resources/functions.xml");',
-        ].each(function (cmd) {
+        [function () {
+            miniLOL.resource.load(miniLOL.resources.config, "resources/config.xml");
+            document.title = miniLOL.config["core"].siteTitle;
+            document.body.innerHTML = miniLOL.config["core"].loadingMessage;
+        },
+
+        function () {
+            miniLOL.resource.load(miniLOL.resources.menus, "resources/menus.xml");
+        },
+
+        function () {
+            miniLOL.resource.load(miniLOL.resources.pages, "resources/pages.xml");
+        },
+
+        function () {
+            miniLOL.resource.load(miniLOL.resources.functions, "resources/functions.xml");
+        },
+        
+        function () {
+            if (miniLOL.config["core"].theme) {
+                var path = miniLOL.config["core"].theme.match(/^(.+?):(.*)$/);
+            
+                if (path) {
+                    miniLOL.theme.path           = path[1];
+                    miniLOL.config["core"].theme = path[2];
+                }
+                else {
+                    miniLOL.theme.path = "themes";
+                }
+
+                miniLOL.error(!miniLOL.theme.load(miniLOL.config["core"].theme));
+           }
+        },
+        
+        function () {
+            if (!miniLOL.config["core"].menuNode) {
+                miniLOL.menus.dom = null;
+            }
+
+            if (miniLOL.menu.enabled()) {
+                miniLOL.menu.change("default");
+            }
+        },
+
+        function () {
+            miniLOL.content.set('Loading modules...');
+            miniLOL.resource.load(miniLOL.resources.modules, "resources/modules.xml", true);
+        },
+        
+        function () {
+            miniLOL.content.set('Checking dependencies...');
             try {
-                eval(cmd);
+                miniLOL.module.dependencies.check();
+            }
+            catch (e) {
+                miniLOL.error("`#{module}` requires `#{require}`".interpolate(e), $(miniLOL.config['core'].contentNode));
+            }
+        }].each(function (callback) {
+            try {
+                callback();
             }
             catch (e) {
                 miniLOL.error(e.toString());
@@ -79,52 +130,11 @@ miniLOL = {
             }
         });
 
-        if (!miniLOL.error(null)) {
-            return false;
-        }
-
-        if (miniLOL.config["core"].theme) {
-            var path = miniLOL.config["core"].theme.match(/^(.+?):(.*)$/);
-            
-            if (path) {
-                miniLOL.theme.path           = path[1];
-                miniLOL.config["core"].theme = path[2];
-            }
-            else {
-                miniLOL.theme.path = "themes";
+        if (miniLOL.error()) {
+            if (!document.body.innerHTML) {
+               miniLOL.error("Something went wrong, but nobody told me what :(");
             }
 
-            miniLOL.error(!miniLOL.theme.load(miniLOL.config["core"].theme));
-        }
-
-        if (!miniLOL.error(null)) {
-            return false;
-        }
-
-        if (!miniLOL.config["core"].menuNode) {
-            miniLOL.menus.dom = null;
-        }
-
-        if (miniLOL.menu.enabled()) {
-            miniLOL.menu.change("default");
-        }
-
-        miniLOL.content.set('Loading modules...');
-        miniLOL.resource.load(miniLOL.resources.modules, "resources/modules.xml", true);
-
-        if (!miniLOL.error(null)) {
-            return false;
-        }
-
-        miniLOL.content.set('Checking dependencies...');
-        try {
-            miniLOL.module.dependencies.check();
-        }
-        catch (e) {
-            miniLOL.error("`#{module}` requires `#{require}`".interpolate(e), $(miniLOL.config['core'].contentNode));
-        }
-
-        if (!miniLOL.error(null)) {
             return false;
         }
 
@@ -147,12 +157,10 @@ miniLOL = {
         if (text === true || text === false) {
             return miniLOL.error._value = text;
         }
+
         else if (text === null) {
             if (miniLOL.error()) {
-                if (!document.body.innerHTML) {
-                    miniLOL.error("Something went wrong, but nobody told me what :(");
-                }
-
+        
                 return false;
             }
 
