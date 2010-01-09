@@ -820,12 +820,14 @@ miniLOL = {
 
                     var itemClass = item.getAttribute("class"); item.removeAttribute("class");
                     var itemId    = item.getAttribute("id"); item.removeAttribute("id");
-                    var itemHref  = item.getAttribute("href"); item.removeAttribute("href");
+                    var itemSrc   = item.getAttribute("src") || item.getAttribute("href"); item.removeAttribute("src"); item.removeAttribute("href");
                     
                     output += template.item.interpolate({
                         "class":    itemClass,
                         id:         itemId,
-                        href:       itemHref,
+                        url:        itemSrc,
+                        src:        itemSrc,
+                        href:       itemSrc,
                         attributes: miniLOL.utils.attributes(item.attributes),
                         text:       text,
                         data:       data
@@ -917,7 +919,7 @@ miniLOL = {
                             if (list[h].nodeName == 'link') {
                                 var link = list[h].cloneNode(true);
                 
-                                var src     = link.getAttribute('src'); link.removeAttribute('src');
+                                var src     = link.getAttribute('src') || link.getAttribute("href"); link.removeAttribute('src'); link.removeAttribute("href");
                                 var target  = link.getAttribute('target'); link.removeAttribute('target');
                                 var text    = link.getAttribute('text'); link.removeAttribute('text');
                                 var before  = link.getAttribute('before') || listBefore || ''; link.removeAttribute('before');
@@ -962,6 +964,8 @@ miniLOL = {
                                     before:     miniLOL.theme.template.list.before.interpolate({ data: before }),
                                     after:      miniLOL.theme.template.list.after.interpolate({ data: after }),
                                     url:        src,
+                                    src:        src,
+                                    href:       src,
                                     target:     target,
                                     text:       text
                                 });
