@@ -1,3 +1,9 @@
+1.0
+  + Internet Explorer support
+  + implemented theming support
+  + improvements in menu templeting
+  = improved the code and moved out dependencies and such
+
 0.8
   + links tag replaced by list tag, will break everything
   + nest element in list tags (pages.xml)

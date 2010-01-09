@@ -2,23 +2,22 @@
 
 <!DOCTYPE menus [
     <!ELEMENT menus (menu*)>
-    <!ATTLIST menus template CDATA #IMPLIED>
 
-    <!ELEMENT menu (#PCDATA)>
+    <!ELEMENT menu (item*)>
     <!ATTLIST menu
-        id       ID    #REQUIRED
-        template CDATA #IMPLIED
+        id  ID  #REQUIRED
+    >
+
+    <!ELEMENT item ANY>
+    <!ATTLIST item
+        href    CDATA   #REQUIRED
     >
 ]>
 
-<menus template="&lt;a onclick=&quot;miniLOL.menu.change('#{name}')&quot;&gt;¤&lt;/a&gt; #{menu}">
-    <menu id="default"><![CDATA[
-        <a href="#home">Home</a> -
-        <a href="#links">My links</a> -
-        <a href="#stuff">My stuff</a>
-    ]]></menu>
-
-    <menu id="stuff"><![CDATA[
-        <a href="#home">NIGGER</a>
-    ]]></menu>
+<menus>
+    <menu id="default">
+        <item href="#home">Home</item>
+        <item href="#links">My links</item>
+        <item href="#stuff">My stuff</item>
+    </menu>
 </menus>

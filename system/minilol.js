@@ -66,8 +66,6 @@ miniLOL = {
          'miniLOL.resource.load(miniLOL.resources.menus, "resources/menus.xml");',
          'miniLOL.resource.load(miniLOL.resources.pages, "resources/pages.xml");',
          'miniLOL.resource.load(miniLOL.resources.functions, "resources/functions.xml");',
-         'var path = miniLOL.config["core"].theme.match(/^(.+?):(.*)$/); if (path) { miniLOL.theme.path = path[1]; miniLOL.config["core"].theme = path[2]; } else { miniLOL.theme.path = "themes"; }',
-         'miniLOL._error = !miniLOL.theme.load(miniLOL.config["core"].theme);',
         ].each(function (cmd) {
             try {
                 eval(cmd);
@@ -81,32 +79,40 @@ miniLOL = {
             }
         });
 
-        if (miniLOL.error()) {
-            if (!document.body.innerHTML) {
-                miniLOL.error("Something went wrong, but nobody told me what :(");
-            }
-
+        if (!miniLOL.error(null)) {
             return false;
         }
 
-        if (miniLOL.menu.exists && !miniLOL.config["core"].menuNode) {
-            miniLOL.menu.exists = false
+        if (miniLOL.config["core"].theme) {
+            var path = miniLOL.config["core"].theme.match(/^(.+?):(.*)$/);
+            
+            if (path) {
+                miniLOL.theme.path           = path[1];
+                miniLOL.config["core"].theme = path[2];
+            }
+            else {
+                miniLOL.theme.path = "themes";
+            }
+
+            miniLOL.error(!miniLOL.theme.load(miniLOL.config["core"].theme));
         }
 
-        new PeriodicalExecuter(miniLOL.refresh, miniLOL.config['core'].refreshEvery || 360)
+        if (!miniLOL.error(null)) {
+            return false;
+        }
 
-        if (miniLOL.menu.exists) {
-            miniLOL.content.set('Loading...');
+        if (!miniLOL.config["core"].menuNode) {
+            miniLOL.menus.dom = null;
+        }
+
+        if (miniLOL.menu.enabled()) {
+            miniLOL.menu.change("default");
         }
 
         miniLOL.content.set('Loading modules...');
         miniLOL.resource.load(miniLOL.resources.modules, "resources/modules.xml", true);
 
-        if (miniLOL.error()) {
-            if (!document.body.innerHTML) {
-                miniLOL.error("Something went wrong, but nobody told me what :(");
-            }
-
+        if (!miniLOL.error(null)) {
             return false;
         }
 
@@ -118,30 +124,46 @@ miniLOL = {
             miniLOL.error("`#{module}` requires `#{require}`".interpolate(e), $(miniLOL.config['core'].contentNode));
         }
 
-        if (miniLOL.config["core"].init) {
-            eval(miniLOL.config["core"].init);
+        if (!miniLOL.error(null)) {
+            return false;
         }
 
-        if (!miniLOL.error()) {
-            miniLOL.go(/\/[#?].+/.test(location.href) ? location.href.replace(/^.*[#?]/, '#') : "#"+miniLOL.config['core'].homePage);
+        miniLOL.go(/\/[#?].+/.test(location.href) ? location.href.replace(/^.*[#?]/, '#') : "#"+miniLOL.config['core'].homePage);
+
+        if (miniLOL.config["core"].initialization) {
+            eval(miniLOL.config["core"].initialization);
         }
 
         Event.fire(document, ':initialized');
+
+        new PeriodicalExecuter(miniLOL.refresh, miniLOL.config['core'].refreshEvery || 360)
     },
 
     error: function (text, element) {
-        if (!text) {
-            return miniLOL._error;
+        if (text === undefined) {
+            return Boolean(miniLOL.error._value);
         }
 
         if (text === true || text === false) {
-            return miniLOL._error = text;
+            return miniLOL.error._value = text;
         }
+        else if (text === null) {
+            if (miniLOL.error()) {
+                if (!document.body.innerHTML) {
+                    miniLOL.error("Something went wrong, but nobody told me what :(");
+                }
 
-        element = element || document.body;
+                return false;
+            }
 
-        element.innerHTML = text;
-        miniLOL._error    = true;
+            return true;
+        }
+        else {
+            element = element || document.body;
+
+            element.innerHTML    = text;
+            miniLOL.error._value = true;
+        }
     },
 
     content: {
@@ -327,10 +349,12 @@ miniLOL = {
 
             load: function (path) {
                 if (this.res == null) {
-                    this.res = {};
+                    this.res = {
+                        dom: null    
+                    };
                 } var res = this.res;
 
-                miniLOL.menus = miniLOL.resources.menus.res;
+                miniLOL.menus = res;
 
                 new Ajax.Request(path, {
                     method: 'get',
@@ -347,18 +371,22 @@ miniLOL = {
                         }
 
                         var response = miniLOL.utils.fixDOM(http.responseXML);
-                        if (response.getElementById('default')) {
-                            miniLOL.menus       = response;
-                            miniLOL.menu.exists = true;
-                        }
-                        else {
-                            miniLOL.menu.exists = false;
-                        }
-                    },
+                        if (!response.getElementById('default')) {
+                            var menus = response.getElementsByTagName("menu");
 
-                    onFailure: function (http) {
-                        miniLOL.menu.exists = false;
-                    }
+                            for (var i = 0; i < menus.length; i++) {
+                                if (!menus[i].getAttribute("id")) {
+                                    menus[i].setAttribute("id", "default");
+                                    break;
+                                }
+                            }
+
+                            miniLOL.error("Error while analyzing menus.xml<br/><br/>No default menu was found.");
+                            return;
+                        }
+
+                        miniLOL.menus.dom = response;
+                    },
                 });
             }
         },
@@ -593,6 +621,14 @@ miniLOL = {
                 return result;
             },
 
+            menu: function () {
+                if (!miniLOL.theme.template.menu._cache) {
+                    miniLOL.theme.template.menu._cache = miniLOL.theme.template.load("menu");
+                }
+
+                return miniLOL.theme.template.menu._cache;
+            },
+
             exists: function (name) {
                 return miniLOL.theme.informations.templates.indexOf(name) >= 0;
             },
@@ -745,63 +781,52 @@ miniLOL = {
             delete miniLOL.theme.finalize;
 
             delete miniLOL.theme.informations;
+
+            delete miniLOL.theme.template.menu._cache;
         }
     },
 
     menu: {
+        parse: function (menu) {
+            var template = miniLOL.theme.template.menu();
+        },
+
         set: function (data) {
-            if (miniLOL.menu.exists) {
-                $(miniLOL.config['core'].menuNode).innerHTML = data;
+            if (!miniLOL.menu.enabled()) {
+                return;
             }
+
+            $(miniLOL.config['core'].menuNode).innerHTML = data;
         },
 
         get: function (name) {
-            if (miniLOL.menu.exists) {
-                name = name || 'default';
-                var menu = miniLOL.menus.getElementById(name);
-
-                if (!menu) {
-                    miniLOL.error("The menu `#{name}` doesn't exist.".interpolate({
-                        name: name
-                    }));
-                }
-
-                return menu.firstChild.nodeValue;
+            if (!miniLOL.menu.enabled()) {
+                return;
             }
 
-            return null;
+            name = name || 'default';
+
+            if (!miniLOL.menu.exists(name)) {
+                miniLOL.error("The menu `#{name}` doesn't exist.".interpolate({
+                    name: name
+                }));
+
+                return false;
+            }
+
+            return miniLOL.menu.parse(miniLOL.menus.dom.getElementById(name))
         },
 
         change: function (name) {
-            if (miniLOL.menu.exists) {
-                this.eleName = 'default';
-                if (name == 'default') {
-                    this.eleName = miniLOL.menu.current;
-                }
-
-                var element  = miniLOL.menus.getElementById(name);
-                var template = miniLOL.menus.documentElement.getAttribute('template') || "#{menu}";
-
-                var template = (element) ? element.getAttribute('template') || template : template;
-                
-                miniLOL.menu.set(template.interpolate({
-                    name: this.eleName,
-                    menu: miniLOL.menu.get(name)
-                }));
-            }
+            miniLOL.menu.set(miniLOL.menu.get(name));
         },
 
-        check: function (menu) {
-            if (miniLOL.menu.exists) {
-                miniLOL.menu.current = menu || 'default';
+        enabled: function () {
+            return Boolean(miniLOL.menus.dom);
+        },
 
-                if (miniLOL.menu.current == 'default') {
-                    miniLOL.menu.set(miniLOL.menu.get('default'));
-                }
-                else {
-                    miniLOL.menu.change(miniLOL.menu.current);
-                }
-            }
+        exists: function (name) {
+            return Boolean(miniLOL.menus.dom.getElementById(name));
         }
     },
 
@@ -1185,15 +1210,12 @@ miniLOL = {
             return miniLOL.page.get(queries.page, queries, url);
         }
         else if (queries.module) {
-            miniLOL.menu.check(queries.menu);
             return miniLOL.module.execute(queries.module, queries, url);
         }
         else if (queries.page) {
-            miniLOL.menu.check(queries.menu);
             return miniLOL.page.load(queries.page, queries, url);
         } 
         else {
-            miniLOL.menu.check(queries.menu);
             miniLOL.content.set('wat');
             return false;
         }
