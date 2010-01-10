@@ -43,9 +43,9 @@ if (navigator.vendor && navigator.vendor.match("Apple")) {
 if (Prototype.Browser.IE) {
     Error.prototype.toString = function () {
         return "#{name}: #{description}<br/><br/>#{stack}".interpolate({
-            name:    this.name,
-            message: this.message,
-            stack:   this.stack
+            name:        this.name,
+            description: this.description,
+            stack:       this.stack.replace(/\n/g, "<br/>")
         });
     };
 

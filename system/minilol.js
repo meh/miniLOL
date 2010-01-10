@@ -1369,6 +1369,8 @@ miniLOL = {
                     return elements[i].nodeValue;
                 }
             }
+
+            return "";
         },
 
         parseQuery: function (url) {
