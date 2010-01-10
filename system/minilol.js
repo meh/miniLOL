@@ -722,7 +722,7 @@ miniLOL = {
                 asynchronous: false,
                 
                 onSuccess: function (http) {
-                    document.body.innerHTML = miniLOL.template = http.responseText;
+                    $(document.body).update(http.responseText);
                 },
 
                 onFailure: function () {
@@ -739,7 +739,7 @@ miniLOL = {
                 miniLOL.theme.style.load(miniLOL.theme.informations.styles[i], false, true);
             }
 
-            miniLOL.theme.initialize();
+            miniLOL.theme.initialize.defer();
 
             return true;
         },
@@ -751,7 +751,7 @@ miniLOL = {
                 return;
             }
 
-            miniLOL.theme.finalize();
+            miniLOL.theme.finalize.defer();
 
             for (var style in miniLOL.theme.style.list) {
                 miniLOL.theme.style.unload(style);
