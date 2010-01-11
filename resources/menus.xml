@@ -19,5 +19,6 @@
         <item href="#home">Home</item>
         <item href="#links">My links</item>
         <item href="#stuff">My stuff</item>
+        <item href="javascript: miniLOL.theme.load('thinlight', true); void(0)">LIGHT!</item>
     </menu>
 </menus>

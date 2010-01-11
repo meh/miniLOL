@@ -25,7 +25,7 @@
  */
 
 miniLOL = {
-    version: '1.0',
+    version: '1.0.1',
 
     initialize: function () {
         [function () {
@@ -56,19 +56,11 @@ miniLOL = {
         },
         
         function () {
-            if (miniLOL.config["core"].theme) {
-                var path = miniLOL.config["core"].theme.match(/^(.+?):(.*)$/);
-            
-                if (path) {
-                    miniLOL.theme.path           = path[1];
-                    miniLOL.config["core"].theme = path[2];
-                }
-                else {
-                    miniLOL.theme.path = "themes";
-                }
+            if (!miniLOL.config["core"].theme) {
+                miniLOL.error("You need a theme.");
+            }
 
-                miniLOL.error(!miniLOL.theme.load(miniLOL.config["core"].theme));
-           }
+            miniLOL.error(!miniLOL.theme.load(miniLOL.config["core"].theme));
         },
         
         function () {
@@ -82,12 +74,12 @@ miniLOL = {
         },
 
         function () {
-            miniLOL.content.set('Loading modules...');
+            miniLOL.content.set("Loading modules...");
             miniLOL.resource.load(miniLOL.resources.modules, "resources/modules.xml", true);
         },
         
         function () {
-            miniLOL.content.set('Checking dependencies...');
+            miniLOL.content.set("Checking dependencies...");
             try {
                 miniLOL.module.dependencies.check();
             }
@@ -115,19 +107,20 @@ miniLOL = {
             return false;
         }
 
-        miniLOL.go(/[#?]./.test(location.href) ? location.href.replace(/^.*[#?]/, '#') : "#"+miniLOL.config['core'].homePage);
+        miniLOL.go(/[#?]./.test(location.href) ? location.href.replace(/^.*[#?]/, '#') : '#'+miniLOL.config["core"].homePage);
 
         if (miniLOL.config["core"].initialization) {
             eval(miniLOL.config["core"].initialization);
         }
 
-        Event.observe(document, ':refresh', miniLOL.refresh);
+        Event.observe(document, ":refresh", miniLOL.refresh);
 
         new PeriodicalExecuter(function () {
-            Event.fire(document, ':refresh');
-        }, miniLOL.config['core'].refreshEvery || 360)
+            Event.fire(document, ":refresh");
+        }, miniLOL.config["core"].refreshEvery || 360)
 
-        Event.fire(document, ':initialized');
+        Event.fire(document, ":initialized");
+        Event.stopObserving(document, ":initialized");
     },
 
     error: function (text, element) {
@@ -548,23 +541,27 @@ miniLOL = {
                     }
                 }
 
-                var link = document.createElement('link');
-                link.setAttribute('rel', 'stylesheet');
-                link.setAttribute('href', "#{path}/#{style}.css".interpolate({ path: path, style: name }));
-                link.setAttribute('type','text/css');
+                var file = "#{path}/#{style}.css".interpolate({ path: path, style: name });
 
-                document.getElementsByTagName('head')[0].appendChild(link);
+                var link = new Element("link", {
+                    rel:  "stylesheet",
+                    href: file,
+                    type: "text/css"
+                });
 
-                miniLOL.theme.style.list["#{path}/#{style}.css".interpolate({ path: path, style: name })] = link;
+                $$("head")[0].insert(link);
+
+                miniLOL.theme.style.list[file] = link;
             },
 
             unload: function (name, path) {
                 path = path || "#{path}/#{theme}".interpolate({ path: miniLOL.theme.path, theme: miniLOL.theme.name });
 
-                var name = "#{path}/#{style}.css".interpolate({ path: path, style: name });
-                if (miniLOL.theme.style.list[name]) {
-                    miniLOL.theme.style.list[name].parentNode.removeChild(miniLOL.theme.style.list[name]);
-                    delete miniLOL.theme.style.list[name];
+                var file = "#{path}/#{style}.css".interpolate({ path: path, style: name });
+
+                if (miniLOL.theme.style.list[file]) {
+                    miniLOL.theme.style.list[file].remove();
+                    delete miniLOL.theme.style.list[file];
                 }
             },
 
@@ -577,39 +574,39 @@ miniLOL = {
 
         template: {
             load: function (name, path) {
-                var result;
-
                 path = path || "#{path}/#{theme}".interpolate({
                     path: miniLOL.theme.path,
                     theme: miniLOL.theme.name
                 });
 
-                new Ajax.Request("#{path}/#{name}.xml".interpolate({ path: path, name: name }), {
+                var file = "#{path}/#{name}.xml".interpolate({ path: path, name: name });
+
+                if (typeof miniLOL.theme.template._cache[file] !== "undefined") {
+                    return miniLOL.theme.template._cache[file];
+                }
+
+                new Ajax.Request(file, {
                     method: 'get',
                     asynchronous: false,
                 
                     onSuccess: function (http) {
-                        result = miniLOL.utils.fixDOM(http.responseXML);
+                        miniLOL.theme.template._cache[file] = miniLOL.utils.fixDOM(http.responseXML);
                     },
 
                     onFailure: function () {
-                        result = false;
+                        miniLOL.theme.template._cache[file] = false;
                     }
                 });
 
-                return result;
+                return miniLOL.theme.template._cache[file];
             },
 
             menu: function () {
-                if (!miniLOL.theme.template.menu._cache) {
-                    miniLOL.theme.template.menu._cache = miniLOL.theme.template.load("menu");
-                }
-
-                return miniLOL.theme.template.menu._cache;
+                return miniLOL.theme.template.load("menu");
             },
 
-            exists: function (name) {
-                return miniLOL.theme.informations.templates.indexOf(name) >= 0;
+            exists: function (name, path) {
+                return Boolean(miniLOL.theme.template.load(name, path));
             },
 
             defaultList: function () {
@@ -626,14 +623,26 @@ miniLOL = {
             }
         },
 
-        load: function (name) {
+        load: function (name, runtime) {
             miniLOL.theme.unload();
 
-            var result         = true;
+            var path = name.match(/^(.+?):(.+)$/);
+            if (path) {
+                alert(path.inspect());
+                miniLOL.theme.path = path[1];
+                name               = path[2];
+            }
+            else {
+                miniLOL.theme.path = "themes";
+            }
+
             miniLOL.theme.name = name;
 
+            var path = "#{path}/#{theme}".interpolate({ path: miniLOL.theme.path, theme: name });
+
+            var result = true;
             // get the informations about the theme and parse the needed data
-            new Ajax.Request("#{path}/#{theme}/theme.xml".interpolate({ path: miniLOL.theme.path, theme: name }), {
+            new Ajax.Request("#{path}/theme.xml".interpolate({ path: path, theme: name }), {
                 method: 'get',
                 asynchronous: false,
                 
@@ -717,7 +726,7 @@ miniLOL = {
             }
 
             // get the html layout and set it
-            new Ajax.Request("#{path}/#{theme}/template.html".interpolate({ path: miniLOL.theme.path, theme: name }), {
+            new Ajax.Request("#{path}/template.html".interpolate({ path: path, theme: name }), {
                 method: 'get',
                 asynchronous: false,
                 
@@ -739,7 +748,17 @@ miniLOL = {
                 miniLOL.theme.style.load(miniLOL.theme.informations.styles[i], false, true);
             }
 
-            miniLOL.theme.initialize.defer();
+            miniLOL.theme.template._cache = {};
+
+            if (runtime) {
+                if (miniLOL.menu.enabled()) {
+                    miniLOL.menu.change(miniLOL.menu.current);
+                }
+
+                miniLOL.go(/[#?]./.test(location.href) ? location.href.replace(/^.*[#?]/, '#') : '#'+miniLOL.config["core"].homePage);
+            }
+
+            miniLOL.theme.initialize();
 
             return true;
         },
@@ -751,10 +770,10 @@ miniLOL = {
                 return;
             }
 
-            miniLOL.theme.finalize.defer();
+            miniLOL.theme.finalize();
 
-            for (var style in miniLOL.theme.style.list) {
-                miniLOL.theme.style.unload(style);
+            for (var i = 0; i < miniLOL.theme.informations.styles.length; i++) {
+                miniLOL.theme.style.unload(miniLOL.theme.informations.styles[i]);
             }
 
             delete miniLOL.theme.name;
@@ -764,7 +783,7 @@ miniLOL = {
 
             delete miniLOL.theme.informations;
 
-            delete miniLOL.theme.template.menu._cache;
+            delete miniLOL.theme.template._cache;
         },
 
         content: function () {
@@ -1028,7 +1047,7 @@ miniLOL = {
         },
 
         get: function (name, queries, url) {
-            miniLOL.content.set(miniLOL.config['core'].loadingMessage);
+            miniLOL.content.set(miniLOL.config["core"].loadingMessage);
 
             var page = miniLOL.pages.dom.getElementById(name);
             var type = queries.type;
@@ -1039,21 +1058,21 @@ miniLOL = {
             }
 
             if (page.getAttribute("alias")) {
-                if (typeof queries[name] != 'string') {
+                if (typeof queries[name] != "string") {
                     delete queries[name];
                 }
                 delete queries.page;
 
                 var queries = miniLOL.utils.toQuery(queries);
                 if (queries) {
-                    queries = "&"+queries;
+                    queries = '&'+queries;
                 }
 
                 return miniLOL.go(page.getAttribute("alias")+queries);
             }
 
             if (type == null) {
-                type = page.getAttribute('type');
+                type = page.getAttribute("type");
             }
         
             if (miniLOL.menu.enabled()) {
@@ -1069,13 +1088,13 @@ miniLOL = {
                     miniLOL.content.set(miniLOL.pages.cache[name]);
                 }
 
-                Event.fire(document, ':go', url);
+                Event.fire(document, ":go", url);
                 return true;
             }
 
-            var pageArguments = page.getAttribute('arguments');
+            var pageArguments = page.getAttribute("arguments");
             if (pageArguments) {
-                pageArguments = miniLOL.utils.parseQuery(pageArguments.replace(/[ ,]+/g, '&amp;'));
+                pageArguments = miniLOL.utils.parseQuery(pageArguments.replace(/[ ,]+/g, "&amp;"));
 
                 for (var key in pageArguments) {
                     if (queries[key] == null) {

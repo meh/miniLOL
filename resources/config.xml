@@ -13,7 +13,7 @@ things to be set and those configurations will go here.
 
 <configuration domain="core">
     <refreshEvery>360</refreshEvery>
-    <siteTitle>miniLOL</siteTitle>
+    <siteTitle></siteTitle>
     <homePage>home</homePage>
 
     <loadingMessage><![CDATA[<center>Loading...</center>]]></loadingMessage>
