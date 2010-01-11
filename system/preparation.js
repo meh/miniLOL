@@ -17,20 +17,24 @@
  * along with miniLOL.  If not, see <http://www.gnu.org/licenses/>.         *
  ****************************************************************************/
 
-unFocus.History.addEventListener('historyChange', function (query) {
+unFocus.History.addEventListener("historyChange", function (query) {
     if (query) {
         miniLOL.go('#' + query);
     }
     else {
-        miniLOL.go('#' + miniLOL.config['core'].homePage);
+        miniLOL.go('#' + miniLOL.config["core"].homePage);
     }
     
     miniLOL.theme.content().scrollTop = 0;
 });
 
 Function.prototype.clone = function () {
-    return eval("("+this.toString().replace(/^function .*?\(/, 'function (')+")");
+    return eval('(' + this.toString().replace(/^function .*?\(/, "function (") + ')');
 };
+
+Object.isBoolean = function (val) {
+    return val.constructor === Boolean;
+}
 
 if (navigator.userAgent.match(/Chrome/)) {
     Prototype.Browser.Chrome = true;
@@ -52,7 +56,7 @@ if (Prototype.Browser.IE) {
     Function.prototype.clone = function () {
         var func = this.toString();
 
-        return new Function(func.substring(func.indexOf("{") + 1, func.lastIndexOf("}")));
+        return new Function(func.substring(func.indexOf('{') + 1, func.lastIndexOf('}')));
     };
 }
 else if (Prototype.Browser.Opera) {
@@ -71,7 +75,7 @@ else if (Prototype.Browser.Gecko) {
         });
     }
 }
-else if (Prototype.Browser.Chrome) {
+else if (Prototype.Browser.Chrome || Prototype.Browser.Safari) {
     Error.prototype.toString = function () {
         return "#{name}: #{message}<br/><br/>#{stack}".interpolate({
             name:    this.name,
@@ -79,7 +83,4 @@ else if (Prototype.Browser.Chrome) {
             stack:   this.stack.replace(/\n/g, "<br/>")
         });
     }
-}
-else if (Prototype.Browser.Safari) {
-
 }
