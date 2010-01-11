@@ -1309,7 +1309,7 @@ miniLOL = {
     },
 
     go: function (url) {
-        var queries = miniLOL.utils.parseQuery(url.replace(/\?/, '#'))
+        var queries = miniLOL.utils.parseQuery(url.replace(/#/, '?'))
         var matches = /#(([^=&]*)&|([^=&]*)$)/.exec(url); // hate WebKit so much.
 
         if (matches) {
