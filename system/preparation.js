@@ -19,10 +19,14 @@
 
 unFocus.History.addEventListener("historyChange", function (query) {
     if (query) {
-        miniLOL.go('#' + query);
+        if (!query.charAt(0) != '#') {
+            query = '#' + query;
+        }
+
+        miniLOL.go(query);
     }
     else {
-        miniLOL.go('#' + miniLOL.config["core"].homePage);
+        miniLOL.go(miniLOL.config["core"].homePage);
     }
     
     miniLOL.theme.content().scrollTop = 0;

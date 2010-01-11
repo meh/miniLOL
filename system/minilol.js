@@ -757,7 +757,7 @@ miniLOL = {
                     miniLOL.menu.change(miniLOL.menu.current);
                 }
 
-                miniLOL.go(/[#?]./.test(location.href) ? location.href.replace(/^.*[#?]/, '#') : '#'+miniLOL.config["core"].homePage);
+                miniLOL.go(/[#?]./.test(location.href) ? location.href.replace(/^.*[#?]/, '#') : miniLOL.config["core"].homePage);
             }
 
             miniLOL.theme.initialize();
@@ -1309,7 +1309,7 @@ miniLOL = {
     },
 
     go: function (url) {
-        var queries = miniLOL.utils.parseQuery(url.sub(/#/, '?'))
+        var queries = miniLOL.utils.parseQuery(url.replace(/\?/, '#'))
         var matches = /#(([^=&]*)&|([^=&]*)$)/.exec(url); // hate WebKit so much.
 
         if (matches) {
