@@ -168,6 +168,8 @@ miniLOL = {
                 return false;
             }
 
+            Event.fire(document, ":resource.load", wrapper.name);
+
             for (var func in wrapper) {
                 if (Object.isFunction(wrapper[func])) {
                     if (wrapper[func]._parent == wrapper) {
@@ -194,6 +196,8 @@ miniLOL = {
                 miniLOL.content.set("What wrapper should be reloaded?");
                 return false;
             }
+
+            Event.fire(document, ":resource.reload", wrapper.name);
 
             wrapper.res = null;
 
@@ -521,6 +525,8 @@ miniLOL = {
             load: function (name, path, overload) {
                 path = path || "#{path}/#{theme}".interpolate({ path: miniLOL.theme.path, theme: miniLOL.theme.name });
 
+                Event.fire(document, ":theme.style.load", { name: name, path: path, overload: Boolean(overload) });
+
                 if (miniLOL.theme.style.exists(name, path)) {
                     if (overload) {
                         miniLOL.theme.style.unload(miniLOL.theme.style.list[name], path);
@@ -546,6 +552,8 @@ miniLOL = {
             unload: function (name, path) {
                 path = path || "#{path}/#{theme}".interpolate({ path: miniLOL.theme.path, theme: miniLOL.theme.name });
 
+                Event.fire(document, ":theme.style.unload", { name: name, path: path });
+
                 var file = "#{path}/#{style}.css".interpolate({ path: path, style: name });
 
                 if (miniLOL.theme.style.list[file]) {
@@ -567,6 +575,8 @@ miniLOL = {
                     path: miniLOL.theme.path,
                     theme: miniLOL.theme.name
                 });
+
+                Event.fire(document, ":theme.template.load", { name: name, path: path });
 
                 var file = "#{path}/#{name}.xml".interpolate({ path: path, name: name });
 
@@ -641,6 +651,8 @@ miniLOL = {
             miniLOL.theme.name = name;
 
             var path = "#{path}/#{theme}".interpolate({ path: miniLOL.theme.path, theme: name });
+
+            Event.fire(document, ":theme.load", { name: name, runtime: Boolean(runtime) });
 
             var result = true;
             // get the informations about the theme and parse the needed data
@@ -762,6 +774,8 @@ miniLOL = {
 
             miniLOL.theme.initialize();
 
+            Event.fire(document, ":theme.loaded", { name: name, runtime: Boolean(runtime) });
+
             return true;
         },
 
@@ -771,6 +785,8 @@ miniLOL = {
             if (!miniLOL.theme.name) {
                 return;
             }
+
+            Event.fire(document, ":theme.unload", { name: miniLOL.theme.name });
 
             miniLOL.theme.finalize();
 
@@ -1051,6 +1067,8 @@ miniLOL = {
         get: function (name, queries, url) {
             miniLOL.content.set(miniLOL.config["core"].loadingMessage);
 
+            Event.fire(document, ":page.get", { name: name, queries: queries });
+
             var page = miniLOL.pages.dom.getElementById(name);
             var type = queries.type;
         
@@ -1095,7 +1113,6 @@ miniLOL = {
                     miniLOL.content.set(miniLOL.pages.cache[name]);
                 }
 
-                Event.fire(document, ":go", url);
                 return true;
             }
 
@@ -1119,13 +1136,14 @@ miniLOL = {
             }
 
             miniLOL.content.set(output);
-            Event.fire(document, ":go", url);
 
             return true;
         },
 
-        load: function (path, queries, url) {
-            miniLOL.content.set(miniLOL.config['core'].loadingMessage);
+        load: function (path, queries) {
+            miniLOL.content.set(miniLOL.config["core"].loadingMessage);
+
+            Event.fire(document, ":page.load", { path: path, queries: queries });
 
             new Ajax.Request("data/#{path}?#{queries}".interpolate({ path: path, queries: miniLOL.utils.toQuery(queries) }), {
                 method: "get",
@@ -1138,7 +1156,7 @@ miniLOL = {
                         miniLOL.content.set(http.responseText);
                     }
 
-                    Event.fire(document, ":go", url);
+                    Event.fire(document, ":page.loaded", http);
                 },
         
                 onFailure: function (http) {
@@ -1146,6 +1164,8 @@ miniLOL = {
                         code: http.status,
                         text: http.statusText
                     }));
+
+                    Event.fire(document, ":page.loaded", http);
                 }
             });
         }
@@ -1194,36 +1214,32 @@ miniLOL = {
             if (obj.onGo) {
                 Event.observe(document, ":go", obj.onGo);
             }
+
+            Event.fire(document, ":module.create", obj);
         },
 
-        execute: function (name, vars, url) {
+        execute: function (name, vars) {
             if (!name) {
-                if (url) {
-                    miniLOL.content.set("What module should be executed?");
-                }
-
-                miniLOL._error = true;
+                miniLOL.error("What module should be executed?");
                 return false;
             }
 
-            if (url) {
+            if (!miniLOL.module.get(name)) {
+                miniLOL.error("The module isn't loaded.");
+                return false;
+            }
+
+            if (miniLOL.module.get(name).type == "active") {
                 miniLOL.content.set(miniLOL.config['core'].loadingMessage);
-            }
-
-            if (!miniLOL.modules[name]) {
-                if (url) {
-                    miniLOL.content.set("The module isn't loaded.");
-                    miniLOL.error = true;
-                }
-
-                return false;
             }
 
             vars = (vars instanceof Array) ? vars : [vars];
 
+            Event.fire(document, ":module.execute", { name: name, arguments: vars });
+
             var result;
             try {
-                result = miniLOL.modules[name].execute.apply(miniLOL.modules[name], vars);
+                result = miniLOL.module.get(name).execute.apply(miniLOL.module.get(name), vars);
             }
             catch (e) {
                 e.fileName = "#{path}/#{module}/main.js".interpolate({
@@ -1241,25 +1257,27 @@ miniLOL = {
                 return false;
             }
 
-            if (url) {
-                Event.fire(document, ":go", url);
-            }
+            Event.fire(document, ":module.executed", { name: name, arguments: vars, result: result });
 
             return result;
         },
 
         load: function (name) {
+            Event.fire(document, ":module.load", name);
+
             try {
                 miniLOL.utils.require("#{path}/#{module}/main.js".interpolate({
                     path: miniLOL.module.path,
                     module: name
                 }));
 
-                if (!miniLOL.modules[name]) {
+                if (!miniLOL.module.get(name)) {
                     throw new Error("Something went wrong while loading the module `#{name}`.".interpolate({
                         name: name
                     }));
                 }
+
+                Event.fire(document, ":module.loaded", name);
 
                 return true;
             }
@@ -1275,17 +1293,21 @@ miniLOL = {
             }
         },
 
+        get: function (name) {
+            return miniLOL.modules[name];
+        },
+
         exists: function (name) {
-            return new Boolean(miniLOL.modules[name]);
+            return new Boolean(miniLOL.module.get(name));
         },
 
         dependencies: {
             check: function () {
                 for (var module in miniLOL.modules) {
-                    var dependencies = miniLOL.modules[module].dependencies;
+                    var dependencies = miniLOL.module.get(module).dependencies;
                     if (dependencies) {
                         for (var i = 0; i < dependencies.length; i++) {
-                            if (!miniLOL.modules[dependencies[i]]) {
+                            if (!miniLOL.module.get(dependencies[i])) {
                                 throw { module: module, require: dependencies[i] };
                             }
                         }
@@ -1296,7 +1318,7 @@ miniLOL = {
             },
 
             needs: function (name, callback, context, wait) {
-                if (miniLOL.modules[name]) {
+                if (miniLOL.module.get(name)) {
                     callback.call(context || window);
                 }
                 else {
@@ -1311,25 +1333,29 @@ miniLOL = {
     go: function (url) {
         var queries = miniLOL.utils.parseQuery(url.replace(/#/, '?'))
         var matches = /#(([^=&]*)&|([^=&]*)$)/.exec(url); // hate WebKit so much.
+        var result  = false;
+
+        miniLOL.menu.change(queries.menu);
 
         if (matches) {
             queries.page = matches[2] || matches[1];
-
-            miniLOL.menu.change(queries.menu);
-            return miniLOL.page.get(queries.page, queries, url);
+            result       = miniLOL.page.get(queries.page, queries);
         }
         else if (queries.module) {
-            miniLOL.menu.change(queries.menu);
-            return miniLOL.module.execute(queries.module, queries, url);
+            result = miniLOL.module.execute(queries.module, queries);
         }
         else if (queries.page) {
-            miniLOL.menu.change(queries.menu);
-            return miniLOL.page.load(queries.page, queries, url);
+            result = miniLOL.page.load(queries.page, queries);
         } 
         else {
             miniLOL.content.set("wat");
-            return false;
         }
+
+        if (result) {
+            Event.fire(document, ":go", url);
+        }
+
+        return result;
     },
 
     utils: {
