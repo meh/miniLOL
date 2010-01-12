@@ -100,15 +100,15 @@ miniLOL = {
             try {
                 miniLOL.module.dependencies.check();
             }
-            catch (e) {
-                miniLOL.error("`#{module}` requires `#{require}`".interpolate(e), miniLOL.theme.content());
+            catch (error) {
+                miniLOL.error("`#{module}` requires `#{require}`".interpolate(error), miniLOL.theme.content());
             }
         }].each(function (callback) {
             try {
                 callback();
             }
-            catch (e) {
-                miniLOL.error(e.toString());
+            catch (error) {
+                miniLOL.error(error.toString());
             }
 
             if (miniLOL.error()) {
@@ -434,7 +434,7 @@ miniLOL = {
                         }
 
                         var functions = http.responseXML.documentElement.getElementsByTagName("function");
-        
+
                         for (var i = 0; i < functions.length; i++) {
                             try {
                                 miniLOL.functions[functions[i].getAttribute("name")]
@@ -442,11 +442,11 @@ miniLOL = {
                                         code: functions[i].firstChild.nodeValue
                                     }));
                             }
-                            catch (e) {
+                            catch (error) {
                                 miniLOL.error("Error while creating `#{name}` wrapper from #{path}:<br/><br/>#{error}".interpolate({
                                     name: functions[i].getAttribute("name"),
                                     path: path,
-                                    error: e.toString()
+                                    error: error.toString()
                                 }));
 
                                 return;
@@ -1203,13 +1203,13 @@ miniLOL = {
                         throw new Error("An error occurred while initializing the module.");
                     }
                 }
-                catch (e) {
-                    e.fileName = "#{path}/#{module}/main.js".interpolate({
+                catch (error) {
+                    error.fileName = "#{path}/#{module}/main.js".interpolate({
                         path: miniLOL.module.path,
                         module: name
                     });
 
-                    throw e;
+                    throw error;
                 }
             }
 
@@ -1248,17 +1248,17 @@ miniLOL = {
             try {
                 result = miniLOL.module.get(name).execute.apply(miniLOL.module.get(name), vars);
             }
-            catch (e) {
-                e.fileName = "#{path}/#{module}/main.js".interpolate({
+            catch (error) {
+                error.fileName = "#{path}/#{module}/main.js".interpolate({
                     path: miniLOL.module.path,
                     module: name
                 });
 
                 miniLOL.error("An error occurred while executing the module `#{name}`<br/><br/>#{file} @ #{line}:<br/>#{error}".interpolate({
                     name:  name,
-                    file:  e.fileName,
-                    line:  e.lineNumber,
-                    error: e.toString()
+                    file:  error.fileName,
+                    line:  error.lineNumber,
+                    error: error.toString()
                 }), miniLOL.theme.content());
 
                 return false;
@@ -1288,12 +1288,12 @@ miniLOL = {
 
                 return true;
             }
-            catch (e) {
+            catch (error) {
                 miniLOL.error("An error occurred while loading the module `#{name}`<br/><br/>#{file} @ #{line}:<br/>#{error}".interpolate({
                     name:  name,
-                    file:  e.fileName,
-                    line:  e.lineNumber,
-                    error: e.toString()
+                    file:  error.fileName,
+                    line:  error.lineNumber,
+                    error: error.toString()
                 }), miniLOL.theme.content());
 
                 return false;
@@ -1501,7 +1501,7 @@ miniLOL = {
                     try {
                         window.eval.call(context, http.responseText);
                     }
-                    catch (e) {
+                    catch (error) {
                         result = null;
                     }
                 },
@@ -1530,7 +1530,7 @@ miniLOL = {
                         window.eval.call(context, http.responseText);
                         result = context;
                     }
-                    catch (e) {
+                    catch (error) {
                         error             = e;
                         error.fileName    = path;
                         error.lineNumber -= 5;
