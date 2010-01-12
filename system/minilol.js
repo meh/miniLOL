@@ -82,6 +82,14 @@ miniLOL = {
             }
         },
 
+        // This is needed because somehow, while initializing miniLOL the template
+        // gets fucked up. Couldn't find a cleaner way to fix it.
+        function () {
+            if (miniLOL.theme.initialize) {
+                miniLOL.theme.initialize();
+            }
+        },
+
         function () {
             miniLOL.content.set("Loading modules...");
             miniLOL.resource.load(miniLOL.resources.modules, "resources/modules.xml", true);
