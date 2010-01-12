@@ -156,11 +156,7 @@ miniLOL = {
     },
 
     content: {
-        set: function (data, evaluate) {
-            if (Object.isUndefined(evaluate)) {
-                evaluate = true;
-            }
-
+        set: function (data) {
             miniLOL.theme.content().update(data);
         },
 
@@ -911,7 +907,7 @@ miniLOL = {
 
         get: function (name) {
             if (!miniLOL.menu.enabled()) {
-                return;
+                return "";
             }
 
             name = name || "default";
@@ -1226,14 +1222,17 @@ miniLOL = {
             Event.fire(document, ":module.create", obj);
         },
 
-        execute: function (name, vars) {
+        execute: function (name, vars, output) {
             if (!name) {
                 miniLOL.error("What module should be executed?");
                 return false;
             }
 
-            if (!miniLOL.module.get(name)) {
-                miniLOL.error("The module isn't loaded.");
+            if (!miniLOL.module.exists(name)) {
+                if (output) {
+                    miniLOL.error("The module isn't loaded.");
+                }
+
                 return false;
             }
 
@@ -1279,7 +1278,7 @@ miniLOL = {
                     module: name
                 }));
 
-                if (!miniLOL.module.get(name)) {
+                if (!miniLOL.module.exists(name)) {
                     throw new Error("Something went wrong while loading the module `#{name}`.".interpolate({
                         name: name
                     }));
@@ -1313,6 +1312,7 @@ miniLOL = {
             check: function () {
                 for (var module in miniLOL.modules) {
                     var dependencies = miniLOL.module.get(module).dependencies;
+
                     if (dependencies) {
                         for (var i = 0; i < dependencies.length; i++) {
                             if (!miniLOL.module.get(dependencies[i])) {
@@ -1350,7 +1350,7 @@ miniLOL = {
             result       = miniLOL.page.get(queries.page, queries);
         }
         else if (queries.module) {
-            result = miniLOL.module.execute(queries.module, queries);
+            result = miniLOL.module.execute(queries.module, queries, true);
         }
         else if (queries.page) {
             result = miniLOL.page.load(queries.page, queries);

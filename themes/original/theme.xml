@@ -24,7 +24,7 @@
     ]]></initialize>
 
     <finalize><![CDATA[
-        Event.stopObserving(window, 'resize', miniLOL.theme.resize);
+        Event.stopObserving(window, "resize", miniLOL.theme.resize);
         delete miniLOL.theme.resize;
     ]]></finalize>
 
