@@ -848,8 +848,14 @@ miniLOL = {
 
             var template = miniLOL.theme.template.menu();
 
+            // Checking if there's a menu template
             if (template) {
-                var tmp  = template.getElementById(layer) || template.getElementById('*');
+                template = template.getElementById(layer) || template.getElementById('*');
+            }
+
+            // If the menu has a template get the wanted layer
+            if (template) {
+                var tmp  = template;
                 template = {};
 
                 if (tmp.getElementsByTagName("menu").length) {
