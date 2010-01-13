@@ -824,6 +824,7 @@ miniLOL = {
         deprecated: function () {
             miniLOL.theme.content._node = miniLOL.config["core"].contentNode || "body";
             miniLOL.theme.menu._node    = miniLOL.config["core"].menuNode || "menu";
+            miniLOL.theme.template.list = miniLOL.theme.template.defaultList();
 
             new Ajax.Request("resources/template.html", {
                 method: "get",
