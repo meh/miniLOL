@@ -48,8 +48,8 @@ miniLOL = {
                 }
             }
                  
-            document.title          = miniLOL.config["core"].siteTitle;
-            document.body.innerHTML = miniLOL.config["core"].loadingMessage;
+            document.title = miniLOL.config["core"].siteTitle;
+            $(document.body).update(miniLOL.config["core"].loadingMessage);
         },
 
         function () {
@@ -65,11 +65,12 @@ miniLOL = {
         },
         
         function () {
-            if (!miniLOL.config["core"].theme) {
-                miniLOL.error("You need a theme.");
+            if (miniLOL.config["core"].theme) {
+                miniLOL.error(!miniLOL.theme.load(miniLOL.config["core"].theme));
             }
-
-            miniLOL.error(!miniLOL.theme.load(miniLOL.config["core"].theme));
+            else {
+                miniLOL.error(!miniLOL.theme.deprecated());
+            }
         },
         
         function () {
@@ -79,14 +80,6 @@ miniLOL = {
 
             if (miniLOL.menu.enabled()) {
                 miniLOL.menu.change("default");
-            }
-        },
-
-        // This is needed because somehow, while initializing miniLOL the template
-        // gets fucked up. Couldn't find a cleaner way to fix it.
-        function () {
-            if (miniLOL.theme.initialize) {
-                miniLOL.theme.initialize();
             }
         },
 
@@ -151,7 +144,7 @@ miniLOL = {
 
         element = element || document.body;
 
-        element.innerHTML    = text;
+        $(element).update(text);
         miniLOL.error._value = true;
     },
 
@@ -540,17 +533,16 @@ miniLOL = {
                     }
                 }
 
-                var file = "#{path}/#{style}.css".interpolate({ path: path, style: name });
+                var file  = "#{path}/#{style}.css".interpolate({ path: path, style: name });
+                var style = miniLOL.utils.includeCSS(file);
 
-                var link = new Element("link", {
-                    rel:  "stylesheet",
-                    href: file,
-                    type: "text/css"
-                });
+                if (!style) {
+                    return false;
+                }
 
-                $$("head")[0].insert(link);
+                miniLOL.theme.style.list[file] = style;
 
-                miniLOL.theme.style.list[file] = link;
+                return true;
             },
 
             unload: function (name, path) {
@@ -639,17 +631,20 @@ miniLOL = {
             }
         },
 
-        load: function (name, runtime) {
+        load: function (name, runtime, noInitialization) {
             miniLOL.theme.unload();
 
             var path = name.match(/^(.+?):(.+)$/);
             if (path) {
-                alert(path.inspect());
                 miniLOL.theme.path = path[1];
                 name               = path[2];
             }
             else {
                 miniLOL.theme.path = "themes";
+            }
+
+            if (miniLOL.theme.name == name) {
+                return true;
             }
 
             miniLOL.theme.name = name;
@@ -763,7 +758,13 @@ miniLOL = {
             }
 
             for (var i = 0; i < miniLOL.theme.informations.styles.length; i++) {
-                miniLOL.theme.style.load(miniLOL.theme.informations.styles[i], false, true);
+                if (!miniLOL.theme.style.load(miniLOL.theme.informations.styles[i], false, true)) {
+                    miniLOL.error("Couldn't load `#{style}` style.".interpolate({
+                        style: miniLOL.theme.informations.styles[i]
+                    }));
+
+                    return false;
+                }
             }
 
             miniLOL.theme.template._cache = {};
@@ -776,14 +777,16 @@ miniLOL = {
                 miniLOL.go(/[#?]./.test(location.href) ? location.href.replace(/^.*[#?]/, '#') : miniLOL.config["core"].homePage);
             }
 
-            miniLOL.theme.initialize();
+            if (!noInitialization && miniLOL.theme.initialize) {
+                miniLOL.utils.retarded(miniLOL.theme.initialize);
+            }
 
             Event.fire(document, ":theme.loaded", { name: name, runtime: Boolean(runtime) });
 
             return true;
         },
 
-        unload: function () {
+        unload: function (noFinalization) {
             miniLOL.theme.template.list = miniLOL.theme.template.defaultList();
 
             if (!miniLOL.theme.name) {
@@ -792,7 +795,9 @@ miniLOL = {
 
             Event.fire(document, ":theme.unload", { name: miniLOL.theme.name });
 
-            miniLOL.theme.finalize();
+            if (!noFinalization && miniLOL.theme.finalize) {
+                miniLOL.theme.finalize();
+            }
 
             for (var i = 0; i < miniLOL.theme.informations.styles.length; i++) {
                 miniLOL.theme.style.unload(miniLOL.theme.informations.styles[i]);
@@ -814,6 +819,26 @@ miniLOL = {
 
         menu: function () {
             return $(miniLOL.theme.menu._node);
+        },
+
+        deprecated: function () {
+            miniLOL.theme.content._node = miniLOL.config["core"].contentNode || "body";
+            miniLOL.theme.menu._node    = miniLOL.config["core"].menuNode || "menu";
+
+            new Ajax.Request("resources/template.html", {
+                method: "get",
+                asynchronos: false,
+
+                onSuccess: function (http) {
+                    $(document.body).update(http.responseText);
+                },
+            });
+
+            miniLOL.utils.includeCSS("resources/style.css");
+
+            miniLOL.theme.template._cache = {};
+
+            return true;
         }
     },
 
@@ -821,35 +846,30 @@ miniLOL = {
         parse: function (menu, layer) {
             layer = layer || 0;
 
-            if (menu.getElementsByTagName("item").length == 0) {
-                return '';
-            }
-
             var template = miniLOL.theme.template.menu();
-            if (template) {
-                template = template.getElementById(layer) || template.getElementById('*');
-            }
 
             if (template) {
-                var tmp  = template;
+                var tmp  = template.getElementById(layer) || template.getElementById('*');
                 template = {};
 
                 if (tmp.getElementsByTagName("menu").length) {
                     template.menu = tmp.getElementsByTagName("menu")[0].firstChild.nodeValue;
                 }
-                else {
-                    template.menu = '';
-                }
 
                 if (tmp.getElementsByTagName("item").length) {
                     template.item = tmp.getElementsByTagName("item")[0].firstChild.nodeValue;
                 }
-                else {
-                    template.item = '';
-                }
             }
             else {
-                return '';
+                template = {};
+            }
+
+            if (!template.menu) {
+                template.menu = '#{data}';
+            }
+
+            if (!template.item) {
+                template.item = '<a href="#{href}">#{text}</a> ';
             }
 
             var output   = '';
@@ -1393,7 +1413,7 @@ miniLOL = {
         },
 
         fixDOM: function (obj) {
-            if (!obj || (Prototype.Browser.Gecko || Prototype.Browser.Opera)) {
+            if (!obj || Prototype.Browser.Good) {
                 return obj;
             }
 
@@ -1485,6 +1505,48 @@ miniLOL = {
             }
             
             return result.substr(0, result.length - 1);
+        },
+
+        retarded: function (func) {
+            if (!Object.isFunction(func)) {
+                return;
+            }
+
+            if (Prototype.Browser.Webkit) {
+                return func.defer();
+            }
+            else {
+                return func();
+            }
+        },
+
+        includeCSS: function (path) {
+            var style = false;
+
+            if (Prototype.Browser.Good) {
+                new Ajax.Request(path, {
+                    method: "get",
+                    asynchronous: false,
+
+                    onSuccess: function (http) {
+                        style = new Element("style");
+                        style.update(http.responseText);
+                    }
+                });
+            }
+            else {
+                style = new Element("link", {
+                    rel: "stylesheet",
+                    href: path,
+                    type: "text/css"
+                });
+            }
+
+            if (style) {
+                $$("head")[0].insert(style);
+            }
+
+            return style;
         },
 
         include: function (path, context) {

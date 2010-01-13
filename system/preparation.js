@@ -48,6 +48,13 @@ if (navigator.userAgent.match(/Safari/)) {
     Prototype.Browser.Safari = true;
 }
 
+if (Prototype.Browser.Gecko || Prototype.Browser.Opera) {
+    Prototype.Browser.Good = true;
+}
+else {
+    Prototype.Browser.Bad = true;
+}
+
 if (Prototype.Browser.IE) {
     Error.prototype.toString = function () {
         return "#{name}: #{description}<br/><br/>#{stack}".interpolate({
