@@ -919,9 +919,14 @@ miniLOL = {
                 }
             }
 
-            return template.menu.interpolate({
-                data: output
-            });
+            if (output.replace(/[\s\n]*/g, '')) {
+                return template.menu.interpolate({
+                    data: output
+                });
+            }
+            else {
+                return '';
+            }
         },
 
         set: function (data) {
