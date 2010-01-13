@@ -40,6 +40,8 @@ Object.isBoolean = function (val) {
     return val.constructor === Boolean;
 }
 
+/* Cross-Browser faggotree */
+
 if (navigator.userAgent.match(/Chrome/)) {
     Prototype.Browser.Chrome = true;
 }
