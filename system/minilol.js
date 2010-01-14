@@ -832,7 +832,7 @@ miniLOL = {
 
                 onSuccess: function (http) {
                     $(document.body).update(http.responseText);
-                },
+                }
             });
 
             miniLOL.utils.includeCSS("resources/style.css");
