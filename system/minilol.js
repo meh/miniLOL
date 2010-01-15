@@ -634,6 +634,7 @@ miniLOL = {
         load: function (name, runtime, noInitialization) {
             miniLOL.theme.unload();
 
+            // The syntax to change the theme path is path:theme
             var path = name.match(/^(.+?):(.+)$/);
             if (path) {
                 miniLOL.theme.path = path[1];
@@ -654,7 +655,7 @@ miniLOL = {
             Event.fire(document, ":theme.load", { name: name, runtime: Boolean(runtime) });
 
             var result = true;
-            // get the informations about the theme and parse the needed data
+            // Get the informations about the theme and parse the needed data
             new Ajax.Request("#{path}/theme.xml".interpolate({ path: path, theme: name }), {
                 method: "get",
                 asynchronous: false,
@@ -738,7 +739,7 @@ miniLOL = {
                 return false;
             }
 
-            // get the html layout and set it
+            // Get the html layout and set it
             new Ajax.Request("#{path}/template.html".interpolate({ path: path, theme: name }), {
                 method: "get",
                 asynchronous: false,
@@ -777,8 +778,17 @@ miniLOL = {
                 miniLOL.go(/[#?]./.test(location.href) ? location.href.replace(/^.*[#?]/, '#') : miniLOL.config["core"].homePage);
             }
 
+            // Sadly this has some problems.
+            // I didn't find a way to know if the CSSs have already been applied and the initialize
+            // may get wrong informations from stuff that uses sizes set by the CSS.
+            //
+            // So it's the designer's work to hack that shit and get it working, you can see an example
+            // in the original theme initialize.
+            //
+            // If someone knows a way to fix this, please contact me.
+            // (Already tried XHR and create <style>, but url() would get borked and it only worked in Firefox and Opera)
             if (!noInitialization && miniLOL.theme.initialize) {
-                miniLOL.utils.retarded(miniLOL.theme.initialize);
+                miniLOL.theme.initialize();
             }
 
             Event.fire(document, ":theme.loaded", { name: name, runtime: Boolean(runtime) });
@@ -1176,7 +1186,7 @@ miniLOL = {
             return true;
         },
 
-        load: function (path, queries) {
+        load: function (path, queries, url) {
             miniLOL.content.set(miniLOL.config["core"].loadingMessage);
 
             Event.fire(document, ":page.load", { path: path, queries: queries });
@@ -1193,6 +1203,8 @@ miniLOL = {
                     }
 
                     Event.fire(document, ":page.loaded", http);
+
+                    Event.fire(document, ":go", url);
                 },
         
                 onFailure: function (http) {
@@ -1385,10 +1397,11 @@ miniLOL = {
             result = miniLOL.module.execute(queries.module, queries, true);
         }
         else if (queries.page) {
-            result = miniLOL.page.load(queries.page, queries);
+            result = miniLOL.page.load(queries.page, queries, url);
         } 
         else {
             miniLOL.content.set("wat");
+            result = false;
         }
 
         if (result) {
@@ -1519,42 +1532,25 @@ miniLOL = {
             return result.substr(0, result.length - 1);
         },
 
-        retarded: function (func) {
-            if (!Object.isFunction(func)) {
-                return;
-            }
-
-            if (Prototype.Browser.Webkit) {
-                return func.defer();
-            }
-            else {
-                return func();
-            }
-        },
-
         includeCSS: function (path) {
             var style = false;
 
-            if (Prototype.Browser.Good) {
-                new Ajax.Request(path, {
-                    method: "get",
-                    asynchronous: false,
+            new Ajax.Request(path, {
+                method: "head",
+                asynchronous: false,
 
-                    onSuccess: function (http) {
-                        style = new Element("style");
-                        style.update(http.responseText);
-                    }
-                });
-            }
-            else {
+                onSuccess: function () {
+                    style = true;
+                }
+            });
+
+            if (style) {
                 style = new Element("link", {
                     rel: "stylesheet",
                     href: path,
                     type: "text/css"
                 });
-            }
 
-            if (style) {
                 $$("head")[0].insert(style);
             }
 

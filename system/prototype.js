@@ -1399,7 +1399,7 @@ Ajax.Request = Class.create(Ajax.Base, {
     this.method = this.options.method;
     var params = Object.clone(this.options.parameters);
 
-    if (!['get', 'post'].include(this.method)) {
+    if (!['get', 'post', 'head'].include(this.method)) {
       params['_method'] = this.method;
       this.method = 'post';
     }

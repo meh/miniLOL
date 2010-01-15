@@ -18,13 +18,16 @@
         }
 
         Event.observe(window, "resize", miniLOL.theme.resize);
-        Event.observe(document, ":initialized", miniLOL.theme.resize);
+        Event.observe(document, ":module.load", miniLOL.theme.resize);
 
-        miniLOL.theme.resize();
+        Event.observe(document, ":initialized", function () {
+            miniLOL.theme.resize.delay(0.1);
+        });
     ]]></initialize>
 
     <finalize><![CDATA[
         Event.stopObserving(window, "resize", miniLOL.theme.resize);
+        Event.stopObserving(document, ":module.load", miniLOL.theme.resize);
         delete miniLOL.theme.resize;
     ]]></finalize>
 
