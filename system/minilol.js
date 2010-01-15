@@ -1146,11 +1146,13 @@ miniLOL = {
                             }
                         }
                         else if (list[h].nodeType == Node.CDATA_SECTION_NODE || list[h].nodeType == Node.TEXT_NODE) {
-                            listOutput += miniLOL.theme.template.list.data.interpolate({
-                                before: miniLOL.theme.template.list.before.interpolate({ data: before }),
-                                after:  miniLOL.theme.template.list.after.interpolate({ data: after }),
-                                data:  list[h].nodeValue
-                            });
+                            if (list[h].nodeValue.replace(/[\s\n]+/g, '')) {
+                                listOutput += miniLOL.theme.template.list.data.interpolate({
+                                    before: miniLOL.theme.template.list.before.interpolate({ data: before }),
+                                    after:  miniLOL.theme.template.list.after.interpolate({ data: after }),
+                                    data:  list[h].nodeValue
+                                });
+                            }
                         }
                     }
 
