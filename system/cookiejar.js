@@ -155,3 +155,5 @@ CookieJar.prototype = {
 		return keys;
 	}
 };
+
+CookieJar.prototype.set = CookieJar.prototype.put;

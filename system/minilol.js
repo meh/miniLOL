@@ -1300,9 +1300,9 @@ miniLOL = {
 
                 miniLOL.error("An error occurred while executing the module `#{name}`<br/><br/>#{file} @ #{line}:<br/>#{error}".interpolate({
                     name:  name,
-                    file:  error.fileName,
-                    line:  error.lineNumber,
-                    error: error.toString()
+                    file:  e.fileName,
+                    line:  e.lineNumber,
+                    error: e.toString()
                 }), miniLOL.theme.content());
 
                 return false;
