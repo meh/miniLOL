@@ -133,7 +133,7 @@ miniLOL = {
         Event.stopObserving(document, ":initialized");
     },
 
-    error: function (text, element) {
+    error: function (text, element, minor) {
         if (Object.isUndefined(text)) {
             return Boolean(miniLOL.error._value);
         }
@@ -145,7 +145,10 @@ miniLOL = {
         element = element || document.body;
 
         $(element).update(text);
-        miniLOL.error._value = true;
+
+        if (!minor) {
+            miniLOL.error._value = true;
+        }
     },
 
     content: {
@@ -185,7 +188,18 @@ miniLOL = {
             }
 
             wrapper._calls.push(args);
-            wrapper.load.apply(wrapper, args);
+
+            try {
+                return wrapper.load.apply(wrapper, args);
+            }
+            catch (e) {
+                miniLOL.error("Error while loading `#{name}` resource.<br/>#{error}".interpolate({
+                    name: wrapper.name,
+                    error: e.toString()
+                }), miniLOL.theme.content());
+
+                return false;
+            }
         },
 
         reload: function (wrapper) {
@@ -304,6 +318,8 @@ miniLOL = {
                         }
                     });
                 }
+
+                return true;
             }
         },
 
@@ -355,6 +371,8 @@ miniLOL = {
                         miniLOL.menus.dom = response;
                     }
                 });
+
+                return true;
             }
         },
     
@@ -399,6 +417,8 @@ miniLOL = {
                         }));
                     }
                 });
+
+                return true;
             }
         },
     
@@ -453,6 +473,8 @@ miniLOL = {
                         }));
                     }
                 });
+
+                return true;
             }
         },
     
@@ -511,6 +533,8 @@ miniLOL = {
                         }), miniLOL.theme.content());
                     }
                 });
+
+                return true;
             }
         }
     },
@@ -1244,6 +1268,10 @@ miniLOL = {
             if (obj.initialize) {
                 try {
                     if (obj.initialize() === false) {
+                        if (miniLOL.error()) {
+                            return false;
+                        }
+
                         throw new Error("An error occurred while initializing the module.");
                     }
                 }
@@ -1321,6 +1349,10 @@ miniLOL = {
                     path: miniLOL.module.path,
                     module: name
                 }));
+
+                if (miniLOL.error()) {
+                    return false;
+                }
 
                 if (!miniLOL.module.exists(name)) {
                     throw new Error("Something went wrong while loading the module `#{name}`.".interpolate({
