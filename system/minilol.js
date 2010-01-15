@@ -74,12 +74,16 @@ miniLOL = {
         },
         
         function () {
-            if (!miniLOL.theme.menu()) {
-                miniLOL.menus.dom = null;
-            }
+            miniLOL.theme.template.menu();
 
-            if (miniLOL.menu.enabled()) {
-                miniLOL.menu.change("default");
+            if (!miniLOL.error()) {
+                if (!miniLOL.theme.menu()) {
+                    miniLOL.menus.dom = null;
+                }
+
+                if (miniLOL.menu.enabled()) {
+                    miniLOL.menu.change("default");
+                }
             }
         },
 
@@ -319,6 +323,10 @@ miniLOL = {
                     });
                 }
 
+                if (miniLOL.error()) {
+                    return false;
+                }
+
                 return true;
             }
         },
@@ -372,6 +380,10 @@ miniLOL = {
                     }
                 });
 
+                if (miniLOL.error()) {
+                    return false;
+                }
+
                 return true;
             }
         },
@@ -417,6 +429,10 @@ miniLOL = {
                         }));
                     }
                 });
+
+                if (miniLOL.error()) {
+                    return false;
+                }
 
                 return true;
             }
@@ -473,6 +489,10 @@ miniLOL = {
                         }));
                     }
                 });
+
+                if (miniLOL.error()) {
+                    return false;
+                }
 
                 return true;
             }
@@ -533,6 +553,10 @@ miniLOL = {
                         }), miniLOL.theme.content());
                     }
                 });
+
+                if (miniLOL.error()) {
+                    return false;
+                }
 
                 return true;
             }
@@ -1431,7 +1455,9 @@ miniLOL = {
         var matches = /#(([^=&]*)&|([^=&]*)$)/.exec(url); // hate WebKit so much.
         var result  = false;
 
-        miniLOL.menu.change(queries.menu);
+        if (queries.menu && miniLOL.menu.current != queries.menu) {
+            miniLOL.menu.change(queries.menu);
+        }
 
         if (matches) {
             queries.page = matches[2] || matches[1];
