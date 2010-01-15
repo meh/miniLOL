@@ -25,7 +25,7 @@
  */
 
 miniLOL = {
-    version: "1.0.1",
+    version: "1.0.2",
 
     initialize: function () {
         [function () {
@@ -856,16 +856,21 @@ miniLOL = {
         },
 
         deprecated: function () {
+            miniLOL.theme.path          = "themes";
             miniLOL.theme.content._node = miniLOL.config["core"].contentNode || "body";
             miniLOL.theme.menu._node    = miniLOL.config["core"].menuNode || "menu";
             miniLOL.theme.template.list = miniLOL.theme.template.defaultList();
 
             new Ajax.Request("resources/template.html", {
                 method: "get",
-                asynchronos: false,
+                asynchronous: false,
 
                 onSuccess: function (http) {
                     $(document.body).update(http.responseText);
+                },
+
+                onFailure: function () {
+                    $(document.body).update("<div id='menu'></div><div id='body'></div>");
                 }
             });
 
@@ -913,6 +918,7 @@ miniLOL = {
                 template.item = '<a href="#{href}">#{text}</a> ';
             }
 
+            var first    = true;
             var output   = '';
             var contents = menu.childNodes;
             
@@ -948,7 +954,11 @@ miniLOL = {
                     break;
 
                     case Node.CDATA_SECTION_NODE:
-                    output += contents[i].nodeValue;
+                    if (!first) {
+                        output += contents[i].nodeValue;
+                    }
+
+                    first = false;
                     break;
                 }
             }

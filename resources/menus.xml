@@ -19,6 +19,6 @@
         <item href="#home"><![CDATA[<i>Home</i>]]></item>
         <item href="#links">My links</item>
         <item href="#stuff">My stuff</item>
-        <item href="javascript: miniLOL.theme.load('thinlight', true); void(0)">LIGHT!</item>
+        <item href="#module=ThemeSwitcher&amp;chooser">Change Theme</item>
     </menu>
 </menus>

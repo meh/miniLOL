@@ -20,4 +20,5 @@ This file contains the enabled modules.
 
 <modules>
     <module name="wordfilter"/>
+    <module name="ThemeSwitcher"/>
 </modules>

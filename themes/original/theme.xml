@@ -23,6 +23,8 @@
         Event.observe(document, ":initialized", function () {
             miniLOL.theme.resize.delay(0.1);
         });
+
+        miniLOL.theme.resize.defer();
     ]]></initialize>
 
     <finalize><![CDATA[
