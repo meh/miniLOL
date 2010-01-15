@@ -673,6 +673,7 @@ miniLOL = {
                     after:  "#{data}",
 
                     link: "<div class='#{class}' id='#{id}'>#{before}<a href='#{url}' target='#{target}' #{attributes}>#{text}</a>#{after}</div>",
+                    item: "<div class='#{class}' id='#{id}'>#{before}<span #{attributes}>#{text}</span>#{after}</div>",
                     nest: "<div class='#{class}' style='#{1}'>#{data}</div>",
                     data: "<div class='data'>#{before}#{data}#{after}</div>"
                 };
@@ -765,6 +766,10 @@ miniLOL = {
 
                         if ((current = list.getElementsByTagName("link")).length) {
                             miniLOL.theme.template.list.link = current[0].firstChild.nodeValue;
+                        }
+
+                        if ((current = list.getElementsByTagName("item")).length) {
+                            miniLOL.theme.template.list.item = current[0].firstChild.nodeValue;
                         }
 
                         if ((current = list.getElementsByTagName("nest")).length) {
@@ -1127,6 +1132,25 @@ miniLOL = {
                                     src:        src,
                                     href:       src,
                                     target:     target,
+                                    text:       text
+                                });
+                            }
+                            else if (list[h].nodeName == "item") {
+                                var item = list[h].cloneNode(true);
+                
+                                var text   = item.getAttribute("text") || ''; item.removeAttribute("text");
+                                var before = item.getAttribute("before") || listBefore || ''; item.removeAttribute("before");
+                                var after  = item.getAttribute("after") || listAfter || ''; item.removeAttribute("after");
+                
+                                var itemClass = item.getAttribute("class") || ''; item.removeAttribute("class");
+                                var itemId    = item.getAttribute("id") || ''; item.removeAttribute("id");
+
+                                listOutput += miniLOL.theme.template.list.item.interpolate({
+                                    "class":    itemClass,
+                                    id:         itemId,
+                                    attributes: miniLOL.utils.attributes(item.attributes),
+                                    before:     miniLOL.theme.template.list.before.interpolate({ data: before }),
+                                    after:      miniLOL.theme.template.list.after.interpolate({ data: after }),
                                     text:       text
                                 });
                             }

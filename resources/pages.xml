@@ -12,7 +12,7 @@
         alias     CDATA #IMPLIED
     >
 
-    <!ELEMENT list (link*, nest*, list*)>
+    <!ELEMENT list (link*, item*, nest*, list*)>
     <!ATTLIST list
         class  CDATA "links"
         before CDATA #IMPLIED
@@ -25,12 +25,21 @@
         class       CDATA "link"
         id          CDATA ""
         src         CDATA #REQUIRED
-        text        CDATA #IMPLIED
+        text        CDATA #REQUIRED
         before      CDATA #IMPLIED
         after       CDATA #IMPLIED
         type        CDATA #IMPLIED
         domain      CDATA #IMPLIED
         menu        CDATA #IMPLIED
+    >
+
+    <!ELEMENT item EMPTY>
+    <!ATTLIST item
+        class   CDATA   "item"
+        id      CDATA   ""
+        text    CDATA   #REQUIRED
+        before  CDATA   #IMPLIED
+        after   CDATA   #IMPLIED
     >
 
     <!ELEMENT nest ANY>
