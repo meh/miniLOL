@@ -954,6 +954,7 @@ miniLOL = {
                     break;
 
                     case Node.CDATA_SECTION_NODE:
+                    case Node.TEXT_NODE:
                     if (!first) {
                         output += contents[i].nodeValue;
                     }
@@ -1120,7 +1121,7 @@ miniLOL = {
                                 });
                             }
                         }
-                        else if (list[h].nodeType == Node.CDATA_SECTION_NODE) {
+                        else if (list[h].nodeType == Node.CDATA_SECTION_NODE || list[h].nodeType == Node.TEXT_NODE) {
                             listOutput += miniLOL.theme.template.list.data.interpolate({
                                 before: miniLOL.theme.template.list.before.interpolate({ data: before }),
                                 after:  miniLOL.theme.template.list.after.interpolate({ data: after }),
@@ -1136,6 +1137,7 @@ miniLOL = {
                     break;
         
                     case Node.CDATA_SECTION_NODE:
+                    case Node.TEXT_NODE:
                     output += contents[i].nodeValue;
                     break;
                 }
@@ -1526,8 +1528,8 @@ miniLOL = {
                     return '';
                     break;
 
-                    case Node.TEXT_NODE:
                     case Node.CDATA_SECTION_NODE:
+                    case Node.TEXT_NODE:
                     if (elements[i].nodeValue.replace(/[\s\n]/g, '')) {
                         return elements[i].nodeValue;
                     }
