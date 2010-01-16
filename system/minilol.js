@@ -31,24 +31,34 @@ miniLOL = {
         [function () {
             miniLOL.resource.load(miniLOL.resources.config, "resources/config.xml");
 
-            if (!miniLOL.config["core"].siteTitle) {
-                 miniLOL.config["core"].siteTitle = "miniLOL #{version}".interpolate(miniLOL);
-            }
-
-            if (!miniLOL.config["core"].loadingMessage) {
-                miniLOL.config["core"].loadingMessage = "Loading...";
-            }
-
-            if (!miniLOL.config["core"].homePage) {
-                miniLOL.config["core"].homePage = "#home";
-            }
-            else {
-                if (miniLOL.config["core"].homePage.charAt(0) != '#') {
-                    miniLOL.config["core"].homePage = '#'+miniLOL.config["core"].homePage;
+            function prepareConfigurations (event) {
+                if (event.memo != "config") {
+                    return;
                 }
-            }
+
+                if (!miniLOL.config["core"].siteTitle) {
+                     miniLOL.config["core"].siteTitle = "miniLOL #{version}".interpolate(miniLOL);
+                }
+
+                if (!miniLOL.config["core"].loadingMessage) {
+                    miniLOL.config["core"].loadingMessage = "Loading...";
+                }
+
+                if (!miniLOL.config["core"].homePage) {
+                    miniLOL.config["core"].homePage = "#home";
+                }
+                else {
+                    if (miniLOL.config["core"].homePage.charAt(0) != '#') {
+                        miniLOL.config["core"].homePage = '#'+miniLOL.config["core"].homePage;
+                    }
+                }
                  
-            document.title = miniLOL.config["core"].siteTitle;
+                document.title = miniLOL.config["core"].siteTitle;
+            }
+
+            Event.observe(document, ":resource.reloaded", prepareConfigurations);
+            prepareConfigurations({ memo: "config" });
+
             $(document.body).update(miniLOL.config["core"].loadingMessage);
         },
 
@@ -222,6 +232,8 @@ miniLOL = {
             for (var i = 0; i < calls.length; i++) {
                 miniLOL.resource.load.apply(window, [wrapper].concat(calls[i]));
             }
+
+            Event.fire(document, ":resource.reloaded", wrapper.name);
         }
     },
 
@@ -299,7 +311,7 @@ miniLOL = {
                         asynchronous: false,
         
                         onSuccess: function (http) {
-                            var error = miniLOL.utils.checkXML(miniLOL.utils.fixDOM(http.responseXML));
+                            var error = miniLOL.utils.checkXML(http.responseXML);
                             if (error) {
                                 miniLOL.error("Error while parsing config.xml<br/><br/>#{error}".interpolate({
                                     error: error.replace(/\n/g, "<br/>").replace(/ /g, "&nbsp;")
@@ -307,6 +319,8 @@ miniLOL = {
 
                                 return;
                             }
+
+                            http.responseXML = miniLOL.utils.fixDOM(http.responseXML);
 
                             var domain = http.responseXML.documentElement.getAttribute("domain") || "core";
                             var config = miniLOL.config[domain] || {};
@@ -321,10 +335,10 @@ miniLOL = {
                             }));
                         }
                     });
-                }
 
-                if (miniLOL.error()) {
-                    return false;
+                    if (miniLOL.error()) {
+                        return false;
+                    }
                 }
 
                 return true;
@@ -1653,10 +1667,8 @@ miniLOL = {
             return style;
         },
 
-        include: function (path, context) {
-            context = context || window;
-            
-            var result = context;
+        include: function (path) {
+            var result = null;
             
             new Ajax.Request(path, {
                 method: "get",
@@ -1665,24 +1677,15 @@ miniLOL = {
                 
                 onSuccess: function (http) {
                     try {
-                        window.eval.call(context, http.responseText);
-                    }
-                    catch (e) {
-                        result = null;
-                    }
-                },
-                
-                onFailure: function () {
-                    result = null;
+                        result = window.eval(http.responseText);
+                    } catch (e) { }
                 }
             });
             
             return result;
         },
 
-        require: function (path, context) {
-            context = context || window;
-            
+        require: function (path) {
             var result;
             var error;
             
@@ -1693,8 +1696,7 @@ miniLOL = {
                 
                 onSuccess: function (http) {
                     try {
-                        window.eval.call(context, http.responseText);
-                        result = context;
+                        result = window.eval(http.responseText);
                     }
                     catch (e) {
                         error             = e;

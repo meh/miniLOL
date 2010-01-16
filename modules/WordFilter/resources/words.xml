@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<filters censor="@#!%$">
+    <filter type="replace" regexp="/NIGGER/gi" to="&lt;span style='color: white; background: black; font-weight: bold;'&gt;NIGGER&lt;/span&gt;"/>
+    <filter type="replace" regexp="/vagina/gi" to="&lt;span style='color: magenta; background: white; font-weight: bold;'&gt;vagina&lt;/span&gt;"/>
+</filters>
