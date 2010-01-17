@@ -18,7 +18,7 @@ Filters._filters = [];
 
 Filters.Filter = Class.create({
     initialize: function (node, censor) {
-        this._type   = node.getAttribute("type") || "censor";
+        this._type = node.getAttribute("type") || "censor";
 
         if (node.getAttribute("regexp")) {
             this._regexp = eval(node.getAttribute("regexp"));
@@ -89,4 +89,4 @@ Filters.reload = function () {
 
 return Filters;
 
-)();
+})();

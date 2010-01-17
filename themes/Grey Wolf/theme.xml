@@ -8,7 +8,7 @@
     >
 ]>
 
-<theme name="GreyWolf" author="barbex" homepage="http://onlyawall.altervista.org" description="Grey as a wolf" menu="head" content="body">
+<theme name="GreyWolf" author="barbex" homepage="http://onlyawall.altervista.org" description="Grey as a wolf" menu="menuContainer" content="body">
     <initialize><![CDATA[
 miniLOL.theme.resize = function () {
 $('body').setStyle({
