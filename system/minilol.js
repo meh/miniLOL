@@ -694,6 +694,10 @@ miniLOL = {
                     nest: "<div class='#{class}' style='#{1}'>#{data}</div>",
                     data: "<div class='data'>#{before}#{data}#{after}</div>"
                 };
+            },
+
+            clearCache: function () {
+                miniLOL.theme.template._cache = {};
             }
         },
 
@@ -730,8 +734,9 @@ miniLOL = {
                     var info = miniLOL.theme.informations = {};
                     var doc  = miniLOL.utils.fixDOM(http.responseXML);
 
-                    info.name   = doc.documentElement.getAttribute("name")   || "Unknown";
-                    info.author = doc.documentElement.getAttribute("author") || "Anonymous";
+                    info.name     = doc.documentElement.getAttribute("name")     || "Unknown";
+                    info.author   = doc.documentElement.getAttribute("author")   || "Anonymous";
+                    info.homepage = doc.documentElement.getAttribute("homepage") || '';
                     
                     miniLOL.theme.menu._node    = doc.documentElement.getAttribute("menu") || "menu";
                     miniLOL.theme.content._node = doc.documentElement.getAttribute("content") || "body";
@@ -838,7 +843,7 @@ miniLOL = {
                 }
             }
 
-            miniLOL.theme.template._cache = {};
+            miniLOL.theme.template.clearCache();
 
             if (runtime) {
                 miniLOL.menu.change(miniLOL.menu.current);
@@ -886,8 +891,6 @@ miniLOL = {
             delete miniLOL.theme.finalize;
 
             delete miniLOL.theme.informations;
-
-            delete miniLOL.theme.template._cache;
         },
 
         content: function () {
@@ -931,11 +934,11 @@ miniLOL = {
 
             var template = miniLOL.theme.template.menu();
 
+            // If the menu has a template get the wanted layer
             if (template) {
                 template = template.getElementById(layer) || template.getElementById('*');
             }
 
-            // If the menu has a template get the wanted layer
             if (template) {
                 var tmp  = template;
                 template = {};
