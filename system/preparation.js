@@ -79,7 +79,7 @@ else if (Prototype.Browser.Opera) {
 }
 else if (Prototype.Browser.Gecko) {
     Error.prototype.toString = function () {
-        return "#{name} (#{fileName}@#{lineNumber}): #{message}<br/><br/>".interpolate({
+        return "#{name}: #{message}<br/><br/>".interpolate({
             name:       this.name,
             fileName:   this.fileName,
             lineNumber: this.lineNumber,

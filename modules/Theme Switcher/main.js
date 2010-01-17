@@ -18,6 +18,8 @@ miniLOL.module.create("Theme Switcher", {
     initialize: function () {
         miniLOL.resource.load(miniLOL.resources.config, this.root+"/resources/config.xml");
 
+        this.Template = miniLOL.utils.require(this.root+"/system/Template.js");
+
         var This = this;
         this.resource = {
             name: "themes",
@@ -65,9 +67,11 @@ miniLOL.module.create("Theme Switcher", {
             return false;
         }
 
-        this.theme = new CookieJar().get("theme");
+        var theme = this.theme = new CookieJar().get("theme");
 
-        this.execute.defer({ theme: this.theme });
+        Event.observe(document, ":initialized", function (event) {
+            miniLOL.module.execute("Theme Switcher", { theme: theme });
+        })
     },
 
     execute: function (args) {

@@ -29,6 +29,8 @@ miniLOL = {
 
     initialize: function () {
         [function () {
+            miniLOL.path = location.href.match(/^(.*?)\/[^\/]*?(#|$)/)[1];
+
             miniLOL.resource.load(miniLOL.resources.config, "resources/config.xml");
 
             function prepareConfigurations (event) {
@@ -162,6 +164,8 @@ miniLOL = {
         if (!minor) {
             miniLOL.error._value = true;
         }
+
+        Event.fire(document, ":error", { text: text, element: element, minor: minor });
     },
 
     content: {
@@ -629,7 +633,7 @@ miniLOL = {
         template: {
             load: function (name, path) {
                 if (!path && !miniLOL.theme.name) {
-                    return false;
+                    return 0;
                 }
 
                 path = path || "#{path}/#{theme}".interpolate({
@@ -656,10 +660,11 @@ miniLOL = {
                                 file:  file,
                                 error: error.replace(/\n/g, "<br/>").replace(/ /g, "&nbsp;")
                             }));
+                            
+                            return;
                         }
-                        else {
-                            miniLOL.theme.template._cache[file] = miniLOL.utils.fixDOM(http.responseXML);
-                        }
+
+                        miniLOL.theme.template._cache[file] = miniLOL.utils.fixDOM(http.responseXML);
                     },
 
                     onFailure: function () {
@@ -1354,7 +1359,8 @@ miniLOL = {
                     }
                 }
                 catch (e) {
-                    e.fileName = "#{path}/#{module}/main.js".interpolate({
+                    e.fileName = "#{root}/#{path}/#{module}/main.js".interpolate({
+                        root: miniLOL.path,
                         path: miniLOL.module.path,
                         module: name
                     });
@@ -1399,7 +1405,8 @@ miniLOL = {
                 result = miniLOL.module.get(name).execute.apply(miniLOL.module.get(name), vars);
             }
             catch (e) {
-                e.fileName = "#{path}/#{module}/main.js".interpolate({
+                e.fileName = "#{root}/#{path}/#{module}/main.js".interpolate({
+                    root: miniLOL.path,
                     path: miniLOL.module.path,
                     module: name
                 });
@@ -1443,8 +1450,9 @@ miniLOL = {
                 return true;
             }
             catch (e) {
-                miniLOL.error("An error occurred while loading the module `#{name}`<br/><br/>#{file} @ #{line}:<br/>#{error}".interpolate({
+                miniLOL.error("An error occurred while loading the module `#{name}`<br/><br/>#{root}/#{file} @ #{line}:<br/>#{error}".interpolate({
                     name:  name,
+                    root:  miniLOL.path,
                     file:  e.fileName,
                     line:  e.lineNumber,
                     error: e.toString()
@@ -1708,8 +1716,8 @@ miniLOL = {
                     }
                 },
                 
-                onFailure: function () {
-                    error            = new Error("Couldn't find the file.");
+                onFailure: function (http) {
+                    error            = new Error("Failed to retrieve the file (#{status} - #{statusText}.".interpolate(http));
                     error.fileName   = path;
                     error.lineNumber = 0;
                 }
