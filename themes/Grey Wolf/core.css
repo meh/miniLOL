@@ -1,0 +1,138 @@
+* {
+    margin: 0;
+    padding: 0;
+    position: relative;
+}
+
+a:link, a:visited, a:active {
+    color: #3D3D3D;
+    font-size: 12px;
+    text-decoration: underline;
+}
+a:hover {
+    color: #5B5B5B;
+    text-decoration: none;
+}
+
+div.project a { text-decoration: none; }
+
+img {
+    border: none;
+    text-align: center;
+}
+
+pre {
+    position: relative;
+}
+
+h1 {
+    font-size: 16px;
+}
+
+h1:before {
+    content: "+ ";
+}
+
+h1:after {
+    content: " +";
+}
+
+#body > code {
+    display: none;
+}
+
+body {
+    width: 100%;
+    height: 100%;
+    background-image:url('images/bg.jpg');
+    background-repeat:no-repeat;
+    background-position: top left;
+    color: #111111;
+    font-family: Courier New, Monospace, Terminus;
+    font-size: 11px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+#container {
+    background-color: #BDBDBD;
+    opacity:0.9;
+    border: dashed 1px #222222;
+    margin-top: 50px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 780px;
+    padding: 6px;
+    padding-left: 3px;
+    padding-right: 3px;
+    text-align: justify;
+}
+
+#head {
+    background-color: #939393;
+    width: 760px;
+    height: 17px;
+    margin-right: auto;
+    margin-left: auto;
+    margin-bottom: 10px;
+    padding: 5px;
+    text-align: right !important;
+    border: double 3px #222222;
+}
+
+#body {
+    background-color: #A5A5A5;
+    width: 760px;
+    height: 450px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: justify;
+    border: dotted 1px #222222;
+    padding: 5px;
+    overflow: auto;
+}
+
+#credits {
+    background-color: #939393;
+    width: 760px;
+    margin-right: auto;
+    margin-left: auto;
+    margin-top: 10px;
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 3px;
+    text-align: right;
+    border: dotted 1px #222222;
+    height: 15px;
+    font-size: 10px;
+}
+
+.hidden {
+    display: none;
+}
+
+input.donate {
+    background: #000000;
+    color: inherit;
+    border: solid 1px #b21818;
+}
+input.donate:hover {
+    color: #ffffff;
+    background-color: #68696b;
+    border: solid 1px #b21818;
+}
+
+.paper pre {
+    width: 90%;
+    margin-top: 20px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 5px;
+    border: 1px solid #b21818;
+    background-color: #000000;
+    overflow: auto;
+    position: relative;
+    top: -10px;
+}
+

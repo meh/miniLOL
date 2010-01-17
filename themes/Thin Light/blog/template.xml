@@ -20,9 +20,7 @@
     
         <pager><![CDATA[
             <div class="pager">
-                #{previous}
-                #{numbers}
-                #{next}
+                pages: #{numbers}
             </div>
             ]]>
             <previous><![CDATA[<div class="previous"><a href="#{link}">&lt;=</a></div>]]></previous>
@@ -55,8 +53,6 @@
             <div class="content">#{content}</div>
 
             #{comments_show}
-
-            #{pager}
         </div>
         ]]>
 

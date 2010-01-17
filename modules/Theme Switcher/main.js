@@ -10,7 +10,7 @@
 *  0. You just DO WHAT THE FUCK YOU WANT TO.                         *
 *********************************************************************/
 
-miniLOL.module.create("ThemeSwitcher", {
+miniLOL.module.create("Theme Switcher", {
     version: "0.1",
 
     type: "passive",
@@ -47,7 +47,7 @@ miniLOL.module.create("ThemeSwitcher", {
                     }
                 });
 
-                var template = miniLOL.theme.template.load("ThemeSwitcher/template")
+                var template = miniLOL.theme.template.load("Theme Switcher/template")
                             || miniLOL.theme.template.load("template", This.root+"/resources");
 
                 if (!template) {
@@ -71,7 +71,7 @@ miniLOL.module.create("ThemeSwitcher", {
     },
 
     execute: function (args) {
-        args["theme"] = args["theme"] || miniLOL.config["ThemeSwitcher"].defaultTheme;
+        args["theme"] = args["theme"] || miniLOL.config["Theme Switcher"].defaultTheme;
 
         if (args["choose"]) {
             this.theme = args["theme"];

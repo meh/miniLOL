@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!DOCTYPE template [
+    <!ELEMENT layer (menu, element)>
+    <!ATTLIST layer
+        id   ID   #REQUIRED
+    >
+
+    <!ELEMENT menu (#PCDATA)>
+
+    <!ELEMENT element (#PCDATA)>
+]>
+
+<template>
+    <layer id="0">
+        <menu><![CDATA[
+            #{data}
+        ]]></menu>
+
+        <item><![CDATA[
+            <div class="menu"><a href="#{href}">#{text}</a>#{data}</div>
+        ]]></item>
+    </layer>
+
+    <layer id="1">
+        <menu><![CDATA[
+            <div class="menu">#{data}</div>
+        ]]></menu>
+
+        <item><![CDATA[
+            <a class="menu_element" href="#{href}"><div class="#{class}">#{text}</div></a>
+        ]]></item>
+    </layer>
+</template>

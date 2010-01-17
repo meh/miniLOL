@@ -8,7 +8,7 @@
     >
 ]>
 
-<theme name="original" author="meh." menu="menu" content="body">
+<theme name="Original" author="meh." homepage="http://meh.doesntexist.org" menu="menu" content="body">
     <initialize><![CDATA[
         miniLOL.theme.resize = function () {
             $("container").setStyle({

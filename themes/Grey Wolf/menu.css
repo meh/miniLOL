@@ -1,0 +1,79 @@
+#head a {
+    color: #3D3D3D;
+    font-size: 13px;
+    text-decoration: underline;
+    font-weight: bold;
+    padding-left: 1px;
+    padding-right: 1px;
+    cursor: crosshair;
+  	 	 z-index:24;
+}
+
+#head a:hover {
+    color: #5B5B5B;
+    text-decoration: none;
+    text-transform: uppercase;
+    z-index: 25;
+}
+
+a span {display: none}
+
+a:hover span {
+	text-transform: none !important;
+    display: block;
+    position:absolute;
+    top: 1.5em;
+    left: 1em;
+    width: 15em;
+    border: 1px solid #000;
+    background-color: #eee;
+    color:#000;
+    text-align: center;
+    opacity:0.8;
+} 
+
+#head .menu {
+    background-color: #939393;
+    position: relative;
+    float: right;
+    text-decoration: none;
+    margin-right: 5px;
+    
+}
+
+#head .menu > .menu {
+    position: absolute;
+    float: right;
+    left: 1px;
+    display: none;
+    opacity: 0.9;
+    z-index: 42;
+    border-top:none;
+	border-right:dotted 1px #222222;
+	border-bottom:dotted 1px #222222;
+	border-left:dotted 1px #222222;
+}
+
+#head div.menu:hover > div.menu {
+    display: block;
+}
+
+#head .menu a.menu_element {
+    padding: 0;
+}
+
+#head .menu a.menu_element div {
+    width: 100%;
+}
+
+#head .menu a.menu_element:hover {
+    color: #5B5B5B;
+    text-transform: capitalize;
+}
+
+#head .menu a.menu_element:hover div {
+}
+
+#head .menu div.new {
+    border-top: dotted 1px #3D3D3D;
+}

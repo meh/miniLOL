@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!DOCTYPE theme [
+    <!ELEMENT theme (file*)>
+    <!ATTLIST theme
+        name   CDATA #REQUIRED
+        author CDATA #REQUIRED
+    >
+]>
+
+<theme name="GreyWolf" author="barbex" homepage="http://onlyawall.altervista.org" description="Grey as a wolf" menu="head" content="body">
+    <initialize><![CDATA[
+miniLOL.theme.resize = function () {
+$('body').setStyle({
+height: (document.viewport.getHeight()-(50+$('head').getHeight()+20)-(50+$('credits').getHeight()+20))+'px'
+});
+};
+ 
+Event.observe(window, "resize", miniLOL.theme.resize);
+Event.observe(document, ":module.load", miniLOL.theme.resize);
+ 
+Event.observe(document, ":initialized", function () {
+miniLOL.theme.resize.delay(0.1);
+});
+ 
+miniLOL.theme.resize.defer();
+]]></initialize>
+ 
+    <finalize><![CDATA[
+Event.stopObserving(window, "resize", miniLOL.theme.resize);
+Event.stopObserving(document, ":module.load", miniLOL.theme.resize);
+delete miniLOL.theme.resize;
+]]></finalize>
+ 
+    <styles>
+        <style name="core"/>
+        <style name="menu"/>
+
+        <style name="blog/style"/>
+
+        <style name="SyntaxHighlighter/style"/>
+    </styles>
+</theme>

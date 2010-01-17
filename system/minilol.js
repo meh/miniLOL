@@ -25,7 +25,7 @@
  */
 
 miniLOL = {
-    version: "1.0.2",
+    version: "1.1",
 
     initialize: function () {
         [function () {
@@ -77,6 +77,7 @@ miniLOL = {
         function () {
             if (miniLOL.config["core"].theme) {
                 miniLOL.error(!miniLOL.theme.load(miniLOL.config["core"].theme));
+                miniLOL.theme.template.menu();
             }
             else {
                 miniLOL.error(!miniLOL.theme.deprecated());
@@ -84,8 +85,6 @@ miniLOL = {
         },
         
         function () {
-            miniLOL.theme.template.menu();
-
             if (!miniLOL.error()) {
                 if (!miniLOL.theme.menu()) {
                     miniLOL.menus.dom = null;
@@ -629,6 +628,10 @@ miniLOL = {
 
         template: {
             load: function (name, path) {
+                if (!path && !miniLOL.theme.name) {
+                    return false;
+                }
+
                 path = path || "#{path}/#{theme}".interpolate({
                     path: miniLOL.theme.path,
                     theme: miniLOL.theme.name
@@ -838,10 +841,7 @@ miniLOL = {
             miniLOL.theme.template._cache = {};
 
             if (runtime) {
-                if (miniLOL.menu.enabled()) {
-                    miniLOL.menu.change(miniLOL.menu.current);
-                }
-
+                miniLOL.menu.change(miniLOL.menu.current);
                 miniLOL.go(/[#?]./.test(location.href) ? location.href.replace(/^.*[#?]/, '#') : miniLOL.config["core"].homePage);
             }
 
@@ -931,7 +931,6 @@ miniLOL = {
 
             var template = miniLOL.theme.template.menu();
 
-            // Checking if there's a menu template
             if (template) {
                 template = template.getElementById(layer) || template.getElementById('*');
             }
@@ -1617,12 +1616,13 @@ miniLOL = {
             var blocks = matches[1].split(/&/);
             for (var i = 0; i < blocks.length; i++) {
                 var parts = blocks[i].split(/=/);
+                var name  = decodeURIComponent(parts[0]);
                 
                 if (parts[1]) {
-                    result[parts[0]] = parts[1];
+                    result[name] = decodeURIComponent(parts[1]);
                 }
                 else {
-                    result[parts[0]] = true;
+                    result[name] = true;
                 }
             }
             

@@ -1,24 +1,5 @@
-.blog div.post {
-    border-bottom: 1px solid #EEF;
-    margin: 8px 0px;
-    padding: 4px;
-}
-
-.blog .post .title a {
-    color: #35A;
-    font-size: 13px;
-    font-weight: 700;
-    text-align: center;
-    text-decoration: none;
-}
-
-.blog .post .date {
-    border-bottom: 1px solid #EEF;
-    padding-bottom: 4px;
-    margin-bottom: 4px;
-    color: #888;
-    font-size: 10px;
-    text-align: center;
+.blog a {
+    font-size: 11px;
 }
 
 .blog pre {
@@ -27,10 +8,15 @@
     margin-left: auto;
     margin-right: auto;
     padding: 5px;
-    border: 1px solid #EEF;
+    border: 1px solid #5B5B5B;
+    background-color: #000000;
+    overflow: auto;
+    position: relative;
+    top: -10px;
 }
 
 .blog .page .post {
+    border-bottom: 1px solid #5B5B5B;
     margin-bottom: 10px;
 }
 
@@ -38,6 +24,16 @@
     width: 100%;
     text-align: center;
     margin-bottom: 10px;
+}
+
+.blog .post .header .title a {
+    font-size: 12px;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.blog .post .header .date {
+    font-size: 10px;
 }
 
 .blog .post .by {
@@ -77,7 +73,8 @@
 .blog .pager .numbers div {
     font-weight: bold;
 
-    border: 1px solid #EEF;
+    background-color: #707070;
+    border: 1px solid #5B5B5B;
 
     padding-left: 2px;
     padding-right: 2px;
@@ -87,7 +84,7 @@
 }
 
 .blog .pager .numbers div:hover {
-    color: #35A;
+    color: #5B5B5B;
 }
 
 .blog .pager .numbers .current{
@@ -98,9 +95,27 @@
     text-decoration: none;
 }
 
+.blog .first:hover a {
+    color: #5B5B5B;
+}
+
+.blog .inner:hover a {
+    color: #5B5B5B;
+}
+
+.blog .last:hover a {
+    color: #5B5B5B;
+}
+
 .blog #editor {
     width: 99%;
     height: 100px;
     font-family: Courier new;
     font-size: 10px;
+}
+
+.blog .syntaxhighlighter {
+    margin: 6px auto 6px auto !important;
+    border: 1px solid #b21818 !important;
+    width: 96% !important;
 }

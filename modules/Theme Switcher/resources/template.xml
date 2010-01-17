@@ -7,7 +7,7 @@
         </div>
         
         <div class="chooser" style="float: left; margin-left: 5px;">
-            <form><select onchange="var name = this.options.item(this.selectedIndex).value; miniLOL.module.execute('ThemeSwitcher', { choose: true, theme: name }); miniLOL.module.execute('ThemeSwitcher', { theme: name });">
+            <form><select onchange="var name = this.options.item(this.selectedIndex).value; miniLOL.module.execute('Theme Switcher', { choose: true, theme: name }); miniLOL.module.execute('Theme Switcher', { theme: name });">
                 #{data}
             </select></form>
         </div>

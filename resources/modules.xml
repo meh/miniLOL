@@ -19,6 +19,6 @@ This file contains the enabled modules.
 -->
 
 <modules>
-    <module name="WordFilter"/>
-    <module name="ThemeSwitcher"/>
+    <module name="Theme Switcher"/>
+    <module name="Word Filter"/>
 </modules>
