@@ -40,6 +40,10 @@ Filters.Filter = Class.create({
 
     apply: function (text) {
         return text.replace(this._regexp, this._to);
+    },
+
+    toString: function () {
+        return "s/#{_regexp}/#{_to}/gi".interpolate(this);
     }
 });
 
@@ -71,7 +75,7 @@ Filters.load = function (path) {
             var filters = dom.getElementsByTagName("filter");
             
             for (var i = 0; i < filters.length; i++) {
-                Filters._filters.push(new Filter(filters[i], dom.documentElement.getAttribute("censor")));
+                Filters._filters.push(new Filters.Filter(filters[i], dom.documentElement.getAttribute("censor")));
             }
 
             Filters._paths.push(path);

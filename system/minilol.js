@@ -1396,7 +1396,7 @@ miniLOL = {
                 miniLOL.content.set(miniLOL.config['core'].loadingMessage);
             }
 
-            vars = (vars instanceof Array) ? vars : [vars];
+            vars = (Object.isArray(vars)) ? vars : [vars];
 
             Event.fire(document, ":module.execute", { name: name, arguments: vars });
 
