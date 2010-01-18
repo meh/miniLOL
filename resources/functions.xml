@@ -26,15 +26,11 @@ Wrappers are useful if you are going to use a module like syntax highlighting.
 -->
 
 <functions>
-    <function name="simple"><![CDATA[
+    <function name="raw"><![CDATA[
         text = text.replace(/&/g,  '&amp;');
         text = text.replace(/</g,  '&lt;');
         text = text.replace(/>/g,  '&gt;');
-        text = text.replace(/\n/g, '<br/>');
 
-        /* Here was a not permanent XSS, that obviously on a standard miniLOL does nothing. */
-        var decoration = (args.decoration || "").escapeHTML();
-
-        text = decoration.times(parseInt(args.times)||10)+'<br/>'+text+decoration.times(parseInt(args.times)||10)+'<br/>';
+        return "<pre>" + text + "</pre>";
     ]]></function>
 </functions>

@@ -24,7 +24,9 @@
     <!ATTLIST link
         class       CDATA "link"
         id          CDATA ""
-        src         CDATA #REQUIRED
+        src         CDATA #IMPLIED
+        url         CDATA #IMPLIED
+        href        CDATA #IMPLIED
         text        CDATA #REQUIRED
         before      CDATA #IMPLIED
         after       CDATA #IMPLIED
@@ -74,20 +76,30 @@ The example below should be self explanatory.
         <![CDATA[
             This is a links collection:<br/>
         ]]>
-        <list before="-&#160;">
-            <link src="#stuff" text="Stuff" arguments="decoration=- times=40" after=" ~ Internal link"/>
-            <link src="separated" text="Separated" after=" ~ Internal link but in data/"/>
-            <link src="#separated" text="Separated" after=" ~ Separated alias'd"/>
-            <link src="http://lulz.thruhere.net" text="IN LULZ WE TRUST" after=" ~ External link"/>
+        <list before="- " style="margin-left: 10px">
+            <link href="#stuff"                     text="Stuff"     after="&#160;&#160;&#160;&#160; ~ Internal link"/>
+            <link href="separated"                  text="Separated" after=" ~ Internal link but in data/" type="raw"/>
+            <link href="#separated"                 text="Separated" after=" ~ Separated alias'd"/>
+            <link href="http://meh.doesntexist.org" text="meh."      after="&#160;&#160;&#160;&#160;&#160; ~ External link"/>
+        </list>
+
+        <![CDATA[<br/>
+            This is a simple list created automatically:<br/>
+        ]]>
+        <list before="# " style="margin-left: 10px">
+            <item text="LOL"/>
+            <item text="WTF"/>
+            <item text="OMG"/>
         </list>
     </page>
 
     <page id="separated" alias="#page=separated"/>
 
     <page id="stuff" type="simple" arguments="decoration=~ times=20">
-        <![CDATA[NIGGER NIGGER NIGGER NIGGER NIGGER NIGGER
-             NIGGER NIGGER NIGGER NIGGER NIGGER NIGGER
-             NIGGER NIGGER NIGGER NIGGER NIGGER NIGGER
+        <![CDATA[
+            NIGGER NIGGER NIGGER NIGGER NIGGER NIGGER
+            NIGGER NIGGER NIGGER NIGGER NIGGER NIGGER
+            NIGGER NIGGER NIGGER NIGGER NIGGER NIGGER
         ]]>
     </page>
 </pages>

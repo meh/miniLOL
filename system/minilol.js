@@ -937,70 +937,73 @@ miniLOL = {
         parse: function (menu, layer) {
             layer = layer || 0;
 
-            var template = miniLOL.theme.template.menu();
+            var template      = miniLOL.theme.template.menu();
+            var layerTemplate = {};
 
             // If the menu has a template get the wanted layer
             if (template) {
-                template = template.getElementById(layer) || template.getElementById('*');
-            }
+                var dom = template.getElementById(layer) || template.getElementById('*');
 
-            if (template) {
-                var tmp  = template;
-                template = {};
+                if (dom) {
+                    if (dom.getElementsByTagName("menu").length) {
+                        layerTemplate.menu = dom.getElementsByTagName("menu")[0].firstChild.nodeValue;
+                    }
 
-                if (tmp.getElementsByTagName("menu").length) {
-                    template.menu = tmp.getElementsByTagName("menu")[0].firstChild.nodeValue;
-                }
-
-                if (tmp.getElementsByTagName("item").length) {
-                    template.item = tmp.getElementsByTagName("item")[0].firstChild.nodeValue;
+                    if (dom.getElementsByTagName("item").length) {
+                        layerTemplate.item = dom.getElementsByTagName("item")[0].firstChild.nodeValue;
+                    }
                 }
             }
-            else {
-                template = {};
+
+            if (!layerTemplate.menu) {
+                layerTemplate.menu = "#{data}";
             }
 
-            if (!template.menu) {
-                template.menu = '#{data}';
-            }
-
-            if (!template.item) {
-                template.item = '<a href="#{href}">#{text}</a> ';
+            if (!layerTemplate.item) {
+                layerTemplate.item = "<a href='#{href}'>#{text}</a> ";
             }
 
             var first    = true;
             var output   = '';
             var contents = menu.childNodes;
+            var newMenu  = $A(contents).any(function (element) { return element.nodeName == "item" });
             
             for (var i = 0; i < contents.length; i++) {
                 switch (contents[i].nodeType) {
                     case Node.ELEMENT_NODE:
-                    var item = contents[i].cloneNode(true);
-
-                    var text = miniLOL.utils.getFirstText(contents[i].childNodes);
-                    var data = miniLOL.menu.parse(contents[i], layer + 1);
-
-                    var itemClass = item.getAttribute("class") || ''; item.removeAttribute("class");
-                    var itemId    = item.getAttribute("id") || ''; item.removeAttribute("id");
-                    var itemSrc   = item.getAttribute("src")
-                                 || item.getAttribute("href")
-                                 || item.getAttribute("url")
-                                 || '';
-                    
-                    item.removeAttribute("src");
-                    item.removeAttribute("href");
-                    item.removeAttribute("url");
-                    
-                    output += template.item.interpolate({
-                        "class":    itemClass,
-                        id:         itemId,
-                        url:        itemSrc,
-                        src:        itemSrc,
-                        href:       itemSrc,
-                        attributes: miniLOL.utils.attributes(item.attributes),
-                        text:       text,
-                        data:       data
-                    });
+                    if (contents[i].nodeName == "menu") {
+                        output += layerTemplate.menu.interpolate({
+                            data: miniLOL.menu.parse(contents[i], layer + 1)
+                        });
+                    }
+                    else if (contents[i].nodeName == "item") {
+                        var item = contents[i].cloneNode(true);
+    
+                        var text = miniLOL.utils.getFirstText(contents[i].childNodes);
+                        var data = miniLOL.menu.parse(contents[i]);
+    
+                        var itemClass = item.getAttribute("class") || ''; item.removeAttribute("class");
+                        var itemId    = item.getAttribute("id") || ''; item.removeAttribute("id");
+                        var itemSrc   = item.getAttribute("src")
+                                     || item.getAttribute("href")
+                                     || item.getAttribute("url")
+                                     || '';
+                        
+                        item.removeAttribute("src");
+                        item.removeAttribute("href");
+                        item.removeAttribute("url");
+                        
+                        output += layerTemplate.item.interpolate({
+                            "class":    itemClass,
+                            id:         itemId,
+                            url:        itemSrc,
+                            src:        itemSrc,
+                            href:       itemSrc,
+                            attributes: miniLOL.utils.attributes(item.attributes),
+                            text:       text,
+                            data:       data
+                        });
+                    }
                     break;
 
                     case Node.CDATA_SECTION_NODE:
@@ -1015,9 +1018,14 @@ miniLOL = {
             }
 
             if (output.replace(/[\s\n]*/g, '')) {
-                return template.menu.interpolate({
-                    data: output
-                });
+                if (layer == 0) {
+                    return layerTemplate.menu.interpolate({
+                        data: output
+                    });
+                }
+                else {
+                    return output;
+                }
             }
             else {
                 return '';

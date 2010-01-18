@@ -3,9 +3,9 @@
 <!DOCTYPE menus [
     <!ELEMENT menus (menu*)>
 
-    <!ELEMENT menu (item*)>
+    <!ELEMENT menu ANY>
     <!ATTLIST menu
-        id  ID  #REQUIRED
+        id  ID  #IMPLIED
     >
 
     <!ELEMENT item ANY>
