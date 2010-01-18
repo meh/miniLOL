@@ -966,7 +966,6 @@ miniLOL = {
             var first    = true;
             var output   = '';
             var contents = menu.childNodes;
-            var newMenu  = $A(contents).any(function (element) { return element.nodeName == "item" });
             
             for (var i = 0; i < contents.length; i++) {
                 switch (contents[i].nodeType) {
@@ -999,10 +998,16 @@ miniLOL = {
                             url:        itemSrc,
                             src:        itemSrc,
                             href:       itemSrc,
-                            attributes: miniLOL.utils.attributes(item.attributes),
+                            attributes: String.fromAttributes(item.attributes),
                             text:       text,
                             data:       data
                         });
+                    }
+                    else {
+                        var format = template.getElementsByTagName(contents[i].nodeName);
+                        if (format.length) {
+                            
+                        }
                     }
                     break;
 
@@ -1154,7 +1159,7 @@ miniLOL = {
                                 listOutput += miniLOL.theme.template.list.link.interpolate({
                                     "class":    linkClass,
                                     id:         linkId,
-                                    attributes: miniLOL.utils.attributes(link.attributes),
+                                    attributes: String.fromAttributes(link.attributes),
                                     before:     miniLOL.theme.template.list.before.interpolate({ data: before }),
                                     after:      miniLOL.theme.template.list.after.interpolate({ data: after }),
                                     url:        src,
@@ -1177,7 +1182,7 @@ miniLOL = {
                                 listOutput += miniLOL.theme.template.list.item.interpolate({
                                     "class":    itemClass,
                                     id:         itemId,
-                                    attributes: miniLOL.utils.attributes(item.attributes),
+                                    attributes: String.fromAttributes(item.attributes),
                                     before:     miniLOL.theme.template.list.before.interpolate({ data: before }),
                                     after:      miniLOL.theme.template.list.after.interpolate({ data: after }),
                                     text:       text
@@ -1210,7 +1215,7 @@ miniLOL = {
                     }
 
                     output += miniLOL.theme.template.list.global.interpolate({
-                        attributes: miniLOL.utils.attributes(ele.attributes),
+                        attributes: String.fromAttributes(ele.attributes),
                         data: listOutput
                     });
                     break;
@@ -1244,7 +1249,7 @@ miniLOL = {
                 }
                 delete queries.page;
 
-                var queries = miniLOL.utils.toQuery(queries);
+                var queries = Object.toQuery(queries);
                 if (queries) {
                     queries = '&'+queries;
                 }
@@ -1279,7 +1284,7 @@ miniLOL = {
 
             var pageArguments = page.getAttribute("arguments");
             if (pageArguments) {
-                pageArguments = miniLOL.utils.parseQuery(pageArguments.replace(/[ ,]+/g, "&amp;"));
+                pageArguments = pageArguments.replace(/[ ,]+/g, "&amp;").parseQuery();
 
                 for (var key in pageArguments) {
                     if (queries[key] == null) {
@@ -1306,7 +1311,7 @@ miniLOL = {
 
             Event.fire(document, ":page.load", { path: path, queries: queries });
 
-            new Ajax.Request("data/#{path}?#{queries}".interpolate({ path: path, queries: miniLOL.utils.toQuery(queries) }), {
+            new Ajax.Request("data/#{path}?#{queries}".interpolate({ path: path, queries: Object.toQuery(queries) }), {
                 method: "get",
         
                 onSuccess: function (http) {
@@ -1509,7 +1514,7 @@ miniLOL = {
     },
 
     go: function (url) {
-        var queries = miniLOL.utils.parseQuery(url.replace(/#/, '?'))
+        var queries = url.replace(/#/, '?').parseQuery();
         var matches = /#(([^=&]*)&|([^=&]*)$)/.exec(url); // hate WebKit so much.
         var result  = false;
 
@@ -1540,19 +1545,6 @@ miniLOL = {
     },
 
     utils: {
-        attributes: function (attributes) {
-            var text = '';
-            
-            for (var i = 0; i < attributes.length; i++) {
-                text += "#{name}='#{value}' ".interpolate({
-                    name: attributes.item(i).nodeName,
-                    value: attributes.item(i).nodeValue
-                });
-            }
-            
-            return text;
-        },
-
         getElementById: function (id) {
             var elements = this.getElementsByTagName('*');
             
@@ -1622,43 +1614,6 @@ miniLOL = {
             }
 
             return '';
-        },
-
-        parseQuery: function (url) {
-            var result  = {};
-            var matches = url.match(/\?(.*)$/);
-            
-            if (!matches) {
-                return result;
-            }
-            
-            var blocks = matches[1].split(/&/);
-            for (var i = 0; i < blocks.length; i++) {
-                var parts = blocks[i].split(/=/);
-                var name  = decodeURIComponent(parts[0]);
-                
-                if (parts[1]) {
-                    result[name] = decodeURIComponent(parts[1]);
-                }
-                else {
-                    result[name] = true;
-                }
-            }
-            
-            return result;
-        },
-
-        toQuery: function (obj) {
-            var result = '';
-            
-            for (var name in obj) {
-                result += "#{name}=#{value}&".interpolate({
-                    name: name,
-                    value: obj[name]
-                });
-            }
-            
-            return result.substr(0, result.length - 1);
         },
 
         includeCSS: function (path) {

@@ -15,3 +15,10 @@ It's really powerful but sadly there's little documentation, I'll write somethin
 If you want more informations about how it works read INTRODUCTION.
 
 miniLOL is already 1 year old so it's pretty stable now.
+
+####
+
+Notice that the release package uses the Theme Switcher module that enables users to choose
+the theme to use. There are 3 themes installed by default, two by me (one copied from a friend's website)
+and another from an user. To stop using the module and use the theme you want just delete the line in
+resources/modules.xml with Theme Switcher and add a <theme>The Theme You Want</theme> to resources/config.xml.

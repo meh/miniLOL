@@ -32,14 +32,6 @@ unFocus.History.addEventListener("historyChange", function (query) {
     miniLOL.theme.content().scrollTop = 0;
 });
 
-Function.prototype.clone = function () {
-    return eval('(' + this.toString().replace(/^function .*?\(/, "function (") + ')');
-};
-
-Object.isBoolean = function (val) {
-    return val.constructor === Boolean;
-}
-
 /* Cross-Browser faggotree */
 
 if (navigator.userAgent.match(/Chrome/)) {
@@ -64,12 +56,6 @@ if (Prototype.Browser.IE) {
             description: this.description,
             stack:       this.stack.replace(/\n/g, "<br/>")
         });
-    };
-
-    Function.prototype.clone = function () {
-        var func = this.toString();
-
-        return new Function(func.substring(func.indexOf('{') + 1, func.lastIndexOf('}')));
     };
 }
 else if (Prototype.Browser.Opera) {
@@ -97,3 +83,5 @@ else if (Prototype.Browser.Chrome || Prototype.Browser.Safari) {
         });
     }
 }
+
+miniLOL.utils.require("system/extension.js");
