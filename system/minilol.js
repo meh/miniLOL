@@ -38,6 +38,10 @@ miniLOL = {
                     return;
                 }
 
+                if (!miniLOL.config["core"]) {
+                    miniLOL.config["core"] = {};
+                }
+
                 if (!miniLOL.config["core"].siteTitle) {
                      miniLOL.config["core"].siteTitle = "miniLOL #{version}".interpolate(miniLOL);
                 }
@@ -314,12 +318,7 @@ miniLOL = {
                         asynchronous: false,
         
                         onSuccess: function (http) {
-                            var error = miniLOL.utils.checkXML(http.responseXML);
-                            if (error) {
-                                miniLOL.error("Error while parsing config.xml<br/><br/>#{error}".interpolate({
-                                    error: error.replace(/\n/g, "<br/>").replace(/ /g, "&nbsp;")
-                                }));
-
+                            if (miniLOL.utils.checkXML(http.responseXML, paths[i])) {
                                 return;
                             }
 
@@ -365,12 +364,7 @@ miniLOL = {
                     asynchronous: false,
 
                     onSuccess: function (http) {
-                        var error = miniLOL.utils.checkXML(http.responseXML);
-                        if (error) {
-                            miniLOL.error("Error while parsing menus.xml<br/><br/>#{error}".interpolate({
-                                error: error.replace(/\n/g, "<br/>").replace(/ /g, "&nbsp;")
-                            }));
-
+                        if (miniLOL.utils.checkXML(http.responseXML, path)) {
                             return;
                         }
 
@@ -423,12 +417,7 @@ miniLOL = {
                     asynchronous: false,
     
                     onSuccess: function (http) {
-                        var error = miniLOL.utils.checkXML(http.responseXML);
-                        if (error) {
-                            miniLOL.error("Error while parsing pages.xml<br/><br/>#{error}".interpolate({
-                                error: error.replace(/\n/g, "<br/>").replace(/ /g, "&nbsp;")
-                            }));
-
+                        if (miniLOL.utils.checkXML(http.responseXML, path)) {
                             return;
                         }
 
@@ -470,12 +459,7 @@ miniLOL = {
                     asynchronous: false,
         
                     onSuccess: function (http) {
-                        var error = miniLOL.utils.checkXML(http.responseXML);
-                        if (error) {
-                            miniLOL.error("Error while parsing functions.xml<br/><br/>#{error}".interpolate({
-                                error: error.replace(/\n/g, "<br/>").replace(/ /g, "&nbsp;")
-                            }));
-
+                        if (miniLOL.utils.checkXML(http.responseXML, path)) {
                             return;
                         }
 
@@ -533,12 +517,7 @@ miniLOL = {
                     asynchronous: false,
         
                     onSuccess: function (http) { 
-                        var error = miniLOL.utils.checkXML(http.responseXML);
-                        if (error) {
-                            miniLOL.error("Error while parsing modules.xml<br/><br/>#{error}".interpolate({
-                                error: error.replace(/\n/g, "<br/>").replace(/ /g, "&nbsp;")
-                            }), miniLOL.theme.content());
-
+                        if (miniLOL.utils.checkXML(http.responseXML, path)) {
                             return;
                         }
 
@@ -654,13 +633,7 @@ miniLOL = {
                     asynchronous: false,
                 
                     onSuccess: function (http) {
-                        var error = miniLOL.utils.checkXML(http.responseXML);
-                        if (error) {
-                            miniLOL.error("Error while parsing #{file}<br/><br/>#{error}".interpolate({
-                                file:  file,
-                                error: error.replace(/\n/g, "<br/>").replace(/ /g, "&nbsp;")
-                            }));
-                            
+                        if (miniLOL.utils.checkXML(http.responseXML, file)) {
                             return;
                         }
 
@@ -1619,16 +1592,27 @@ miniLOL = {
             return obj;
         },
 
-        checkXML: function (xml) {
+        checkXML: function (xml, path) {
+            var error = false;
+
             if (!xml) {
-                return "There's a syntax error.";
+                error = "There's a syntax error.";
             }
 
             if (xml.documentElement.nodeName == "parsererror") {
-                return xml.documentElement.textContent;
+                error = xml.documentElement.textContent;
             }
 
-            return false;
+            if (path && error) {
+                miniLOL.error("Error while parsing #{path}<br/><br/>#{error}".interpolate({
+                    path:  path,
+                    error: error.replace(/\n/g, "<br/>").replace(/ /g, "&nbsp;")
+                }));
+
+                return error;
+            }
+
+            return error;
         },
 
         getFirstText: function (elements) {
@@ -1714,7 +1698,7 @@ miniLOL = {
                 },
                 
                 onFailure: function (http) {
-                    error            = new Error("Failed to retrieve the file (#{status} - #{statusText}.".interpolate(http));
+                    error            = new Error("Failed to retrieve the file (#{status} - #{statusText}).".interpolate(http));
                     error.fileName   = path;
                     error.lineNumber = 0;
                 }

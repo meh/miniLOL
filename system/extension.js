@@ -62,10 +62,10 @@ String.prototype.parseQuery = function () {
 Object.toQuery = function (query) {
     var result = '';
     
-    for (var name in obj) {
+    for (var name in query) {
         result += "#{name}=#{value}&".interpolate({
             name: name,
-            value: obj[name]
+            value: query[name]
         });
     }
     

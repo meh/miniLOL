@@ -31,6 +31,6 @@ Wrappers are useful if you are going to use a module like syntax highlighting.
         text = text.replace(/</g,  '&lt;');
         text = text.replace(/>/g,  '&gt;');
 
-        return "<pre>" + text + "</pre>";
+        text = "<pre>" + text + "</pre>";
     ]]></function>
 </functions>
