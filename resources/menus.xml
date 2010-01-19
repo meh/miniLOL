@@ -19,6 +19,8 @@
         <item href="#home"><![CDATA[<i>Home</i>]]></item>
         <item href="#links">My links</item>
         <item href="#stuff">My stuff</item>
-        <item href="#module=Theme Switcher&amp;chooser">Change Theme</item>
+        <item href="#module=Theme Switcher&amp;chooser">Change Theme
+            <tooltip>The Theme Switcher is really awesome :3</tooltip>
+        </item>
     </menu>
 </menus>

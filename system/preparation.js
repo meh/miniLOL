@@ -65,10 +65,8 @@ else if (Prototype.Browser.Opera) {
 }
 else if (Prototype.Browser.Gecko) {
     Error.prototype.toString = function () {
-        return "#{name}: #{message}<br/><br/>".interpolate({
+        return "#{name}: #{message}<br/><br/>#{stack}".interpolate({
             name:       this.name,
-            fileName:   this.fileName,
-            lineNumber: this.lineNumber,
             message:    this.message,
             stack:      this.stack.replace(/\n/g, "<br/>")
         });

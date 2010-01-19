@@ -31,4 +31,8 @@
             <a class="menu_element" href="#{href}"><div class="#{class}">#{text}</div></a>
         ]]></item>
     </layer>
+
+    <tooltip><![CDATA[
+        <span class="tooltip">#{text}</span>
+    ]]></tooltip>
 </template>

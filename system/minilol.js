@@ -934,6 +934,36 @@ miniLOL = {
     },
 
     menu: {
+        parseOther: function (data, template) {
+            var output  = '';
+            var outputs = {};
+
+            if (!data || !template) {
+                return output;
+            }
+
+            template = template.getElementsByTagName(data.nodeName);
+            if (template.length == 0) {
+                return output;
+            }
+            else {
+                template = template[0]
+            }
+
+            var text = miniLOL.utils.getFirstText(template.childNodes);
+
+            var objects = data.childNodes;
+            for (var i = 0; i < objects.length; i++) {
+                if (objects[i].nodeType == Node.ELEMENT_NODE) {
+                    outputs[objects[i].nodeName] = miniLOL.menu.parseOther(objects[i], template);
+                }
+            }
+
+            outputs["text"] = miniLOL.utils.getFirstText(data.childNodes);
+
+            return text.interpolate(Object.extend(outputs, Object.fromAttributes(data.attributes)));
+        },
+
         parse: function (menu, layer) {
             layer = layer || 0;
 
@@ -952,6 +982,11 @@ miniLOL = {
                     if (dom.getElementsByTagName("item").length) {
                         layerTemplate.item = dom.getElementsByTagName("item")[0].firstChild.nodeValue;
                     }
+                }
+            }
+            else {
+                if (miniLOL.error()) {
+                    return false;
                 }
             }
 
@@ -1004,10 +1039,7 @@ miniLOL = {
                         });
                     }
                     else {
-                        var format = template.getElementsByTagName(contents[i].nodeName);
-                        if (format.length) {
-                            
-                        }
+                        output += miniLOL.menu.parseOther(contents[i], template);
                     }
                     break;
 
