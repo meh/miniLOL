@@ -709,21 +709,23 @@ miniLOL = {
         load: function (name, runtime, noInitialization) {
             miniLOL.theme.unload();
 
+            var oldPath = miniLOL.theme.path;
+            var oldName = miniLOL.theme.name;
+
             // The syntax to change the theme path is path:theme
             var path = name.match(/^(.+?):(.+)$/);
             if (path) {
                 miniLOL.theme.path = path[1];
-                name               = path[2];
+                miniLOL.theme.name = path[2];
             }
             else {
                 miniLOL.theme.path = "themes";
+                miniLOL.theme.name = name;
             }
 
-            if (miniLOL.theme.name == name) {
+            if (miniLOL.theme.name == oldName && miniLOL.theme.path == oldPath) {
                 return true;
             }
-
-            miniLOL.theme.name = name;
 
             var path = "#{path}/#{theme}".interpolate({ path: miniLOL.theme.path, theme: name });
 
