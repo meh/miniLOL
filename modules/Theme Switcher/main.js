@@ -20,8 +20,6 @@ miniLOL.module.create("Theme Switcher", {
 
         this.Themes = miniLOL.utils.require(this.root+"/system/Themes.js");
         this.themes = new this.Themes("template", this.root+"/resources");
-
-        window.console.log(this.themes)
         
         if (!this.themes.load(this.root+"/resources/themes.xml")) {
             return false;
