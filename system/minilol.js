@@ -1035,9 +1035,14 @@ miniLOL = {
             }
 
             if (output.replace(/[\s\n]*/g, '')) {
-                return miniLOL.menu.layer(template, layer).menu.interpolate({
-                    data: output
-                });
+                if (layer == 0) {
+                    return miniLOL.menu.layer(template, layer).menu.interpolate({
+                        data: output
+                    });
+                }
+                else {
+                    return output;
+                }
             }
             else {
                 return '';
