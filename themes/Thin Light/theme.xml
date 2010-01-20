@@ -13,15 +13,10 @@
         <link><![CDATA[<div class="#{class}" id="#{id}">#{before}<div class="url"><a href="#{url}" target="#{target}" #{attributes}>#{text}</a></div><div class="description">#{after}</div></div>]]></link>
     </list>
 
-    <templates>
-        <template name="blog/template"/>
-        <template name="blog/editors"/>
-    </templates>
-
     <styles>
         <style name="core"/>
         <style name="menu"/>
 
-        <style name="blog/style"/>
+        <style name="Blog/style"/>
     </styles>
 </theme>

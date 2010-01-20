@@ -909,6 +909,31 @@ miniLOL = {
     },
 
     menu: {
+        layer: function (template, layer) {
+            var result = {};
+            var dom    = template.getElementById(layer) || template.getElementById('*');
+
+            if (dom) {
+                if (dom.getElementsByTagName("menu").length) {
+                    result.menu = dom.getElementsByTagName("menu")[0].firstChild.nodeValue;
+                }
+
+                if (dom.getElementsByTagName("item").length) {
+                    result.item = dom.getElementsByTagName("item")[0].firstChild.nodeValue;
+                }
+            }
+
+            if (!result.menu) {
+                result.menu = "#{data}";
+            }
+
+            if (!result.item) {
+                result.item = "<a href='#{href}'>#{text}</a> ";
+            }
+
+            return result;
+        },
+
         parseOther: function (data, template) {
             var output  = '';
             var outputs = {};
@@ -942,35 +967,17 @@ miniLOL = {
         parse: function (menu, layer) {
             layer = layer || 0;
 
-            var template      = miniLOL.theme.template.menu();
-            var layerTemplate = {};
+            var template = miniLOL.theme.template.menu();
+            var layerTemplate;
 
             // If the menu has a template get the wanted layer
             if (template) {
-                var dom = template.getElementById(layer) || template.getElementById('*');
-
-                if (dom) {
-                    if (dom.getElementsByTagName("menu").length) {
-                        layerTemplate.menu = dom.getElementsByTagName("menu")[0].firstChild.nodeValue;
-                    }
-
-                    if (dom.getElementsByTagName("item").length) {
-                        layerTemplate.item = dom.getElementsByTagName("item")[0].firstChild.nodeValue;
-                    }
-                }
+                layerTemplate = miniLOL.menu.layer(template, layer);
             }
             else {
                 if (miniLOL.error()) {
                     return false;
                 }
-            }
-
-            if (!layerTemplate.menu) {
-                layerTemplate.menu = "#{data}";
-            }
-
-            if (!layerTemplate.item) {
-                layerTemplate.item = "<a href='#{href}'>#{text}</a> ";
             }
 
             var first    = true;
@@ -981,7 +988,7 @@ miniLOL = {
                 switch (contents[i].nodeType) {
                     case Node.ELEMENT_NODE:
                     if (contents[i].nodeName == "menu") {
-                        output += layerTemplate.menu.interpolate({
+                        output += miniLOL.menu.layer(template, layer + 1).menu.interpolate({
                             data: miniLOL.menu.parse(contents[i], layer + 1)
                         });
                     }

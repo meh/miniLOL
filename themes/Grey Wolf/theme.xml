@@ -36,8 +36,8 @@ delete miniLOL.theme.resize;
         <style name="core"/>
         <style name="menu"/>
 
-        <style name="blog/style"/>
+        <style name="Blog/style"/>
 
-        <style name="SyntaxHighlighter/style"/>
+        <style name="Syntax Highlighter/style"/>
     </styles>
 </theme>
