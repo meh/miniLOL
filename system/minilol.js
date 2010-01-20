@@ -911,15 +911,18 @@ miniLOL = {
     menu: {
         layer: function (template, layer) {
             var result = {};
-            var dom    = template.getElementById(layer) || template.getElementById('*');
 
-            if (dom) {
-                if (dom.getElementsByTagName("menu").length) {
-                    result.menu = dom.getElementsByTagName("menu")[0].firstChild.nodeValue;
-                }
+            if (template) {
+                var dom = template.getElementById(layer) || template.getElementById('*');
 
-                if (dom.getElementsByTagName("item").length) {
-                    result.item = dom.getElementsByTagName("item")[0].firstChild.nodeValue;
+                if (dom) {
+                    if (dom.getElementsByTagName("menu").length) {
+                        result.menu = dom.getElementsByTagName("menu")[0].firstChild.nodeValue;
+                    }
+
+                    if (dom.getElementsByTagName("item").length) {
+                        result.item = dom.getElementsByTagName("item")[0].firstChild.nodeValue;
+                    }
                 }
             }
 
@@ -968,13 +971,8 @@ miniLOL = {
             layer = layer || 0;
 
             var template = miniLOL.theme.template.menu();
-            var layerTemplate;
 
-            // If the menu has a template get the wanted layer
-            if (template) {
-                layerTemplate = miniLOL.menu.layer(template, layer);
-            }
-            else {
+            if (!template) {
                 if (miniLOL.error()) {
                     return false;
                 }
@@ -1009,7 +1007,7 @@ miniLOL = {
                         item.removeAttribute("href");
                         item.removeAttribute("url");
                         
-                        output += layerTemplate.item.interpolate({
+                        output += miniLOL.menu.layer(template, layer).item.interpolate({
                             "class":    itemClass,
                             id:         itemId,
                             url:        itemSrc,
@@ -1037,14 +1035,9 @@ miniLOL = {
             }
 
             if (output.replace(/[\s\n]*/g, '')) {
-                if (layer == 0) {
-                    return layerTemplate.menu.interpolate({
-                        data: output
-                    });
-                }
-                else {
-                    return output;
-                }
+                return miniLOL.menu.layer(template, layer).menu.interpolate({
+                    data: output
+                });
             }
             else {
                 return '';
@@ -1355,6 +1348,11 @@ miniLOL = {
 
     module: {
         create: function (name, obj) {
+            if (!obj) {
+                miniLOL.error("Like, do I know how this module is done?");
+                return false;
+            }
+
             obj.name = name;
             obj.root = "#{path}/#{module}".interpolate({
                 path: miniLOL.module.path,
@@ -1413,7 +1411,7 @@ miniLOL = {
 
             if (!miniLOL.module.exists(name)) {
                 if (output) {
-                    miniLOL.error("The module `#{name}` isn't loaded.".interpolate({ name: name }), miniLOL.template.content(), true);
+                    miniLOL.error("The module `#{name}` isn't loaded.".interpolate({ name: name }), miniLOL.theme.template.content(), true);
                 }
 
                 return false;
