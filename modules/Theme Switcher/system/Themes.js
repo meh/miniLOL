@@ -41,7 +41,7 @@ var Themes = Class.create({
                 }
     
                 result = true;
-            },
+            }
         });
     
         return result;
