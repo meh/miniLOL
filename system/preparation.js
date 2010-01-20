@@ -38,7 +38,7 @@ if (navigator.userAgent.match(/Chrome/)) {
     Prototype.Browser.Chrome = true;
 }
 
-if (navigator.userAgent.match(/Safari/)) {
+if (navigator.userAgent.match(/Safari/) && !Prototype.Browser.Chrome) {
     Prototype.Browser.Safari = true;
 }
 

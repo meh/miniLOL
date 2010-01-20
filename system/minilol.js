@@ -1416,7 +1416,7 @@ miniLOL = {
 
             if (!miniLOL.module.exists(name)) {
                 if (output) {
-                    miniLOL.error("The module `#{name}` isn't loaded.".interpolate({ name: name }), miniLOL.theme.template.content(), true);
+                    miniLOL.error("The module `#{name}` isn't loaded.".interpolate({ name: name }), miniLOL.theme.content(), true);
                 }
 
                 return false;
