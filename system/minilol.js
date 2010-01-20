@@ -1406,7 +1406,7 @@ miniLOL = {
 
             if (!miniLOL.module.exists(name)) {
                 if (output) {
-                    miniLOL.error("The module isn't loaded.");
+                    miniLOL.error("The module `#{name}` isn't loaded.".interpolate({ name: name }));
                 }
 
                 return false;
