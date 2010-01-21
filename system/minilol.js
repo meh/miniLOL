@@ -1401,6 +1401,12 @@ miniLOL = {
 
             miniLOL.modules[name] = obj;
 
+            if (obj.aliases) {
+                for (var i = 0; i < obj.aliases.length; i++) {
+                    miniLOL.modules[obj.aliases[i]] = obj;
+                }
+            }
+
             if (obj.onGo) {
                 Event.observe(document, ":go", obj.onGo);
             }

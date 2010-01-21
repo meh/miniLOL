@@ -1,13 +1,5 @@
 miniLOL is a complete while lightweight CMS.
 
-Supported browsers (if you test it on other browsers, contact me):
-Firefox           >= 1.5
-Opera             >= 9.25
-Chrome            >= 1.0
-Safari            >= 2.0.4
-Internet Explorer >= 6
-Konqueror         >= 4.3 (tested on it, if someone can test it on an older version contact me)
-
 It's written in Javascript and it uses a lot of XML for configurations and such.
 
 It's really powerful but sadly there's little documentation, I'll write something someday.
@@ -15,6 +7,16 @@ It's really powerful but sadly there's little documentation, I'll write somethin
 If you want more informations about how it works read INTRODUCTION.
 
 miniLOL is already 1 year old so it's pretty stable now.
+
+Supported browsers (if you test it on other browsers or older versions, contact me):
+|- Firefox           >= 1.5
+|- Opera             >= 9.25
+|- Chrome            >= 1.0
+|- Safari            >= 2.0.4
+|- Internet Explorer >= 6
+|- Konqueror         >= 4.3
+|- Camino            >= 2.0
+`- Epiphany          >= 2.0
 
 ####
 
