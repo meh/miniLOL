@@ -1,12 +1,14 @@
-Function.prototype.clone = function () {
-    if (Prototype.Browser.IE) {
+if (Prototype.Browser.IE) {
+    Function.prototype.clone = function () {
         var func = this.toString();
         return new Function(func.substring(func.indexOf('{') + 1, func.lastIndexOf('}')));
     }
-    else {
+}
+else {
+    Function.prototype.clone = function () {
         return eval('(' + this.toString().replace(/^function .*?\(/, "function (") + ')');
     }
-};
+}
 
 Object.isBoolean = function (val) {
     return val.constructor === Boolean;
