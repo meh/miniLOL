@@ -18,6 +18,5 @@ things to be set and those configurations will go here.
 
     <loadingMessage><![CDATA[<center>Loading...</center>]]></loadingMessage>
 
-    <!-- There's the ThemeSwitcher module that takes care of themes -->
-    <!-- <theme>original</theme> -->
+    <theme>Original</theme>
 </configuration>
