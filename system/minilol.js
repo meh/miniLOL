@@ -1546,19 +1546,17 @@ miniLOL = {
         }
 
         if (matches) {
-            if (Object.isUndefined(matches[2])) {
-                queries.page = matches[1];
+            queries.page = (Object.isUndefined(matches[2])) ? matches[1] : matches[2];
+
+            if (queries.page) {
+                result = miniLOL.page.get(queries.page, queries);
             }
             else {
-                if (matches[2]) {
-                    queries.page = matches[2];
-                }
-                else {
-                    queries.page = miniLOL.config["core"].homePage;
-                }
+                result = miniLOL.go("#{page}&#{queries}".interpolate({
+                    page:    miniLOL.config["core"].homePage,
+                    queries: Object.toQuery(queries)
+                }));
             }
-
-            result = miniLOL.page.get(queries.page, queries);
         }
         else if (queries.module) {
             result = miniLOL.module.execute(queries.module, queries, true);
