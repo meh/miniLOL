@@ -20,8 +20,6 @@ resources/pages.xml
 resources/menus.xml
 resources/functions.xml
 resources/modules.xml
-resources/style.css
-resources/template.html
 
 - resources/config.xml has the job of keeping the core's and modules'
   configurations like the site title and content/menu nodes' id.
@@ -127,9 +125,3 @@ resources/template.html
 - resources/modules.xml is just a simple list of the modules that have to be
   loaded, just put the file in modules/ and add the element with the module
   name.
-
-- resources/style.css should be the main stylesheet file but you can have
-  multiple or none stylesheets, it's your choice.
-
-- resources/template.html is the html that's loaded in the body, so this is
-  one of the most important parts.

@@ -1546,8 +1546,19 @@ miniLOL = {
         }
 
         if (matches) {
-            queries.page = matches[2] || matches[1];
-            result       = miniLOL.page.get(queries.page, queries);
+            if (Object.isUndefined(matches[2])) {
+                queries.page = matches[1];
+            }
+            else {
+                if (matches[2]) {
+                    queries.page = matches[2];
+                }
+                else {
+                    queries.page = miniLOL.config["core"].homePage;
+                }
+            }
+
+            result = miniLOL.page.get(queries.page, queries);
         }
         else if (queries.module) {
             result = miniLOL.module.execute(queries.module, queries, true);
