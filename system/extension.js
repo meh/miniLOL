@@ -39,7 +39,7 @@ Object.fromAttributes = function (attributes) {
 
 String.prototype.parseQuery = function () {
     var result  = {};
-    var matches = this.match(/\?(.*)$/);
+    var matches = this.match(/[?#](.*)$/);
     
     if (!matches) {
         return result;
