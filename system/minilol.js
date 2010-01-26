@@ -93,7 +93,7 @@ miniLOL = {
         function () {
             if (!miniLOL.error()) {
                 if (!miniLOL.theme.menu()) {
-                    miniLOL.menus.dom = null;
+                    miniLOL.menus = null;
                 }
 
                 if (miniLOL.menu.enabled()) {
@@ -353,11 +353,12 @@ miniLOL = {
             load: function (path) {
                 if (!this.res) {
                     this.res = {
-                        dom: null    
+                        dom: null,
+                        list: {}
                     };
                 } var res = this.res;
 
-                miniLOL.menus = res;
+                miniLOL.menus = res.list;
 
                 new Ajax.Request(path, {
                     method: "get",
@@ -370,24 +371,24 @@ miniLOL = {
 
                         var response = miniLOL.utils.fixDOM(http.responseXML);
 
-                        miniLOL.menu._default = response.getElementById("default");
-                        if (!miniLOL.menu._default) {
-                            var menus = response.getElementsByTagName("menu");
+                        miniLOL.menus["default"] = response.getElementById("default");
 
-                            for (var i = 0; i < menus.length; i++) {
-                                if (!menus[i].getAttribute("id")) {
-                                    miniLOL.menu._default = menus[i];
-                                    break;
-                                }
+                        var menus = response.documentElement.childNodes;
+                        for (var i = 0; i < menus.length; i++) {
+                            var id = menus[i].getAttribute("id");
+
+                            if (!id && !miniLOL.menus["default"]) {
+                                miniLOL.menus["default"] = menus[i];
                             }
-
-                            if (i >= menus.length) {
-                                miniLOL.error("Error while analyzing menus.xml<br/><br/>No default menu was found.");
-                                return;
+                            else {
+                                miniLOL.menus[id] = menus[i];
                             }
                         }
 
-                        miniLOL.menus.dom = response;
+                        if (!miniLOL.menus["default"]) {
+                            miniLOL.error("Error while analyzing menus.xml<br/><br/>No default menu was found.");
+                            return;
+                        }
                     }
                 });
 
@@ -1070,16 +1071,18 @@ miniLOL = {
                 });
             }
 
-            return miniLOL.menu.parse(miniLOL.menus.dom.getElementById(name) || miniLOL.menu._default)
+            return miniLOL.menu.parse(miniLOL.menus[name]);
         },
 
         change: function (name) {
             miniLOL.menu.current = name;
             miniLOL.menu.set(miniLOL.menu.get(name));
+
+            Event.fire(document, ":menu.change");
         },
 
         enabled: function () {
-            return Boolean(miniLOL.menus.dom);
+            return Boolean(miniLOL.menus);
         },
 
         exists: function (name) {
@@ -1087,7 +1090,7 @@ miniLOL = {
                 return true;
             }
 
-            return Boolean(miniLOL.menus.dom.getElementById(name));
+            return Boolean(miniLOL.menus[name]);
         }
     },
 
