@@ -302,45 +302,41 @@ miniLOL = {
                 return result;
             },
 
-            load: function () {
+            load: function (path) {
                 if (!this.res) {
                     this.res = {};
                 } var res = this.res;
 
                 miniLOL.config = this.res;
 
-                var paths = $A(arguments);
-
                 var This = this;
-                for (var i = 0; i < paths.length; i++) {
-                    new Ajax.Request(paths[i], {
-                        method: "get",
-                        asynchronous: false,
-        
-                        onSuccess: function (http) {
-                            if (miniLOL.utils.checkXML(http.responseXML, paths[i])) {
-                                return;
-                            }
-
-                            http.responseXML = miniLOL.utils.fixDOM(http.responseXML);
-
-                            var domain = http.responseXML.documentElement.getAttribute("domain") || "core";
-                            var config = miniLOL.config[domain] || {};
-
-                            miniLOL.config[domain]
-                                = Object.extend(config, This.parse(http.responseXML.documentElement));
-                        },
-        
-                        onFailure: function (http) {
-                            miniLOL.error("Error while loading config.xml (#{error})".interpolate({
-                                error: http.status
-                            }));
+                new Ajax.Request(path, {
+                    method: "get",
+                    asynchronous: false,
+    
+                    onSuccess: function (http) {
+                        if (miniLOL.utils.checkXML(http.responseXML, path)) {
+                            return;
                         }
-                    });
 
-                    if (miniLOL.error()) {
-                        return false;
+                        http.responseXML = miniLOL.utils.fixDOM(http.responseXML);
+
+                        var domain = http.responseXML.documentElement.getAttribute("domain") || "core";
+                        var config = miniLOL.config[domain] || {};
+
+                        miniLOL.config[domain]
+                            = Object.extend(config, This.parse(http.responseXML.documentElement));
+                    },
+    
+                    onFailure: function (http) {
+                        miniLOL.error("Error while loading config.xml (#{error})".interpolate({
+                            error: http.status
+                        }));
                     }
+                });
+
+                if (miniLOL.error()) {
+                    return false;
                 }
 
                 return true;
@@ -375,6 +371,10 @@ miniLOL = {
 
                         var menus = response.documentElement.childNodes;
                         for (var i = 0; i < menus.length; i++) {
+                            if (menus[i].nodeType != Node.ELEMENT_NODE) {
+                                continue;
+                            }
+
                             var id = menus[i].getAttribute("id");
 
                             if (!id && !miniLOL.menus["default"]) {
@@ -973,7 +973,7 @@ miniLOL = {
 
             var template = miniLOL.theme.template.menu();
 
-            if (!template) {
+            if (!template || !menu) {
                 if (miniLOL.error()) {
                     return false;
                 }
@@ -1066,19 +1066,27 @@ miniLOL = {
             name = name || "default";
 
             if (!miniLOL.menu.exists(name)) {
-                return "The menu `#{name}` doesn't exist.".interpolate({
+                var error = "The menu `#{name}` doesn't exist.".interpolate({
                     name: name
                 });
+
+                miniLOL.error(error);
+
+                return error;
             }
 
             return miniLOL.menu.parse(miniLOL.menus[name]);
         },
 
         change: function (name) {
-            miniLOL.menu.current = name;
-            miniLOL.menu.set(miniLOL.menu.get(name));
+            var content = miniLOL.menu.get(name);
 
-            Event.fire(document, ":menu.change");
+            if (!miniLOL.error()) {
+                miniLOL.menu.set(content);
+                miniLOL.menu.current = name;
+            }
+
+            Event.fire(document, ":menu.change", miniLOL.menus[name]);
         },
 
         enabled: function () {
@@ -1086,10 +1094,6 @@ miniLOL = {
         },
 
         exists: function (name) {
-            if (name == "default") {
-                return true;
-            }
-
             return Boolean(miniLOL.menus[name]);
         }
     },
