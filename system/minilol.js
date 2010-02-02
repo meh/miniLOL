@@ -241,6 +241,35 @@ miniLOL = {
             }
 
             Event.fire(document, ":resource.reloaded", wrapper.name);
+        },
+
+        removeCall: function (wrapper, call) {
+            if (!wrapper) {
+                miniLOL.content.set("What wrapper should I clean?");
+                return false;
+            }
+
+            var remove = wrapper._calls.find(function (current) {
+                var equal = false;
+
+                for (var i = 0; i < current.length; i++) {
+                    if (call[i] == current[i]) {
+                        equal = true;
+                    }
+
+                    if (!equal) {
+                        break;
+                    }
+                }
+
+                return equal;
+            });
+
+            if (remove) {
+                wrapper._calls = wrapper._calls.filter(function (current) {
+                    return current != remove;
+                });
+            }
         }
     },
 
@@ -1268,6 +1297,10 @@ miniLOL = {
                 }
                 delete queries.page;
 
+                if (!queries.title && page.getAttribute("title")) {
+                    queries.title = encodeURIComponent(page.getAttribute("title"));
+                }
+
                 var queries = Object.toQuery(queries);
                 if (queries) {
                     queries = '&'+queries;
@@ -1288,11 +1321,22 @@ miniLOL = {
             if (miniLOL.menu.enabled()) {
                 miniLOL.menu.change(miniLOL.menu.current);
             }
+
+            if (url) {
+                var data = {};
+                Object.extend(data, miniLOL.config["core"]);
+                Object.extend(data, queries);
+
+                document.title = (
+                       queries.title
+                    || page.getAttribute("title")
+                    || miniLOL.config["core"].siteTitle
+                ).interpolate(data);
+            }
         
             if (miniLOL.pages.cache[name]) {
                 if (miniLOL.functions[type]) {
                     miniLOL.content.set(miniLOL.functions[type](miniLOL.pages.cache[name], queries));
-                    
                 }
                 else {
                     miniLOL.content.set(miniLOL.pages.cache[name]);
@@ -1329,6 +1373,17 @@ miniLOL = {
             miniLOL.content.set(miniLOL.config["core"].loadingMessage);
 
             Event.fire(document, ":page.load", { path: path, queries: queries });
+
+            if (url) {
+                var data = {};
+                Object.extend(data, miniLOL.config["core"]);
+                Object.extend(data, queries);
+
+                document.title = (
+                       queries.title
+                    || miniLOL.config["core"].siteTitle
+                ).interpolate(data);
+            }
 
             new Ajax.Request("data/#{path}?#{queries}".interpolate({ path: path, queries: Object.toQuery(queries) }), {
                 method: "get",
@@ -1437,6 +1492,16 @@ miniLOL = {
 
             if (output) {
                 miniLOL.content.set(miniLOL.config['core'].loadingMessage);
+
+                var data = {};
+                Object.extend(data, miniLOL.config["core"]);
+                Object.extend(data, vars);
+
+                document.title = (
+                       vars.title
+                    || miniLOL.module.get(name).title
+                    || miniLOL.config["core"].siteTitle
+                ).interpolate(data);
             }
 
             vars = (Object.isArray(vars)) ? vars : [vars];
@@ -1556,7 +1621,7 @@ miniLOL = {
             queries.page = (Object.isUndefined(matches[2])) ? matches[1] : matches[2];
 
             if (queries.page) {
-                result = miniLOL.page.get(queries.page, queries);
+                result = miniLOL.page.get(queries.page, queries, url);
             }
             else {
                 result = miniLOL.go("#{page}&#{queries}".interpolate({
