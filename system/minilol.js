@@ -59,7 +59,9 @@ miniLOL = {
                     }
                 }
                  
-                document.title = miniLOL.config["core"].siteTitle;
+                if (!document.title) {
+                    document.title = miniLOL.config["core"].siteTitle;
+                }
             }
 
             Event.observe(document, ":resource.reloaded", prepareConfigurations);
@@ -1174,7 +1176,8 @@ miniLOL = {
                                 var domain = link.getAttribute("domain") || ''; link.removeAttribute("domain");
                                 var args   = link.getAttribute("arguments") || listArgs; link.removeAttribute("arguments");
                                 var menu   = link.getAttribute("menu") || listMenu; link.removeAttribute("menu");
-                
+                                var title  = link.getAttribute("title") || ""; link.removeAttribute("title");
+
                                 var out = src.match(/^(\w+:\/\/|mailto:)/);
                 
                                 var linkClass = link.getAttribute("class") || ''; link.removeAttribute("class");
@@ -1195,13 +1198,24 @@ miniLOL = {
                                         src = "#page=" + src;
                                     }
 
-                                    text = text || src;
-        
+                                    text   = text || src;
                                     args   = args ? '&'+args.replace(/[ ,]+/g, "&amp;") : '';
                                     ltype  = ltype ? "&type="+ltype : '';
                                     menu   = miniLOL.menu.enabled() && menu ? "&amp;menu="+menu : '';
-                                    src    = src + args + ltype + menu;
                                     target = '';
+
+                                    if (title) {
+                                        title = title.interpolate({
+                                            text: text,
+                                            url:  src,
+                                            href: src,
+                                            src:  src
+                                        });
+                                    }
+
+                                    title = title ? "&title="+encodeURIComponent(title) : '';
+
+                                    src = src + args + ltype + menu + title;
                                 }
 
                                 listOutput += miniLOL.theme.template.list.link.interpolate({
@@ -1214,7 +1228,8 @@ miniLOL = {
                                     src:        src,
                                     href:       src,
                                     target:     target,
-                                    text:       text
+                                    text:       text,
+                                    title:      title
                                 });
                             }
                             else if (list[h].nodeName == "item") {
