@@ -213,14 +213,7 @@ miniLOL = {
         function () {
             miniLOL.resources.pages = new miniLOL.Resource("miniLOL.pages", {
                 load: function (path) {
-                    if (!this.res) {
-                        this.res = {
-                            dom: null,
-                            cache: {}
-                        };
-                    } var res = this.res;
-    
-                    miniLOL.pages = this.res;
+                    miniLOL.pages = this._data;
     
                     new Ajax.Request(path, {
                         method: "get",
@@ -251,10 +244,19 @@ miniLOL = {
                     }
     
                     return true;
+                },
+
+                clear: function () {
+                    this._data = {
+                        dom: null,
+                        cache: {}
+                    };
                 }
             });
 
-            miniLOL.resources.pages.load("resources/pages.xml");
+            if (miniLOL.utils.fileExists("resources/pages.xml")) {
+                miniLOL.resources.pages.load("resources/pages.xml");
+            }
         },
 
         function () {
@@ -1626,17 +1628,23 @@ miniLOL = {
             return '';
         },
 
-        includeCSS: function (path) {
-            var style = false;
+        fileExists: function (path) {
+            var result = false;
 
             new Ajax.Request(path, {
                 method: "head",
                 asynchronous: false,
 
                 onSuccess: function () {
-                    style = true;
+                    result = true;
                 }
             });
+
+            return result;
+        },
+
+        includeCSS: function (path) {
+            var style = miniLOL.utils.fileExists(path);
 
             if (style) {
                 style = new Element("link", {
