@@ -159,9 +159,7 @@ miniLOL = {
         },
 
         function () {
-            miniLOL.resources.menus = new miniLOL.Resource({
-                name: "miniLOL.menus",
-
+            miniLOL.resources.menus = new miniLOL.Resource("miniLOL.menus", {
                 load: function (path) {
                     miniLOL.menus = this._data;
     
@@ -1710,6 +1708,10 @@ miniLOL = {
 
 miniLOL.Resource = Class.create({
     initialize: function (name, wrapper) {
+        if (!wrapper) {
+            throw new Error("No wrapper has been passed.");
+        }
+
         this._name    = name;
         this._wrapper = wrapper;
 
@@ -1762,9 +1764,9 @@ miniLOL.Resource = Class.create({
     reload: function () {
         Event.fire(document, ":resource.reload", { name: this._name });
 
-        this._resource.clear();
+        this._wrapper.clear();
 
-        var calls = this._resource.flush();
+        var calls = this.flush();
 
         for (var i = 0; i < calls.length; i++) {
             this.load.apply(this, calls[i]);
@@ -1775,11 +1777,11 @@ miniLOL.Resource = Class.create({
 
     clear: function () {
         Event.fire(document, ":resource.clear", { name: this._name });
-        this._resource.clear();
-    }
+        this._wrapper.clear();
+    },
 
     flush: function (call) {
-        Event.fire(document, ":resource.flush"; { name: this._name, call: call });
+        Event.fire(document, ":resource.flush", { name: this._name, call: call });
 
         var result;
 
@@ -1807,7 +1809,7 @@ miniLOL.Resource = Class.create({
             }
         }
         else {
-            result      = this.calls;
+            result      = this._calls;
             this._calls = [];
         }
 
