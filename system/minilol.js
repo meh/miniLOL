@@ -740,7 +740,7 @@ miniLOL = {
 
             if (runtime) {
                 miniLOL.menu.change(miniLOL.menu.current);
-                miniLOL.go(/[#?]./.test(location.href) ? location.href.replace(/^.*[#?]/, '#') : miniLOL.config["core"].homePage);
+                miniLOL.go(location.href);
             }
 
             // Sadly this has some problems.
@@ -1533,8 +1533,7 @@ miniLOL = {
             result = miniLOL.page.load(queries.page, queries, url);
         } 
         else {
-            miniLOL.content.set("wat");
-            result = false;
+            result = miniLOL.go(miniLOL.config["core"].homePage);
         }
 
         if (result) {
@@ -1787,6 +1786,10 @@ miniLOL.Resource = Class.create({
 
         if (Object.isArray(call)) {
             result = this._calls.find(function (current) {
+                if (current.length != call.length) {
+                    return false;
+                }
+
                 var equal = false;
 
                 for (var i = 0; i < current.length; i++) {
