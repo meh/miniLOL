@@ -234,9 +234,10 @@ miniLOL = {
     
                             var pages = http.responseXML.documentElement.getElementsByTagName("page");
                             for (var i = 0; i < pages.length; i++) {
-                                delete miniLOL.pages.cache[pages[i].getAttribute("id")];
+                                var id = pages[i].getAttribute("id");
 
-                                miniLOL.pages.data.push(pages[i]);
+                                delete miniLOL.pages.cache[id];
+                                miniLOL.pages.data[id] = pages[i];
                             }
                         },
         
@@ -1030,7 +1031,7 @@ miniLOL = {
 
             Event.fire(document, ":page.get", { name: name, queries: queries });
 
-            var page = miniLOL.pages.data.find(function (page) { return page.getAttribute("id") == name });
+            var page = miniLOL.pages.data[name];
             var type = queries.type;
         
             if (!page) {
