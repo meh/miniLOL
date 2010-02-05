@@ -1534,9 +1534,9 @@ miniLOL = {
         }
 
         if (matches) {
-            queries.page = (Object.isUndefined(matches[2])) ? matches[1] : matches[2];
+            queries.page = matches[2] || matches[1];
 
-            if (queries.page) {
+            if (queries.page && queries.page != '&') {
                 result = miniLOL.page.get(queries.page, queries, url);
             }
             else {
