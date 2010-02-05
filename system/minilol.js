@@ -156,7 +156,7 @@ miniLOL = {
                     }
     
                     return result;
-                },
+                }
             });
 
             miniLOL.resources.config.load("resources/config.xml");
@@ -952,7 +952,7 @@ miniLOL = {
                         item.removeAttribute("href");
                         item.removeAttribute("url");
                         
-                        output += miniLOL.menu.layer(template, layer).item.interpolate({
+                        output += miniLOL.menu.layer(template, layer).item.interpolate(Object.extend(Object.fromAttributes(item.attributes), {
                             "class":    itemClass,
                             id:         itemId,
                             url:        itemSrc,
@@ -961,7 +961,7 @@ miniLOL = {
                             attributes: String.fromAttributes(item.attributes),
                             text:       text,
                             data:       data
-                        });
+                        }));
                     }
                     else {
                         output += miniLOL.menu.parseOther(contents[i], template);
@@ -1205,7 +1205,7 @@ miniLOL = {
                                     src = src + args + ltype + menu + title;
                                 }
 
-                                listOutput += miniLOL.theme.template.list.link.interpolate({
+                                listOutput += miniLOL.theme.template.list.link.interpolate(Object.extend(Object.fromAttributes(link.attributes), {
                                     "class":    linkClass,
                                     id:         linkId,
                                     attributes: String.fromAttributes(link.attributes),
@@ -1217,7 +1217,7 @@ miniLOL = {
                                     target:     target,
                                     text:       text,
                                     title:      title
-                                });
+                                }));
                             }
                             else if (list[h].nodeName == "item") {
                                 var item = list[h].cloneNode(true);
@@ -1229,14 +1229,14 @@ miniLOL = {
                                 var itemClass = item.getAttribute("class") || ''; item.removeAttribute("class");
                                 var itemId    = item.getAttribute("id") || ''; item.removeAttribute("id");
 
-                                listOutput += miniLOL.theme.template.list.item.interpolate({
+                                listOutput += miniLOL.theme.template.list.item.interpolate(Object.extend(Object.fromAttributes(item.attributes), {
                                     "class":    itemClass,
                                     id:         itemId,
                                     attributes: String.fromAttributes(item.attributes),
                                     before:     miniLOL.theme.template.list.before.interpolate({ data: before }),
                                     after:      miniLOL.theme.template.list.after.interpolate({ data: after }),
                                     text:       text
-                                });
+                                }));
                             }
                             else if (list[h].nodeName == "list") {
                                 listOutput += miniLOL.page.parse({ childNodes: [list[h]] }, [contents[i]]);
@@ -1264,10 +1264,10 @@ miniLOL = {
                         }
                     }
 
-                    output += miniLOL.theme.template.list.global.interpolate({
+                    output += miniLOL.theme.template.list.global.interpolate(Object.extend(Object.fromAttributes(ele.attributes), {
                         attributes: String.fromAttributes(ele.attributes),
                         data: listOutput
-                    });
+                    }));
                     break;
         
                     case Node.CDATA_SECTION_NODE:
@@ -1520,6 +1520,11 @@ miniLOL = {
     },
 
     go: function (url) {
+        if (url != location.href && url.match(/^(\w+:\/\/|mailto:)/)) {
+            location.href = url;
+            return true;
+        }
+
         var queries = url.parseQuery();
         var matches = /#(([^=&]*)&|([^=&]*)$)/.exec(url); // hate WebKit so much.
         var result  = false;
