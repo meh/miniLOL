@@ -166,10 +166,6 @@ miniLOL = {
 
         function () {
             miniLOL.resources.menus = new miniLOL.Resource("miniLOL.menus", {
-                initialize: function () {
-                    miniLOL.menus = this._data;
-                },
-    
                 load: function (path) {
                     new Ajax.Request(path, {
                         method: "get",
@@ -224,10 +220,6 @@ miniLOL = {
 
         function () {
             miniLOL.resources.pages = new miniLOL.Resource("miniLOL.pages", {
-                initialize: function () {
-                    miniLOL.pages = this._data;
-                },
-
                 load: function (path) {
                     new Ajax.Request(path, {
                         method: "get",
@@ -263,7 +255,7 @@ miniLOL = {
                 },
 
                 clear: function () {
-                    this._data = miniLOL.pages = {
+                    miniLOL.pages = this._data = {
                         data: [],
                         cache: {}
                     };
@@ -278,8 +270,6 @@ miniLOL = {
         function () {
             miniLOL.resources.functions = new miniLOL.Resource("miniLOL.functions", {
                 load: function (path) {
-                    miniLOL.functions = this._data;
-    
                     new Ajax.Request(path, {
                         method: "get",
                         asynchronous: false,
@@ -322,6 +312,10 @@ miniLOL = {
                     }
     
                     return true;
+                },
+
+                clear: function () {
+                    miniLOL.functions = this._data = {};
                 }
             });
 
@@ -355,8 +349,6 @@ miniLOL = {
 
             miniLOL.resources.modules = new miniLOL.Resource("miniLOL.modules", {
                 load: function (path, output) {
-                    miniLOL.modules = this._data;
-    
                     new Ajax.Request(path, {
                         method: "get",
                         asynchronous: false,
@@ -400,6 +392,10 @@ miniLOL = {
                     }
     
                     return true;
+                },
+
+                clear: function () {
+                    miniLOL.modules = this._data = {};
                 }
             });
 
