@@ -70,6 +70,47 @@ miniLOL = {
             Event.observe(document, ":resource.loaded", prepareConfigurations);
 
             miniLOL.resources.config = new miniLOL.Resource("miniLOL.config", {
+                initialize: function () {
+                    miniLOL.config = this._data;
+                },
+ 
+                load: function (path) {
+                    var This = this;
+                    new Ajax.Request(path, {
+                        method: "get",
+                        asynchronous: false,
+        
+                        onSuccess: function (http) {
+                            if (miniLOL.utils.checkXML(http.responseXML, path)) {
+                                return;
+                            }
+    
+                            http.responseXML = miniLOL.utils.fixDOM(http.responseXML);
+    
+                            var domain = http.responseXML.documentElement.getAttribute("domain") || "core";
+                            var config = miniLOL.config[domain] || {};
+    
+                            miniLOL.config[domain] = Object.extend(config, This.parse(http.responseXML.documentElement));
+                        },
+        
+                        onFailure: function (http) {
+                            miniLOL.error("Error while loading config.xml (#{error})".interpolate({
+                                error: http.status
+                            }));
+                        }
+                    });
+    
+                    if (miniLOL.error()) {
+                        return false;
+                    }
+    
+                    return true;
+                },
+
+                clear: function () {
+                    this._data = miniLOL.config = {};
+                },
+
                 parse: function (obj, text) {
                     if (text) {
                         var result = '';
@@ -116,41 +157,6 @@ miniLOL = {
     
                     return result;
                 },
-    
-                load: function (path) {
-                    miniLOL.config = this._data;
-    
-                    var This = this;
-                    new Ajax.Request(path, {
-                        method: "get",
-                        asynchronous: false,
-        
-                        onSuccess: function (http) {
-                            if (miniLOL.utils.checkXML(http.responseXML, path)) {
-                                return;
-                            }
-    
-                            http.responseXML = miniLOL.utils.fixDOM(http.responseXML);
-    
-                            var domain = http.responseXML.documentElement.getAttribute("domain") || "core";
-                            var config = miniLOL.config[domain] || {};
-    
-                            miniLOL.config[domain] = Object.extend(config, This.parse(http.responseXML.documentElement));
-                        },
-        
-                        onFailure: function (http) {
-                            miniLOL.error("Error while loading config.xml (#{error})".interpolate({
-                                error: http.status
-                            }));
-                        }
-                    });
-    
-                    if (miniLOL.error()) {
-                        return false;
-                    }
-    
-                    return true;
-                }
             });
 
             miniLOL.resources.config.load("resources/config.xml");
@@ -160,9 +166,11 @@ miniLOL = {
 
         function () {
             miniLOL.resources.menus = new miniLOL.Resource("miniLOL.menus", {
-                load: function (path) {
+                initialize: function () {
                     miniLOL.menus = this._data;
+                },
     
+                load: function (path) {
                     new Ajax.Request(path, {
                         method: "get",
                         asynchronous: false,
@@ -204,6 +212,10 @@ miniLOL = {
                     }
     
                     return true;
+                },
+
+                clear: function () {
+                    this._data = miniLOL.menus = {};
                 }
             });
 
@@ -212,9 +224,11 @@ miniLOL = {
 
         function () {
             miniLOL.resources.pages = new miniLOL.Resource("miniLOL.pages", {
-                load: function (path) {
+                initialize: function () {
                     miniLOL.pages = this._data;
-    
+                },
+
+                load: function (path) {
                     new Ajax.Request(path, {
                         method: "get",
                         asynchronous: false,
@@ -224,11 +238,13 @@ miniLOL = {
                                 return;
                             }
     
-                            miniLOL.pages.dom = miniLOL.utils.fixDOM(http.responseXML);
+                            var dom = miniLOL.utils.fixDOM(http.responseXML);
     
                             var pages = http.responseXML.documentElement.getElementsByTagName("page");
                             for (var i = 0; i < pages.length; i++) {
                                 delete miniLOL.pages.cache[pages[i].getAttribute("id")];
+
+                                miniLOL.pages.data.push(pages[i]);
                             }
                         },
         
@@ -247,8 +263,8 @@ miniLOL = {
                 },
 
                 clear: function () {
-                    this._data = {
-                        dom: null,
+                    this._data = miniLOL.pages = {
+                        data: [],
                         cache: {}
                     };
                 }
@@ -824,6 +840,53 @@ miniLOL = {
     },
 
     menu: {
+        set: function (data) {
+            if (!miniLOL.menu.enabled()) {
+                return;
+            }
+
+            miniLOL.theme.menu().update(data);
+        },
+
+        get: function (name) {
+            if (!miniLOL.menu.enabled()) {
+                return "";
+            }
+
+            name = name || "default";
+
+            if (!miniLOL.menu.exists(name)) {
+                var error = "The menu `#{name}` doesn't exist.".interpolate({
+                    name: name
+                });
+
+                miniLOL.error(error);
+
+                return error;
+            }
+
+            return miniLOL.menu.parse(miniLOL.menus[name]);
+        },
+
+        change: function (name) {
+            var content = miniLOL.menu.get(name);
+
+            if (!miniLOL.error()) {
+                miniLOL.menu.set(content);
+                miniLOL.menu.current = name;
+            }
+
+            Event.fire(document, ":menu.change", miniLOL.menus[name]);
+        },
+
+        enabled: function () {
+            return Boolean(miniLOL.menus["default"]);
+        },
+
+        exists: function (name) {
+            return Boolean(miniLOL.menus[name]);
+        },
+
         layer: function (template, layer) {
             var result = {};
 
@@ -850,36 +913,6 @@ miniLOL = {
             }
 
             return result;
-        },
-
-        parseOther: function (data, template) {
-            var output  = '';
-            var outputs = {};
-
-            if (!data || !template) {
-                return output;
-            }
-
-            template = template.getElementsByTagName(data.nodeName);
-            if (template.length == 0) {
-                return output;
-            }
-            else {
-                template = template[0]
-            }
-
-            var text = miniLOL.utils.getFirstText(template.childNodes);
-
-            var objects = data.childNodes;
-            for (var i = 0; i < objects.length; i++) {
-                if (objects[i].nodeType == Node.ELEMENT_NODE) {
-                    outputs[objects[i].nodeName] = miniLOL.menu.parseOther(objects[i], template);
-                }
-            }
-
-            outputs["text"] = miniLOL.utils.getFirstText(data.childNodes);
-
-            return text.interpolate(Object.extend(outputs, Object.fromAttributes(data.attributes)));
         },
 
         parse: function (menu, layer) {
@@ -964,55 +997,129 @@ miniLOL = {
             }
         },
 
-        set: function (data) {
-            if (!miniLOL.menu.enabled()) {
-                return;
+        parseOther: function (data, template) {
+            var output  = '';
+            var outputs = {};
+
+            if (!data || !template) {
+                return output;
             }
 
-            miniLOL.theme.menu().update(data);
-        },
-
-        get: function (name) {
-            if (!miniLOL.menu.enabled()) {
-                return "";
+            template = template.getElementsByTagName(data.nodeName);
+            if (template.length == 0) {
+                return output;
+            }
+            else {
+                template = template[0]
             }
 
-            name = name || "default";
+            var text = miniLOL.utils.getFirstText(template.childNodes);
 
-            if (!miniLOL.menu.exists(name)) {
-                var error = "The menu `#{name}` doesn't exist.".interpolate({
-                    name: name
-                });
-
-                miniLOL.error(error);
-
-                return error;
+            var objects = data.childNodes;
+            for (var i = 0; i < objects.length; i++) {
+                if (objects[i].nodeType == Node.ELEMENT_NODE) {
+                    outputs[objects[i].nodeName] = miniLOL.menu.parseOther(objects[i], template);
+                }
             }
 
-            return miniLOL.menu.parse(miniLOL.menus[name]);
-        },
+            outputs["text"] = miniLOL.utils.getFirstText(data.childNodes);
 
-        change: function (name) {
-            var content = miniLOL.menu.get(name);
-
-            if (!miniLOL.error()) {
-                miniLOL.menu.set(content);
-                miniLOL.menu.current = name;
-            }
-
-            Event.fire(document, ":menu.change", miniLOL.menus[name]);
-        },
-
-        enabled: function () {
-            return Boolean(miniLOL.menus);
-        },
-
-        exists: function (name) {
-            return Boolean(miniLOL.menus[name]);
+            return text.interpolate(Object.extend(outputs, Object.fromAttributes(data.attributes)));
         }
     },
 
     page: {
+        get: function (name, queries, url) {
+            miniLOL.content.set(miniLOL.config["core"].loadingMessage);
+
+            Event.fire(document, ":page.get", { name: name, queries: queries });
+
+            var page = miniLOL.pages.data.find(function (page) { return page.getAttribute("id") == name });
+            var type = queries.type;
+        
+            if (!page) {
+                miniLOL.content.set("404 - Not Found");
+                return false;
+            }
+
+            if (page.getAttribute("alias")) {
+                if (typeof queries[name] != "string") {
+                    delete queries[name];
+                }
+                delete queries.page;
+
+                if (!queries.title && page.getAttribute("title")) {
+                    queries.title = encodeURIComponent(page.getAttribute("title"));
+                }
+
+                var queries = Object.toQuery(queries);
+                if (queries) {
+                    queries = '&'+queries;
+                }
+
+                page = page.getAttribute("alias");
+                if (page.charAt(0) != '#') {
+                    page = '#'+page;
+                }
+
+                return miniLOL.go(page+queries);
+            }
+
+            if (type == null) {
+                type = page.getAttribute("type");
+            }
+        
+            if (miniLOL.menu.enabled()) {
+                miniLOL.menu.change(miniLOL.menu.current);
+            }
+
+            if (url) {
+                var data = {};
+                Object.extend(data, miniLOL.config["core"]);
+                Object.extend(data, queries);
+
+                document.title = (
+                       queries.title
+                    || page.getAttribute("title")
+                    || miniLOL.config["core"].siteTitle
+                ).interpolate(data);
+            }
+        
+            if (miniLOL.pages.cache[name]) {
+                if (miniLOL.functions[type]) {
+                    miniLOL.content.set(miniLOL.functions[type](miniLOL.pages.cache[name], queries));
+                }
+                else {
+                    miniLOL.content.set(miniLOL.pages.cache[name]);
+                }
+
+                return true;
+            }
+
+            var pageArguments = page.getAttribute("arguments");
+            if (pageArguments) {
+                pageArguments = pageArguments.replace(/[ ,]+/g, "&amp;").parseQuery();
+
+                for (var key in pageArguments) {
+                    if (queries[key] == null) {
+                        queries[key] = pageArguments[key];
+                    }
+                }
+            }
+        
+            var output = miniLOL.page.parse(page);
+
+            miniLOL.pages.cache[name] = output;
+
+            if (miniLOL.functions[type]) {
+                output = miniLOL.functions[type](output, queries);
+            }
+
+            miniLOL.content.set(output);
+
+            return true;
+        },
+
         parse: function (page, data) {
             var output   = '';
             var contents = page.childNodes;
@@ -1174,97 +1281,6 @@ miniLOL = {
             }
 
             return output;
-        },
-
-        get: function (name, queries, url) {
-            miniLOL.content.set(miniLOL.config["core"].loadingMessage);
-
-            Event.fire(document, ":page.get", { name: name, queries: queries });
-
-            var page = miniLOL.pages.dom.getElementById(name);
-            var type = queries.type;
-        
-            if (!page) {
-                miniLOL.content.set("404 - Not Found");
-                return false;
-            }
-
-            if (page.getAttribute("alias")) {
-                if (typeof queries[name] != "string") {
-                    delete queries[name];
-                }
-                delete queries.page;
-
-                if (!queries.title && page.getAttribute("title")) {
-                    queries.title = encodeURIComponent(page.getAttribute("title"));
-                }
-
-                var queries = Object.toQuery(queries);
-                if (queries) {
-                    queries = '&'+queries;
-                }
-
-                page = page.getAttribute("alias");
-                if (page.charAt(0) != '#') {
-                    page = '#'+page;
-                }
-
-                return miniLOL.go(page+queries);
-            }
-
-            if (type == null) {
-                type = page.getAttribute("type");
-            }
-        
-            if (miniLOL.menu.enabled()) {
-                miniLOL.menu.change(miniLOL.menu.current);
-            }
-
-            if (url) {
-                var data = {};
-                Object.extend(data, miniLOL.config["core"]);
-                Object.extend(data, queries);
-
-                document.title = (
-                       queries.title
-                    || page.getAttribute("title")
-                    || miniLOL.config["core"].siteTitle
-                ).interpolate(data);
-            }
-        
-            if (miniLOL.pages.cache[name]) {
-                if (miniLOL.functions[type]) {
-                    miniLOL.content.set(miniLOL.functions[type](miniLOL.pages.cache[name], queries));
-                }
-                else {
-                    miniLOL.content.set(miniLOL.pages.cache[name]);
-                }
-
-                return true;
-            }
-
-            var pageArguments = page.getAttribute("arguments");
-            if (pageArguments) {
-                pageArguments = pageArguments.replace(/[ ,]+/g, "&amp;").parseQuery();
-
-                for (var key in pageArguments) {
-                    if (queries[key] == null) {
-                        queries[key] = pageArguments[key];
-                    }
-                }
-            }
-        
-            var output = miniLOL.page.parse(page);
-
-            miniLOL.pages.cache[name] = output;
-
-            if (miniLOL.functions[type]) {
-                output = miniLOL.functions[type](output, queries);
-            }
-
-            miniLOL.content.set(output);
-
-            return true;
         },
 
         load: function (path, queries, url) {
@@ -1741,6 +1757,10 @@ miniLOL.Resource = Class.create({
 
         this.clear();
         this.flush();
+
+        if (this._wrapper.initialize) {
+            this._wrapper.initialize();
+        }
     },
 
     load: function () {
