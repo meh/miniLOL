@@ -1520,7 +1520,7 @@ miniLOL = {
     },
 
     go: function (url) {
-        if (url != location.href && url.match(/^(\w+:\/\/|mailto:)/)) {
+        if (!url.startsWith(miniLOL.path) && url.match(/^(\w+:\/\/|mailto:)/)) {
             location.href = url;
             return true;
         }
