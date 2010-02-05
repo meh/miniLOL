@@ -906,7 +906,7 @@ miniLOL = {
             }
 
             if (!result.item) {
-                result.item = "<a href='#{href}'>#{text}</a> ";
+                result.item = "<a href='#{href}' #{attributes}>#{text}</a> ";
             }
 
             return result;
