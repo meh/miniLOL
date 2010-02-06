@@ -335,14 +335,12 @@ miniLOL = {
         },
         
         function () {
-            if (!miniLOL.error()) {
-                if (!miniLOL.theme.menu()) {
-                    miniLOL.menus = null;
-                }
+            if (!miniLOL.theme.menu()) {
+                miniLOL.menus = null;
+            }
 
-                if (miniLOL.menu.enabled()) {
-                    miniLOL.menu.change("default");
-                }
+            if (miniLOL.menu.enabled()) {
+                miniLOL.menu.set(miniLOL.config["core"].loadingMessage);
             }
         },
 
@@ -402,6 +400,12 @@ miniLOL = {
             });
 
             miniLOL.resources.modules.load("resources/modules.xml", true);
+        },
+
+        function () {
+            if (miniLOL.menu.enabled()) {
+                miniLOL.menu.change("default");
+            }
         },
         
         function () {
@@ -754,7 +758,7 @@ miniLOL = {
 
             miniLOL.theme.template.clearCache();
 
-            if (runtime) {
+            if (runtime && miniLOL.initialized) {
                 miniLOL.menu.change(miniLOL.menu.current);
                 miniLOL.go(location.href);
             }
