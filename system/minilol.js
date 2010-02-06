@@ -28,12 +28,13 @@ miniLOL = {
     version: "1.2",
 
     initialize: function () {
-        if (miniLOL._initialized) {
+        if (miniLOL.initialized) {
             throw new Error("miniLOL has already been initialized.");
         }
 
-        miniLOL.path      = location.href.match(/^(.*?)\/[^\/]*?(#|$)/)[1];
-        miniLOL.resources = {};
+        miniLOL.initialized = false;
+        miniLOL.path        = location.href.match(/^(.*?)\/[^\/]*?(#|$)/)[1];
+        miniLOL.resources   = {};
 
         [function () {
             function prepareConfigurations (event) {
@@ -447,7 +448,7 @@ miniLOL = {
         Event.fire(document, ":initialized");
         Event.stopObserving(document, ":initialized");
 
-        miniLOL._initialized = true;
+        miniLOL.initialized = true;
     },
 
     error: function (text, element, minor) {
@@ -1550,7 +1551,8 @@ miniLOL = {
             result = miniLOL.module.execute(queries.module, queries, true);
         }
         else if (queries.page) {
-            result = miniLOL.page.load(queries.page, queries, url);
+            var page = queries.page; delete queries.page;
+            result   = miniLOL.page.load(page, queries, url);
         } 
         else {
             result = miniLOL.go(miniLOL.config["core"].homePage);
