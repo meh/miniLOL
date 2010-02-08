@@ -58,7 +58,7 @@ miniLOL = {
                     miniLOL.config["core"].homePage = "#home";
                 }
                 else {
-                    if (miniLOL.config["core"].homePage.charAt(0) != '#') {
+                    if (miniLOL.config["core"].homePage.charAt(0) != '#' && !miniLOL.config["core"].homePage.isURL()) {
                         miniLOL.config["core"].homePage = '#'+miniLOL.config["core"].homePage;
                     }
                 }
@@ -258,7 +258,7 @@ miniLOL = {
 
                 clear: function () {
                     miniLOL.pages = this._data = {
-                        data: [],
+                        data: {},
                         cache: {}
                     };
                 }
@@ -1060,7 +1060,7 @@ miniLOL = {
                 }
 
                 page = page.getAttribute("alias");
-                if (page.charAt(0) != '#') {
+                if (!page.isURL() && page.charAt(0) != '#') {
                     page = '#'+page;
                 }
 
@@ -1170,7 +1170,7 @@ miniLOL = {
                                 var menu   = link.getAttribute("menu") || listMenu; link.removeAttribute("menu");
                                 var title  = link.getAttribute("title") || ""; link.removeAttribute("title");
 
-                                var out = src.match(/^(\w+:\/\/|mailto:)/);
+                                var out = src.isURL();
                 
                                 var linkClass = link.getAttribute("class") || ''; link.removeAttribute("class");
                                 var linkId    = link.getAttribute("id") || ''; link.removeAttribute("id");
@@ -1525,7 +1525,7 @@ miniLOL = {
     },
 
     go: function (url) {
-        if (!url.startsWith(miniLOL.path) && url.match(/^(\w+:\/\/|mailto:)/)) {
+        if (!url.startsWith(miniLOL.path) && url.isURL()) {
             location.href = url;
             return true;
         }

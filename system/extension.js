@@ -73,3 +73,24 @@ Object.toQuery = function (query) {
     
     return result.substr(0, result.length - 1);
 }
+
+String.prototype.isURL = function () {
+    var match = this.match(/^mailto:([\w.%+-]+@[\w.]+\.[A-Za-z]{2,4})$/);
+    if (match) {
+        return {
+            protocol: "mailto",
+            uri:      match[1]
+        };
+    }
+
+    match = this.match(/^(\w+):(\/\/.+?(:\d)?)(\/)?/);
+
+    if (!match) {
+        return false;
+    }
+
+    return {
+        protocol: match[1],
+        uri:      match[2]
+    };
+}
