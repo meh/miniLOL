@@ -95,9 +95,7 @@ miniLOL = {
                         },
         
                         onFailure: function (http) {
-                            miniLOL.error("Error while loading config.xml (#{error})".interpolate({
-                                error: http.status
-                            }));
+                            miniLOL.error("Error while loading config.xml (#{status} - #{statusText})".interpolate(http);
                         }
                     });
     
@@ -243,9 +241,7 @@ miniLOL = {
                         },
         
                         onFailure: function (http) {
-                            miniLOL.error("Error while loading pages.xml (#{error})".interpolate({
-                                error: http.status
-                            }));
+                            miniLOL.error("Error while loading pages.xml (#{status} - #{statusText})".interpolate(http)
                         }
                     });
     
@@ -303,9 +299,7 @@ miniLOL = {
                         },
             
                         onFailure: function (http) {
-                            miniLOL.error("Error while loading functions.xml (#{error})".interpolate({
-                                error: http.status
-                            }));
+                            miniLOL.error("Error while loading functions.xml (#{status} - #{statusText}})".interpolate(http);
                         }
                     });
     
@@ -381,9 +375,7 @@ miniLOL = {
                         },
             
                         onFailure: function (http) {
-                            miniLOL.error("Error while loading modules.xml (#{error})".interpolate({
-                                error: http.status
-                            }), miniLOL.theme.content());
+                            miniLOL.error("Error while loading modules.xml (#{status} - #{statusText})".interpolate(http);
                         }
                     });
     
@@ -637,7 +629,7 @@ miniLOL = {
 
             Event.fire(document, ":theme.load", { name: name, runtime: Boolean(runtime) });
 
-            var result = true;
+            var error;
             // Get the informations about the theme and parse the needed data
             new Ajax.Request("#{path}/theme.xml".interpolate({ path: path, theme: name }), {
                 method: "get",
@@ -654,20 +646,32 @@ miniLOL = {
                     miniLOL.theme.menu._node    = doc.documentElement.getAttribute("menu") || "menu";
                     miniLOL.theme.content._node = doc.documentElement.getAttribute("content") || "body";
 
-                    var initialize = doc.getElementsByTagName("initialize");
-                    if (initialize.length) {
-                        miniLOL.theme.initialize = new Function(initialize[0].firstChild.nodeValue);
+                    try {
+                        var initialize = doc.getElementsByTagName("initialize");
+                        if (initialize.length) {
+                            miniLOL.theme.initialize = new Function(initialize[0].firstChild.nodeValue);
+                        }
+                        else {
+                            miniLOL.theme.initialize = new Function;
+                        }
                     }
-                    else {
-                        miniLOL.theme.initialize = new Function;
+                    catch (e) {
+                        error = "An error occurred on the theme's initialize function:<br/><br/>"+e.toString();
+                        return false;
                     }
 
-                    var finalize = doc.getElementsByTagName("finalize");
-                    if (finalize.length) {
-                        miniLOL.theme.finalize = new Function(finalize[0].firstChild.nodeValue);
+                    try {
+                        var finalize = doc.getElementsByTagName("finalize");
+                        if (finalize.length) {
+                            miniLOL.theme.finalize = new Function(finalize[0].firstChild.nodeValue);
+                        }
+                        else {
+                            miniLOL.theme.finalize = new Function;
+                        }
                     }
-                    else {
-                        miniLOL.theme.finalize = new Function;
+                    catch (e) {
+                        error = "An error occurred on the theme's finalize function:<br/><br/>"+e.toString();
+                        return false;
                     }
 
                     info.styles = [];
@@ -718,12 +722,11 @@ miniLOL = {
                 },
 
                 onFailure: function () {
-                    result = false;
-                }
+                    error = "Could not load theme's informations.";
             });
 
-            if (result == false) {
-                miniLOL.error("Error while loading theme's informations.");
+            if (error) {
+                miniLOL.error(error);
                 return false;
             }
 
@@ -1318,10 +1321,7 @@ miniLOL = {
                 },
         
                 onFailure: function (http) {
-                    miniLOL.content.set("#{code} - #{text}".interpolate({
-                        code: http.status,
-                        text: http.statusText
-                    }));
+                    miniLOL.content.set("#{status} - #{statusText}".interpolate(http);
 
                     Event.fire(document, ":page.loaded", http);
                 }
@@ -1733,6 +1733,21 @@ miniLOL = {
             }
             
             return result;
+        },
+
+        loadInto: function (path, id, synchronous) {
+            new Ajax.Request(path, {
+                method: "get",
+                asynchronous: !synchronous,
+
+                onSuccess: function (http) {
+                    $(id).innerHTML = http.responseText;
+                },
+
+                onFailure: function (http) {
+                    $(id).innerHTML = "#{status} - #{statusText}".interpolate(http);
+                }
+            });
         }
     }
 }
