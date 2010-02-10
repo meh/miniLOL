@@ -95,7 +95,7 @@ miniLOL = {
                         },
         
                         onFailure: function (http) {
-                            miniLOL.error("Error while loading config.xml (#{status} - #{statusText})".interpolate(http);
+                            miniLOL.error("Error while loading config.xml (#{status} - #{statusText})".interpolate(http));
                         }
                     });
     
@@ -241,7 +241,7 @@ miniLOL = {
                         },
         
                         onFailure: function (http) {
-                            miniLOL.error("Error while loading pages.xml (#{status} - #{statusText})".interpolate(http)
+                            miniLOL.error("Error while loading pages.xml (#{status} - #{statusText})".interpolate(http))
                         }
                     });
     
@@ -299,7 +299,7 @@ miniLOL = {
                         },
             
                         onFailure: function (http) {
-                            miniLOL.error("Error while loading functions.xml (#{status} - #{statusText}})".interpolate(http);
+                            miniLOL.error("Error while loading functions.xml (#{status} - #{statusText}})".interpolate(http));
                         }
                     });
     
@@ -375,7 +375,7 @@ miniLOL = {
                         },
             
                         onFailure: function (http) {
-                            miniLOL.error("Error while loading modules.xml (#{status} - #{statusText})".interpolate(http);
+                            miniLOL.error("Error while loading modules.xml (#{status} - #{statusText})".interpolate(http));
                         }
                     });
     
@@ -1321,7 +1321,7 @@ miniLOL = {
                 },
         
                 onFailure: function (http) {
-                    miniLOL.content.set("#{status} - #{statusText}".interpolate(http);
+                    miniLOL.content.set("#{status} - #{statusText}".interpolate(http));
 
                     Event.fire(document, ":page.loaded", http);
                 }
