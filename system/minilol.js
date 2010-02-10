@@ -723,6 +723,7 @@ miniLOL = {
 
                 onFailure: function () {
                     error = "Could not load theme's informations.";
+                }
             });
 
             if (error) {
@@ -740,12 +741,12 @@ miniLOL = {
                 },
 
                 onFailure: function () {
-                    result = false;
+                    error = "Could not load template.html.";
                 }
             });
 
-            if (result == false) {
-                miniLOL.error("Error while loading the layout.");
+            if (error) {
+                miniLOL.error(error);
                 return false;
             }
 
