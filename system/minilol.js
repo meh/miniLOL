@@ -1735,7 +1735,7 @@ miniLOL = {
             return result;
         },
 
-        loadInto: function (path, id, synchronous) {
+        loadInto: function (id, path, synchronous) {
             new Ajax.Request(path, {
                 method: "get",
                 asynchronous: !synchronous,
