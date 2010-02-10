@@ -115,9 +115,10 @@ String.prototype.isURL = function () {
 }
 
 Element.prototype.load = function (path, options) {
-    new Ajax.Updater(this, path, options);
-}
-
-Element.prototype.loadEvery = function (path, options) {
-    new Ajax.PeriodicalUpdater(this, path, options);
+    if (options && !Object.isUndefined(options.frequency)) {
+        new Ajax.PeriodicalUpdater(this, path, options);
+    }
+    else {
+        new Ajax.Updater(this, path, options);
+    }
 }
