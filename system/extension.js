@@ -113,3 +113,20 @@ String.prototype.isURL = function () {
         uri:      match[2]
     };
 }
+
+Element.prototype.load = function (path, synchronous) {
+    var element = this;
+
+    new Ajax.Request(path, {
+        method: "get",
+        asynchronous: !synchronous,
+        
+        onSuccess: function (http) {
+            element.update(http.responseText);
+        },
+
+        onFailure: function (http) {
+            element.update("#{status} - #{statusText}".interpolate(http));
+        }
+    });
+}

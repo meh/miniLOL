@@ -1733,21 +1733,6 @@ miniLOL = {
             }
             
             return result;
-        },
-
-        loadInto: function (id, path, synchronous) {
-            new Ajax.Request(path, {
-                method: "get",
-                asynchronous: !synchronous,
-
-                onSuccess: function (http) {
-                    $(id).innerHTML = http.responseText;
-                },
-
-                onFailure: function (http) {
-                    $(id).innerHTML = "#{status} - #{statusText}".interpolate(http);
-                }
-            });
         }
     }
 }
