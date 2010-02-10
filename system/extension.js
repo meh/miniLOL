@@ -114,19 +114,10 @@ String.prototype.isURL = function () {
     };
 }
 
-Element.prototype.load = function (path, synchronous) {
-    var element = this;
+Element.prototype.load = function (path, options) {
+    new Ajax.Updater(this, path, options);
+}
 
-    new Ajax.Request(path, {
-        method: "get",
-        asynchronous: !synchronous,
-        
-        onSuccess: function (http) {
-            element.update(http.responseText);
-        },
-
-        onFailure: function (http) {
-            element.update("#{status} - #{statusText}".interpolate(http));
-        }
-    });
+Element.prototype.loadEvery = function (path, options) {
+    new Ajax.PeriodicalUpdater(this, path, options);
 }
