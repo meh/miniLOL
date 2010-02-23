@@ -155,7 +155,35 @@ var Class = (function() {
 })();
 (function() {
 
-  var _toString = Object.prototype.toString;
+  var _toString = Object.prototype.toString,
+      NULL_TYPE = 'Null',
+      UNDEFINED_TYPE = 'Undefined',
+      BOOLEAN_TYPE = 'Boolean',
+      NUMBER_TYPE = 'Number',
+      STRING_TYPE = 'String',
+      OBJECT_TYPE = 'Object',
+      BOOLEAN_CLASS = '[object Boolean]',
+      NUMBER_CLASS = '[object Number]',
+      STRING_CLASS = '[object String]',
+      ARRAY_CLASS = '[object Array]',
+      NATIVE_JSON_STRINGIFY_SUPPORT = window.JSON &&
+        typeof JSON.stringify === 'function' &&
+        JSON.stringify(0) === '0' &&
+        typeof JSON.stringify(Prototype.K) === 'undefined';
+
+  function Type(o) {
+    switch(o) {
+      case null: return NULL_TYPE;
+      case (void 0): return UNDEFINED_TYPE;
+    }
+    var type = typeof o;
+    switch(type) {
+      case 'boolean': return BOOLEAN_TYPE;
+      case 'number':  return NUMBER_TYPE;
+      case 'string':  return STRING_TYPE;
+    }
+    return OBJECT_TYPE;
+  }
 
   function extend(destination, source) {
     for (var property in source)
@@ -174,27 +202,71 @@ var Class = (function() {
     }
   }
 
-  function toJSON(object) {
-    var type = typeof object;
+
+  function toJSON(value) {
+    return Str('', { '': value }, []);
+  }
+
+  function Str(key, holder, stack) {
+    var value = holder[key],
+        type = typeof value;
+
+    if (Type(value) === OBJECT_TYPE && typeof value.toJSON === 'function') {
+      value = value.toJSON(key);
+    }
+
+    var _class = _toString.call(value);
+
+    switch (_class) {
+      case NUMBER_CLASS:
+      case BOOLEAN_CLASS:
+      case STRING_CLASS:
+        value = value.valueOf();
+    }
+
+    switch (value) {
+      case null: return 'null';
+      case true: return 'true';
+      case false: return 'false';
+    }
+
+    type = typeof value;
     switch (type) {
-      case 'undefined':
-      case 'function':
-      case 'unknown': return;
-      case 'boolean': return object.toString();
+      case 'string':
+        return value.inspect(true);
+      case 'number':
+        return isFinite(value) ? String(value) : 'null';
+      case 'object':
+
+        for (var i = 0, length = stack.length; i < length; i++) {
+          if (stack[i] === value) { throw new TypeError(); }
+        }
+        stack.push(value);
+
+        var partial = [];
+        if (_class === ARRAY_CLASS) {
+          for (var i = 0, length = value.length; i < length; i++) {
+            var str = Str(i, value, stack);
+            partial.push(typeof str === 'undefined' ? 'null' : str);
+          }
+          partial = '[' + partial.join(',') + ']';
+        } else {
+          var keys = Object.keys(value);
+          for (var i = 0, length = keys.length; i < length; i++) {
+            var key = keys[i], str = Str(key, value, stack);
+            if (typeof str !== "undefined") {
+               partial.push(key.inspect(true)+ ':' + str);
+             }
+          }
+          partial = '{' + partial.join(',') + '}';
+        }
+        stack.pop();
+        return partial;
     }
+  }
 
-    if (object === null) return 'null';
-    if (object.toJSON) return object.toJSON();
-    if (isElement(object)) return;
-
-    var results = [];
-    for (var property in object) {
-      var value = toJSON(object[property]);
-      if (!isUndefined(value))
-        results.push(property.toJSON() + ': ' + value);
-    }
-
-    return '{' + results.join(', ') + '}';
+  function stringify(object) {
+    return JSON.stringify(object);
   }
 
   function toQueryString(object) {
@@ -206,9 +278,13 @@ var Class = (function() {
   }
 
   function keys(object) {
+    if (Type(object) !== OBJECT_TYPE) { throw new TypeError(); }
     var results = [];
-    for (var property in object)
-      results.push(property);
+    for (var property in object) {
+      if (object.hasOwnProperty(property)) {
+        results.push(property);
+      }
+    }
     return results;
   }
 
@@ -228,7 +304,7 @@ var Class = (function() {
   }
 
   function isArray(object) {
-    return _toString.call(object) == "[object Array]";
+    return _toString.call(object) === ARRAY_CLASS;
   }
 
   var hasNativeIsArray = (typeof Array.isArray == 'function')
@@ -247,11 +323,11 @@ var Class = (function() {
   }
 
   function isString(object) {
-    return _toString.call(object) == "[object String]";
+    return _toString.call(object) === STRING_CLASS;
   }
 
   function isNumber(object) {
-    return _toString.call(object) == "[object Number]";
+    return _toString.call(object) === NUMBER_CLASS;
   }
 
   function isUndefined(object) {
@@ -261,10 +337,10 @@ var Class = (function() {
   extend(Object, {
     extend:        extend,
     inspect:       inspect,
-    toJSON:        toJSON,
+    toJSON:        NATIVE_JSON_STRINGIFY_SUPPORT ? stringify : toJSON,
     toQueryString: toQueryString,
     toHTML:        toHTML,
-    keys:          keys,
+    keys:          Object.keys || keys,
     values:        values,
     clone:         clone,
     isElement:     isElement,
@@ -366,14 +442,28 @@ Object.extend(Function.prototype, (function() {
 })());
 
 
-Date.prototype.toJSON = function() {
-  return '"' + this.getUTCFullYear() + '-' +
-    (this.getUTCMonth() + 1).toPaddedString(2) + '-' +
-    this.getUTCDate().toPaddedString(2) + 'T' +
-    this.getUTCHours().toPaddedString(2) + ':' +
-    this.getUTCMinutes().toPaddedString(2) + ':' +
-    this.getUTCSeconds().toPaddedString(2) + 'Z"';
-};
+
+(function(proto) {
+
+
+  function toISOString() {
+    return this.getUTCFullYear() + '-' +
+      (this.getUTCMonth() + 1).toPaddedString(2) + '-' +
+      this.getUTCDate().toPaddedString(2) + 'T' +
+      this.getUTCHours().toPaddedString(2) + ':' +
+      this.getUTCMinutes().toPaddedString(2) + ':' +
+      this.getUTCSeconds().toPaddedString(2) + 'Z';
+  }
+
+
+  function toJSON() {
+    return this.toISOString();
+  }
+
+  if (!proto.toISOString) proto.toISOString = toISOString;
+  if (!proto.toJSON) proto.toJSON = toJSON;
+
+})(Date.prototype);
 
 
 RegExp.prototype.match = RegExp.prototype.test;
@@ -432,6 +522,9 @@ Object.extend(String, {
 });
 
 Object.extend(String.prototype, (function() {
+  var NATIVE_JSON_PARSE_SUPPORT = window.JSON &&
+    typeof JSON.parse === 'function' &&
+    JSON.parse('{"test": true}').test;
 
   function prepareReplacement(replacement) {
     if (Object.isFunction(replacement)) return replacement;
@@ -585,10 +678,6 @@ Object.extend(String.prototype, (function() {
     return "'" + escapedString.replace(/'/g, '\\\'') + "'";
   }
 
-  function toJSON() {
-    return this.inspect(true);
-  }
-
   function unfilterJSON(filter) {
     return this.replace(filter || Prototype.JSONFilter, '$1');
   }
@@ -596,16 +685,29 @@ Object.extend(String.prototype, (function() {
   function isJSON() {
     var str = this;
     if (str.blank()) return false;
-    str = this.replace(/\\./g, '@').replace(/"[^"\\\n\r]*"/g, '');
-    return (/^[,:{}\[\]0-9.\-+Eaeflnr-u \n\r\t]*$/).test(str);
+    str = str.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g, '@');
+    str = str.replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']');
+    str = str.replace(/(?:^|:|,)(?:\s*\[)+/g, '');
+    return (/^[\],:{}\s]*$/).test(str);
   }
 
   function evalJSON(sanitize) {
-    var json = this.unfilterJSON();
+    var json = this.unfilterJSON(),
+        cx = /[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g;
+    if (cx.test(json)) {
+      json = json.replace(cx, function (a) {
+        return '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
+      });
+    }
     try {
       if (!sanitize || json.isJSON()) return eval('(' + json + ')');
     } catch (e) { }
     throw new SyntaxError('Badly formed JSON string: ' + this.inspect());
+  }
+
+  function parseJSON() {
+    var json = this.unfilterJSON();
+    return JSON.parse(json);
   }
 
   function include(pattern) {
@@ -655,10 +757,9 @@ Object.extend(String.prototype, (function() {
     underscore:     underscore,
     dasherize:      dasherize,
     inspect:        inspect,
-    toJSON:         toJSON,
     unfilterJSON:   unfilterJSON,
     isJSON:         isJSON,
-    evalJSON:       evalJSON,
+    evalJSON:       NATIVE_JSON_PARSE_SUPPORT ? parseJSON : evalJSON,
     include:        include,
     startsWith:     startsWith,
     endsWith:       endsWith,
@@ -1045,15 +1146,6 @@ Array.from = $A;
     return '[' + this.map(Object.inspect).join(', ') + ']';
   }
 
-  function toJSON() {
-    var results = [];
-    this.each(function(object) {
-      var value = Object.toJSON(object);
-      if (!Object.isUndefined(value)) results.push(value);
-    });
-    return '[' + results.join(', ') + ']';
-  }
-
   function indexOf(item, i) {
     i || (i = 0);
     var length = this.length;
@@ -1102,8 +1194,7 @@ Array.from = $A;
     clone:     clone,
     toArray:   clone,
     size:      size,
-    inspect:   inspect,
-    toJSON:    toJSON
+    inspect:   inspect
   });
 
   var CONCAT_ARGUMENTS_BUGGY = (function() {
@@ -1152,6 +1243,8 @@ var Hash = Class.create(Enumerable, (function() {
   function toObject() {
     return Object.clone(this._object);
   }
+
+
 
   function keys() {
     return this.pluck('key');
@@ -1202,10 +1295,6 @@ var Hash = Class.create(Enumerable, (function() {
     }).join(', ') + '}>';
   }
 
-  function toJSON() {
-    return Object.toJSON(this.toObject());
-  }
-
   function clone() {
     return new Hash(this);
   }
@@ -1225,7 +1314,7 @@ var Hash = Class.create(Enumerable, (function() {
     update:                 update,
     toQueryString:          toQueryString,
     inspect:                inspect,
-    toJSON:                 toJSON,
+    toJSON:                 toObject,
     clone:                  clone
   };
 })());
@@ -1250,10 +1339,6 @@ Object.extend(Number.prototype, (function() {
     return '0'.times(length - string.length) + string;
   }
 
-  function toJSON() {
-    return isFinite(this) ? this.toString() : 'null';
-  }
-
   function abs() {
     return Math.abs(this);
   }
@@ -1275,7 +1360,6 @@ Object.extend(Number.prototype, (function() {
     succ:           succ,
     times:          times,
     toPaddedString: toPaddedString,
-    toJSON:         toJSON,
     abs:            abs,
     round:          round,
     ceil:           ceil,
@@ -4254,18 +4338,15 @@ delete Prototype._original_property;
     initialize: function($super, element, preCompute) {
       $super();
       this.element = $(element);
+
+      Element.Layout.PROPERTIES.each( function(property) {
+        this._set(property, null);
+      }, this);
+
       if (preCompute) {
         this._preComputing = true;
         this._begin();
-      }
-      Element.Layout.PROPERTIES.each( function(property) {
-        if (preCompute) {
-          this._compute(property);
-        } else {
-          this._set(property, null);
-        }
-      }, this);
-      if (preCompute) {
+        Element.Layout.PROPERTIES.each( this._compute, this );
         this._end();
         this._preComputing = false;
       }
@@ -4348,10 +4429,7 @@ delete Prototype._original_property;
       if (!(property in COMPUTATIONS)) {
         throw "Property not found.";
       }
-
-      var value = COMPUTATIONS[property].call(this, this.element);
-      this._set(property, value);
-      return value;
+      return this._set(property, COMPUTATIONS[property].call(this, this.element));
     },
 
     toCSS: function() {
@@ -4591,8 +4669,8 @@ delete Prototype._original_property;
     }
   });
 
-  function getLayout(element) {
-    return new Element.Layout(element);
+  function getLayout(element, preCompute) {
+    return new Element.Layout(element, preCompute);
   }
 
   function measure(element, property) {
@@ -4711,6 +4789,8 @@ delete Prototype._original_property;
       width:  layout.get('width') + 'px',
       height: layout.get('height') + 'px'
     });
+
+    return element;
   }
 
   function relativize(element) {
@@ -5788,7 +5868,18 @@ Object.extend(Element.ClassNames.prototype, Enumerable);
   });
 
   Object.extend(Selector, {
-    matchElements: Prototype.Selector.filter,
+    matchElements: function(elements, expression) {
+      var match = Prototype.Selector.match,
+          results = [];
+
+      for (var i = 0, length = elements.length; i < length; i++) {
+        var element = elements[i];
+        if (match(element, expression)) {
+          results.push(Element.extend(element));
+        }
+      }
+      return results;
+    },
 
     findElement: function(elements, expression, index) {
       index = index || 0;
