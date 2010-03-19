@@ -458,7 +458,7 @@ miniLOL = {
 
         element = element || document.body;
 
-        $(element).update(text);
+        $(element).update(text.escapeHTML());
 
         if (!minor) {
             miniLOL.error._value = true;
