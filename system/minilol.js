@@ -196,7 +196,7 @@ miniLOL = {
                             }
     
                             if (!miniLOL.menus["default"]) {
-                                miniLOL.error("Error while analyzing menus.xml<br/><br/>No default menu was found.");
+                                miniLOL.error("Error while analyzing menus.xml\n\nNo default menu was found.");
                                 return;
                             }
                         }
@@ -287,7 +287,7 @@ miniLOL = {
                                         }));
                                 }
                                 catch (e) {
-                                    miniLOL.error("Error while creating `#{name}` wrapper from #{path}:<br/><br/>#{error}".interpolate({
+                                    miniLOL.error("Error while creating `#{name}` wrapper from #{path}:\n\n#{error}".interpolate({
                                         name:  functions[i].getAttribute("name"),
                                         path:  path,
                                         error: e.toString()
@@ -458,7 +458,7 @@ miniLOL = {
 
         element = element || document.body;
 
-        $(element).update(text.escapeHTML());
+        $(element).update(text.escapeHTML().replace(/\n/g, '<br/>'));
 
         if (!minor) {
             miniLOL.error._value = true;
@@ -656,7 +656,7 @@ miniLOL = {
                         }
                     }
                     catch (e) {
-                        error = "An error occurred on the theme's initialize function:<br/><br/>"+e.toString();
+                        error = "An error occurred on the theme's initialize function:\n\n"+e.toString();
                         return false;
                     }
 
@@ -670,7 +670,7 @@ miniLOL = {
                         }
                     }
                     catch (e) {
-                        error = "An error occurred on the theme's finalize function:<br/><br/>"+e.toString();
+                        error = "An error occurred on the theme's finalize function:\n\n"+e.toString();
                         return false;
                     }
 
@@ -1436,7 +1436,7 @@ miniLOL = {
                     module: name
                 });
 
-                miniLOL.error("An error occurred while executing the module `#{name}`<br/><br/>#{file} @ #{line}:<br/>#{error}".interpolate({
+                miniLOL.error("An error occurred while executing the module `#{name}`\n\n#{file} @ #{line}:\n#{error}".interpolate({
                     name:  name,
                     file:  e.fileName,
                     line:  e.lineNumber,
@@ -1475,7 +1475,7 @@ miniLOL = {
                 return true;
             }
             catch (e) {
-                miniLOL.error("An error occurred while loading the module `#{name}`<br/><br/>#{root}/#{file} @ #{line}:<br/>#{error}".interpolate({
+                miniLOL.error("An error occurred while loading the module `#{name}`\n\n#{root}/#{file} @ #{line}:\n\n#{error}".interpolate({
                     name:  name,
                     root:  miniLOL.path,
                     file:  e.fileName,
@@ -1623,9 +1623,9 @@ miniLOL = {
             }
 
             if (path && error) {
-                miniLOL.error("Error while parsing #{path}<br/><br/>#{error}".interpolate({
+                miniLOL.error("Error while parsing #{path}\n\n#{error}".interpolate({
                     path:  path,
-                    error: error.replace(/\n/g, "<br/>").replace(/ /g, "&nbsp;")
+                    error: error
                 }));
 
                 return error;
@@ -1784,7 +1784,7 @@ miniLOL.Resource = Class.create({
             result = this._wrapper.load.apply(this._wrapper, args);
         }
         catch (e) {
-            miniLOL.error("Error while loading `#{name}` resource.<br/>#{error}".interpolate({
+            miniLOL.error("Error while loading `#{name}` resource.\n#{error}".interpolate({
                 name: this._name,
                 error: e.toString()
             }), miniLOL.theme.content());
