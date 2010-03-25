@@ -37,7 +37,7 @@ String.fromAttributes = function (attributes) {
     var result = '';
     
     for (var i = 0; i < attributes.length; i++) {
-        result += "#{name}='#{value}' ".interpolate({
+        result += '#{name}="#{value}" '.interpolate({
             name: attributes.item(i).nodeName,
             value: attributes.item(i).nodeValue
         });

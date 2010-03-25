@@ -458,7 +458,7 @@ miniLOL = {
 
         element = element || document.body;
 
-        $(element).update(text.escapeHTML().replace(/\n/g, '<br/>'));
+        $(element).update(text.replace(/<br\/>/g, "\n").escapeHTML().replace(/\n/g, '<br/>'));
 
         if (!minor) {
             miniLOL.error._value = true;
@@ -592,10 +592,10 @@ miniLOL = {
                     before: "#{data}",
                     after:  "#{data}",
 
-                    link: "<div class='#{class}' id='#{id}'>#{before}<a href='#{url}' target='#{target}' #{attributes}>#{text}</a>#{after}</div>",
-                    item: "<div class='#{class}' id='#{id}'>#{before}<span #{attributes}>#{text}</span>#{after}</div>",
-                    nest: "<div class='#{class}' style='#{style}'>#{data}</div>",
-                    data: "<div class='data'>#{before}#{data}#{after}</div>"
+                    link: '<div class="#{class}" id="#{id}">#{before}<a href="#{url}" target="#{target}" #{attributes}>#{text}</a>#{after}</div>',
+                    item: '<div class="#{class}" id="#{id}">#{before}<span #{attributes}>#{text}</span>#{after}</div>',
+                    nest: '<div class="#{class}" style="#{style}">#{data}</div>',
+                    data: '<div class="data">#{before}#{data}#{after}</div>'
                 };
             },
 
@@ -833,7 +833,7 @@ miniLOL = {
                 },
 
                 onFailure: function () {
-                    $(document.body).update("<div id='menu'></div><div id='body'></div>");
+                    $(document.body).update('<div id="menu"></div><div id="body"></div>');
                 }
             });
 
@@ -862,13 +862,7 @@ miniLOL = {
             name = name || "default";
 
             if (!miniLOL.menu.exists(name)) {
-                var error = "The menu `#{name}` doesn't exist.".interpolate({
-                    name: name
-                });
-
-                miniLOL.error(error);
-
-                return error;
+                return null;
             }
 
             return miniLOL.menu.parse(miniLOL.menus[name]);
@@ -915,7 +909,7 @@ miniLOL = {
             }
 
             if (!result.item) {
-                result.item = "<a href='#{href}' #{attributes}>#{text}</a> ";
+                result.item = '<a href="#{href}" #{attributes}>#{text}</a> ';
             }
 
             return result;
