@@ -871,9 +871,17 @@ miniLOL = {
         change: function (name) {
             var content = miniLOL.menu.get(name);
 
-            if (!miniLOL.error()) {
+            if (content) {
                 miniLOL.menu.set(content);
                 miniLOL.menu.current = name;
+            }
+            else {
+                var error = "The menu `#{name}` doesn't exist.".interpolate({
+                    name: name
+                });
+                
+                miniLOL.error(error);
+                return error;
             }
 
             Event.fire(document, ":menu.change", miniLOL.menus[name]);
