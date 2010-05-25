@@ -854,7 +854,9 @@ miniLOL = {
             miniLOL.theme.menu().update(data);
         },
 
-        get: function (name) {
+        get: function (name, layer) {
+            layer = layer || 0;
+
             if (!miniLOL.menu.enabled()) {
                 return "";
             }
@@ -865,7 +867,7 @@ miniLOL = {
                 return null;
             }
 
-            return miniLOL.menu.parse(miniLOL.menus[name]);
+            return miniLOL.menu.parse(miniLOL.menus[name], layer);
         },
 
         change: function (name) {
