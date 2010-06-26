@@ -890,7 +890,7 @@ miniLOL = {
         },
 
         enabled: function () {
-            return Boolean(miniLOL.menus["default"]);
+            return Boolean(miniLOL.menus);
         },
 
         exists: function (name) {
