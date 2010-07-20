@@ -1488,7 +1488,7 @@ Ajax.Request = Class.create(Ajax.Base, {
           this.options.parameters :
           Object.toQueryString(this.options.parameters);
 
-    if (!['get', 'post', 'head'].include(this.method)) {
+    if (!['get', 'post'].include(this.method)) {
       params += (params ? '&' : '') + "_method=" + this.method;
       this.method = 'post';
     }
@@ -1883,7 +1883,7 @@ if (!Node.ELEMENT_NODE) {
 Element.idCounter = 1;
 Element.cache = { };
 
-function purgeElement(element) {
+Element._purgeElement = function(element) {
   var uid = element._prototypeUID;
   if (uid) {
     Element.stopObserving(element);
@@ -1964,6 +1964,7 @@ Element.Methods = {
 
     function update(element, content) {
       element = $(element);
+      var purgeElement = Element._purgeElement;
 
       var descendants = element.getElementsByTagName('*'),
        i = descendants.length;
@@ -3264,6 +3265,8 @@ Element.addMethods({
 
   purge: function(element) {
     if (!(element = $(element))) return;
+    var purgeElement = Element._purgeElement;
+
     purgeElement(element);
 
     var descendants = element.getElementsByTagName('*'),
@@ -3283,11 +3286,13 @@ Element.addMethods({
     return (Number(match[1]) / 100);
   }
 
-  function getPixelValue(value, property) {
+  function getPixelValue(value, property, context) {
+    var element = null;
     if (Object.isElement(value)) {
       element = value;
       value = element.getStyle(property);
     }
+
     if (value === null) {
       return null;
     }
@@ -3296,7 +3301,9 @@ Element.addMethods({
       return window.parseFloat(value);
     }
 
-    if (/\d/.test(value) && element.runtimeStyle) {
+    var isPercentage = value.include('%'), isViewport = (context === document.viewport);
+
+    if (/\d/.test(value) && element && element.runtimeStyle && !(isPercentage && isViewport)) {
       var style = element.style.left, rStyle = element.runtimeStyle.left;
       element.runtimeStyle.left = element.currentStyle.left;
       element.style.left = value || 0;
@@ -3307,18 +3314,33 @@ Element.addMethods({
       return value;
     }
 
-    if (value.include('%')) {
+    if (element && isPercentage) {
+      context = context || element.parentNode;
       var decimal = toDecimal(value);
-      var whole;
-      if (property.include('left') || property.include('right') ||
-       property.include('width')) {
-        whole = $(element.parentNode).measure('width');
-      } else if (property.include('top') || property.include('bottom') ||
-       property.include('height')) {
-        whole = $(element.parentNode).measure('height');
+      var whole = null;
+      var position = element.getStyle('position');
+
+      var isHorizontal = property.include('left') || property.include('right') ||
+       property.include('width');
+
+      var isVertical =  property.include('top') || property.include('bottom') ||
+        property.include('height');
+
+      if (context === document.viewport) {
+        if (isHorizontal) {
+          whole = document.viewport.getWidth();
+        } else if (isVertical) {
+          whole = document.viewport.getHeight();
+        }
+      } else {
+        if (isHorizontal) {
+          whole = $(context).measure('width');
+        } else if (isVertical) {
+          whole = $(context).measure('height');
+        }
       }
 
-      return whole * decimal;
+      return (whole === null) ? 0 : whole * decimal;
     }
 
     return 0;
@@ -3410,6 +3432,9 @@ Element.addMethods({
       var position = element.getStyle('position'),
        width = element.getStyle('width');
 
+      var context = (position === 'fixed') ? document.viewport :
+       element.parentNode;
+
       element.setStyle({
         position:   'absolute',
         visibility: 'hidden',
@@ -3420,9 +3445,9 @@ Element.addMethods({
 
       var newWidth;
       if (width && (positionedWidth === width)) {
-        newWidth = getPixelValue(width);
+        newWidth = getPixelValue(element, 'width', context);
       } else if (width && (position === 'absolute' || position === 'fixed')) {
-        newWidth = getPixelValue(width);
+        newWidth = getPixelValue(element, 'width', context);
       } else {
         var parent = element.parentNode, pLayout = $(parent).getLayout();
 
@@ -3453,6 +3478,7 @@ Element.addMethods({
       if (!(property in COMPUTATIONS)) {
         throw "Property not found.";
       }
+
       return this._set(property, COMPUTATIONS[property].call(this, this.element));
     },
 
@@ -3729,11 +3755,38 @@ Element.addMethods({
   }
 
   function getDimensions(element) {
-    var layout = $(element).getLayout();
-    return {
-      width:  layout.get('width'),
-      height: layout.get('height')
+    element = $(element);
+    var display = Element.getStyle(element, 'display');
+
+    if (display && display !== 'none') {
+      return { width: element.offsetWidth, height: element.offsetHeight };
+    }
+
+    var style = element.style;
+    var originalStyles = {
+      visibility: style.visibility,
+      position:   style.position,
+      display:    style.display
     };
+
+    var newStyles = {
+      visibility: 'hidden',
+      display:    'block'
+    };
+
+    if (originalStyles.position !== 'fixed')
+      newStyles.position = 'absolute';
+
+    Element.setStyle(element, newStyles);
+
+    var dimensions = {
+      width:  element.offsetWidth,
+      height: element.offsetHeight
+    };
+
+    Element.setStyle(element, originalStyles);
+
+    return dimensions;
   }
 
   function getOffsetParent(element) {
