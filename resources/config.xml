@@ -18,5 +18,5 @@ things to be set and those configurations will go here.
 
     <loadingMessage><![CDATA[<center>Loading...</center>]]></loadingMessage>
 
-    <theme>Original</theme>
+    <theme>Gray</theme>
 </configuration>

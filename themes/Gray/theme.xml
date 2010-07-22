@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!DOCTYPE theme [
+    <!ELEMENT theme (initialize?, finalize?, styles?)>
+    <!ATTLIST theme
+        name   CDATA #REQUIRED
+        author CDATA #REQUIRED
+    >
+
+    <!ELEMENT initialize (#PCDATA)>
+
+    <!ELEMENT finalize (#PCDATA)>
+
+    <!ELEMENT styles (style+)>
+    
+    <!ELEMENT style EMPTY>
+    <!ATTLIST style
+        name    CDATA   #REQUIRED
+    >
+]>
+
+<theme name="Gray" author="meh." homepage="http://meh.doesntexist.org" menu="menu" content="body">
+    <thanks><![CDATA[
+        Thanks to <a href="http://www.webdesignerwall.com/" target="_blank">Web Designer Wall</a> for their 
+        <a href="http://www.webdesignerwall.com/tutorials/css3-dropdown-menu/" target="_blank">CSS3 Dropdown Menu</a>
+    ]]></thanks>
+
+    <initialize><![CDATA[
+        $('title').update(miniLOL.config["core"].logo || miniLOL.config["core"].siteTitle)
+
+        miniLOL.theme.data.current = function (event) {
+            var matches = event.memo.match(/(#[^&]*)/)
+            var url;
+
+            if (matches) {
+                url = matches[1];
+            }
+            else {
+                url = miniLOL.config["core"].homePage
+            }
+
+            if (url[0] != '#') {
+                url = "#" + url;
+            }
+
+            var element;
+
+            $A(miniLOL.theme.menu().getElementsByTagName("a")).each(function (item) {
+                if (item.getAttribute("href").include(url)) {
+                    element = item;
+                }
+                else if (url == miniLOL.config["core"].homePage && item.getAttribute("href") == "#") {
+                    element = item;
+                }
+
+                if (element) {
+                    throw $break;
+                }
+            });
+
+            if (element) {
+                $$(".current").each(function (element) {
+                    element.removeClassName("current");
+                });
+
+                while (element.parentNode.getAttribute("id") != "nav") {
+                    element = element.parentNode;
+                }
+
+                element.addClassName('current');
+            }
+            else if ($$(".current").length == 0) {
+                $($("nav").getElementsByTagName("li")[0]).addClassName("current");
+            }
+        }
+
+        Event.observe(document, ":go", miniLOL.theme.data.current);
+        Event.observe(document, ":initialized", miniLOL.theme.data.current);
+    ]]></initialize>
+
+    <finalize><![CDATA[
+        Event.stopObserving(document, ":go", miniLOL.theme.data.current);
+    ]]></finalize>
+
+    <styles>
+        <style name="core"/>
+        <style name="menu"/>
+
+        <style name="Blog/style"/>
+        <style name="Syntax Highlighter/style"/>
+    </styles>
+</theme>

@@ -1,0 +1,39 @@
+body {
+    font: normal .8em/1.5em Arial, Helvetica, sans-serif;
+    background: #ebebeb;
+    width: 900px;
+    margin: 0 auto;
+    color: #666;
+}
+
+a {
+    color: #333;
+}
+
+#title {
+    width: 100%;
+    margin: 30px auto;
+    font-size: 42px;
+    text-align: center;
+}
+
+#body {
+    margin: 20px auto 60px auto;
+    padding: 0 10px;
+
+    font-size: 12px;
+}
+
+#credits {
+    width: 100%;
+
+    position: fixed;
+    bottom: 0;
+    right: 0;
+
+    padding: 3px;
+
+    text-align: right;
+
+    z-index: -23;
+}

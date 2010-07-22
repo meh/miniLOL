@@ -1,0 +1,121 @@
+.blog a {
+    font-size: 11px;
+}
+
+.blog pre {
+    width: 90%;
+    margin-top: 20px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 5px;
+    border: 1px solid #8b8b8b;
+    background-color: #FFFFFF;
+    overflow: auto;
+    position: relative;
+    top: -10px;
+}
+
+.blog .page .post {
+    border-bottom: 1px solid #8b8b8b;
+    margin-bottom: 10px;
+}
+
+.blog .post .header {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.blog .post .header .title a {
+    font-size: 12px;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.blog .post .header .date {
+    font-size: 10px;
+}
+
+.blog .post .by {
+    margin-top: 10px;
+    text-align: right;
+}
+
+.blog .post .by .author {
+    font-weight: bold;
+}
+
+.blog .post .by .date {
+    font-style: italic;
+}
+
+.blog .pager {
+    margin-top: 10px;
+}
+
+.blog .pager div {
+    float: left;
+}
+
+.blog .pager .previous {
+    margin-right: 5px;
+}
+
+.blog .pager .next {
+    margin-left: 5px;
+}
+
+.blog .pager .previous a, .blog .pager .next a {
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.blog .pager .numbers div {
+    font-weight: bold;
+
+    background-color: #FFFFFF;
+    border: 1px solid #8b8b8b;
+
+    padding-left: 2px;
+    padding-right: 2px;
+
+    margin-left: 2px;
+    margin-right: 2px;
+}
+
+.blog .pager .numbers div:hover {
+    color: #8b8b8b;
+}
+
+.blog .pager .numbers .current{
+    font-weight: normal;
+}
+
+.blog .pager .numbers a {
+    text-decoration: none;
+}
+
+.blog .first:hover a {
+    color: #8b8b8b;
+}
+
+.blog .inner:hover a {
+    color: #8b8b8b;
+}
+
+.blog .last:hover a {
+    color: #8b8b8b;
+}
+
+.blog #editor {
+    width: 99%;
+    height: 100px;
+    font-family: Courier new;
+    font-size: 10px;
+}
+
+.blog .syntaxhighlighter {
+    margin: 6px auto 6px auto !important;
+    border: 1px solid #8b8b8b !important;
+    width: 96% !important;
+}

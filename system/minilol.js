@@ -760,12 +760,12 @@ miniLOL = {
                 }
             }
 
-            miniLOL.theme.template.clearCache();
-
             if (runtime && miniLOL.initialized) {
                 miniLOL.menu.change(miniLOL.menu.current);
                 miniLOL.go(location.href);
             }
+
+            miniLOL.theme.data = {};
 
             // Sadly this has some problems.
             // I didn't find a way to know if the CSSs have already been applied and the initialize
@@ -786,6 +786,10 @@ miniLOL = {
         },
 
         unload: function (noFinalization) {
+            delete miniLOL.theme.data;
+
+            miniLOL.theme.template.clearCache();
+
             miniLOL.theme.template.list = miniLOL.theme.template.defaultList();
 
             if (!miniLOL.theme.name) {
@@ -839,7 +843,7 @@ miniLOL = {
 
             miniLOL.utils.includeCSS("resources/style.css");
 
-            miniLOL.theme.template._cache = {};
+            miniLOL.theme.template.clearCache();
 
             return true;
         }
@@ -901,8 +905,8 @@ miniLOL = {
             var result = {};
 
             if (template) {
-                var dom = template.getElementById(layer) || template.getElementById('*');
-
+                var dom = template.getElementById(layer) || template.getElementById('default');
+                
                 if (dom) {
                     if (dom.getElementsByTagName("menu").length) {
                         result.menu = dom.getElementsByTagName("menu")[0].firstChild.nodeValue;
@@ -951,9 +955,6 @@ miniLOL = {
                     else if (contents[i].nodeName == "item") {
                         var item = contents[i].cloneNode(true);
     
-                        var text = miniLOL.utils.getFirstText(contents[i].childNodes);
-                        var data = miniLOL.menu.parse(contents[i]);
-    
                         var itemClass = item.getAttribute("class") || ''; item.removeAttribute("class");
                         var itemId    = item.getAttribute("id") || ''; item.removeAttribute("id");
                         var itemSrc   = item.getAttribute("src")
@@ -972,8 +973,8 @@ miniLOL = {
                             src:        itemSrc,
                             href:       itemSrc,
                             attributes: String.fromAttributes(item.attributes),
-                            text:       text,
-                            data:       data
+                            text:       miniLOL.utils.getFirstText(contents[i].childNodes),
+                            data:       miniLOL.menu.parse(contents[i], layer+1)
                         }));
                     }
                     else {
@@ -1858,6 +1859,10 @@ miniLOL.Resource = Class.create({
         }
 
         return result;
+    },
+
+    data: function () {
+        return this._wrapper._data;
     }
 });
 
