@@ -114,21 +114,19 @@ miniLOL = {
                     if (text) {
                         var result = '';
     
-                        for (var i = 0; i < obj.childNodes.length; i++) {
-                            var text = obj.childNodes[i];
-    
+                        $A(obj.childNodes).each(function (text) {
                             if (text.nodeType != Node.CDATA_SECTION_NODE && text.nodeType != Node.TEXT_NODE) {
-                                continue;
+                                return;
                             }
     
                             text = text.nodeValue;
     
                             if (text.match(/^[\s\n]*$/m)) {
-                                continue;
+                                return;
                             }
                             
                             result += text;
-                        }
+                        });
     
                         return result;
                     }
@@ -139,11 +137,9 @@ miniLOL = {
     
                     var result = {};
     
-                    for (var i = 0; i < obj.childNodes.length; i++) {
-                        var node = obj.childNodes[i];
-    
+                    $A(obj.childNodes).each(function (node) {
                         if (node.nodeType != Node.ELEMENT_NODE) {
-                            continue;
+                            return;
                         }
     
                         if (node.getElementsByTagName('*').length == 0) {
@@ -152,7 +148,7 @@ miniLOL = {
                         else {
                             result[node.nodeName] = this.parse(node);
                         }
-                    }
+                    });
     
                     return result;
                 }
@@ -179,21 +175,20 @@ miniLOL = {
     
                             miniLOL.menus["default"] = response.getElementById("default");
     
-                            var menus = response.documentElement.childNodes;
-                            for (var i = 0; i < menus.length; i++) {
-                                if (menus[i].nodeType != Node.ELEMENT_NODE) {
-                                    continue;
+                            $A(response.documentElement.childNodes).each(function (menu) {
+                                if (menu.nodeType != Node.ELEMENT_NODE) {
+                                    return;
                                 }
     
-                                var id = menus[i].getAttribute("id");
+                                var id = menu.getAttribute("id");
     
                                 if (!id && !miniLOL.menus["default"]) {
-                                    miniLOL.menus["default"] = menus[i];
+                                    miniLOL.menus["default"] = menu;
                                 }
                                 else {
-                                    miniLOL.menus[id] = menus[i];
+                                    miniLOL.menus[id] = menu;
                                 }
-                            }
+                            });
     
                             if (!miniLOL.menus["default"]) {
                                 miniLOL.error("Error while analyzing menus.xml\n\nNo default menu was found.");
@@ -231,13 +226,12 @@ miniLOL = {
     
                             var dom = miniLOL.utils.fixDOM(http.responseXML);
     
-                            var pages = http.responseXML.documentElement.getElementsByTagName("page");
-                            for (var i = 0; i < pages.length; i++) {
-                                var id = pages[i].getAttribute("id");
+                            $A(http.responseXML.documentElement.getElementsByTagName("page")).each(function (page) {
+                                var id = page.getAttribute("id");
 
                                 delete miniLOL.pages.cache[id];
-                                miniLOL.pages.data[id] = pages[i];
-                            }
+                                miniLOL.pages.data[id] = page;
+                            });
                         },
         
                         onFailure: function (http) {
@@ -277,25 +271,23 @@ miniLOL = {
                                 return;
                             }
     
-                            var functions = http.responseXML.documentElement.getElementsByTagName("function");
-    
-                            for (var i = 0; i < functions.length; i++) {
+                            $A(http.responseXML.documentElement.getElementsByTagName("function")).each(function (func) {
                                 try {
-                                    miniLOL.functions[functions[i].getAttribute("name")]
+                                    miniLOL.functions[func.getAttribute("name")]
                                         = new Function("var text = arguments[0]; var args = arguments[1]; #{code}; return text;".interpolate({
-                                            code: functions[i].firstChild.nodeValue
+                                            code: func.firstChild.nodeValue
                                         }));
                                 }
                                 catch (e) {
                                     miniLOL.error("Error while creating `#{name}` wrapper from #{path}:\n\n#{error}".interpolate({
-                                        name:  functions[i].getAttribute("name"),
+                                        name:  func.getAttribute("name"),
                                         path:  path,
                                         error: e.toString()
                                     }));
     
                                     return;
                                 }
-                            }
+                            });
                         },
             
                         onFailure: function (http) {
@@ -773,7 +765,7 @@ miniLOL = {
             }
 
             if (runtime && miniLOL.initialized) {
-                miniLOL.menu.change(miniLOL.menu.current);
+                miniLOL.menu.change(miniLOL.menu.current, true);
                 miniLOL.go(location.href);
             }
 
@@ -798,10 +790,6 @@ miniLOL = {
         },
 
         unload: function (noFinalization) {
-            if (miniLOL.theme.data) {
-                delete miniLOL.theme.data;
-            }
-
             miniLOL.theme.template.clearCache();
 
             if (!miniLOL.theme.name) {
@@ -814,9 +802,11 @@ miniLOL = {
                 miniLOL.theme.finalize();
             }
 
-            for (var i = 0; i < miniLOL.theme.informations.styles.length; i++) {
-                miniLOL.theme.style.unload(miniLOL.theme.informations.styles[i]);
-            }
+            delete miniLOL.theme.data;
+
+            $A(miniLOL.theme.informations.styles).each(function (style) {
+                miniLOL.theme.style.unload(style);
+            });
 
             delete miniLOL.theme.name;
 
@@ -917,13 +907,72 @@ miniLOL = {
             return Boolean(miniLOL.menus[name]);
         },
 
+        parse: function (menu, layer) {
+            layer = layer || 0;
+
+            var template = miniLOL.theme.template.menu();
+
+            if (!template || !menu) {
+                if (miniLOL.error()) {
+                    return false;
+                }
+            }
+
+            var first  = true;
+            var output = "";
+
+            $A(menu.childNodes).each(function (e) {
+                switch (e.nodeType) {
+                    case Node.ELEMENT_NODE:
+                    if (e.nodeName == "menu") {
+                        output += miniLOL.menu.parsers.layer(template, layer).menu.interpolate({
+                            data: miniLOL.menu.parse(e, layer)
+                        });
+                    }
+                    else if (e.nodeName == "item") {
+                        output += miniLOL.menu.parsers.item(e, template, layer)
+                    }
+                    else {
+                        output += miniLOL.menu.parsers.other(e, template);
+                    }
+                    break;
+
+                    case Node.CDATA_SECTION_NODE:
+                    case Node.TEXT_NODE:
+                    if (!first) {
+                        output += e.nodeValue;
+                    }
+
+                    first = false;
+                    break;
+                }
+            });
+
+            if (output.replace(/[\s\n]*/g, '')) {
+                if (layer == 0) {
+                    return miniLOL.menu.parsers.layer(template, layer).menu.interpolate({
+                        data: output
+                    });
+                }
+                else {
+                    return output;
+                }
+            }
+            else {
+                return '';
+            }
+        },
+
         parsers: {
             layer: function (template, layer) {
-                var result = {};
+                var result = {
+                    menu: "",
+                    item: ""
+                };
 
                 if (template) {
                     var dom = template.getElementById(layer) || template.getElementById('default');
-                
+
                     if (dom) {
                         if (dom.getElementsByTagName("menu").length) {
                             result.menu = dom.getElementsByTagName("menu")[0].firstChild.nodeValue;
@@ -932,18 +981,44 @@ miniLOL = {
                         if (dom.getElementsByTagName("item").length) {
                             result.item = dom.getElementsByTagName("item")[0].firstChild.nodeValue;
                         }
+
+                        if (!result.menu) {
+                            result.menu = "#{data}";
+                        }
+
+                        if (!result.item) {
+                            result.item = '<a href="#{href}" #{attributes}>#{text}</a> ';
+                        }
                     }
                 }
 
-                if (!result.menu) {
-                    result.menu = "#{data}";
-                }
-
-                if (!result.item) {
-                    result.item = '<a href="#{href}" #{attributes}>#{text}</a> ';
-                }
-
                 return result;
+            },
+
+            item: function (element, template, layer) {
+                item = element.cloneNode(true);
+
+                var itemClass = item.getAttribute("class") || ''; item.removeAttribute("class");
+                var itemId    = item.getAttribute("id") || ''; item.removeAttribute("id");
+                var itemSrc   = item.getAttribute("src")
+                             || item.getAttribute("href")
+                             || item.getAttribute("url")
+                             || '';
+                
+                item.removeAttribute("src");
+                item.removeAttribute("href");
+                item.removeAttribute("url");
+                
+                return miniLOL.menu.parsers.layer(template, layer).item.interpolate(Object.extend(Object.fromAttributes(item.attributes), {
+                    "class":    itemClass,
+                    id:         itemId,
+                    url:        itemSrc,
+                    src:        itemSrc,
+                    href:       itemSrc,
+                    attributes: String.fromAttributes(item.attributes),
+                    text:       miniLOL.utils.getFirstText(element.childNodes),
+                    data:       miniLOL.menu.parse(element, layer + 1)
+                }));
             },
 
             other: function (data, template) {
@@ -973,84 +1048,6 @@ miniLOL = {
                 outputs["text"] = miniLOL.utils.getFirstText(data.childNodes);
     
                 return text.interpolate(Object.extend(outputs, Object.fromAttributes(data.attributes)));
-            }
-        },
-
-        parse: function (menu, layer) {
-            layer = layer || 0;
-
-            var template = miniLOL.theme.template.menu();
-
-            if (!template || !menu) {
-                if (miniLOL.error()) {
-                    return false;
-                }
-            }
-
-            var first  = true;
-            var output = "";
-
-            $A(menu.childNodes).each(function (e) {
-                switch (e.nodeType) {
-                    case Node.ELEMENT_NODE:
-                    if (e.nodeName == "menu") {
-                        output += miniLOL.menu.parsers.layer(template, layer + 1).menu.interpolate({
-                            data: miniLOL.menu.parse(content, layer + 1)
-                        });
-                    }
-                    else if (e.nodeName == "item") {
-                        var item = e.cloneNode(true);
-    
-                        var itemClass = item.getAttribute("class") || ''; item.removeAttribute("class");
-                        var itemId    = item.getAttribute("id") || ''; item.removeAttribute("id");
-                        var itemSrc   = item.getAttribute("src")
-                                     || item.getAttribute("href")
-                                     || item.getAttribute("url")
-                                     || '';
-                        
-                        item.removeAttribute("src");
-                        item.removeAttribute("href");
-                        item.removeAttribute("url");
-                        
-                        output += miniLOL.menu.parsers.layer(template, layer).item.interpolate(Object.extend(Object.fromAttributes(item.attributes), {
-                            "class":    itemClass,
-                            id:         itemId,
-                            url:        itemSrc,
-                            src:        itemSrc,
-                            href:       itemSrc,
-                            attributes: String.fromAttributes(item.attributes),
-                            text:       miniLOL.utils.getFirstText(e.childNodes),
-                            data:       miniLOL.menu.parse(content, layer+1)
-                        }));
-                    }
-                    else {
-                        output += miniLOL.menu.parsers.other(content, template);
-                    }
-                    break;
-
-                    case Node.CDATA_SECTION_NODE:
-                    case Node.TEXT_NODE:
-                    if (!first) {
-                        output += e.nodeValue;
-                    }
-
-                    first = false;
-                    break;
-                }
-            });
-
-            if (output.replace(/[\s\n]*/g, '')) {
-                if (layer == 0) {
-                    return miniLOL.menu.parsers.layer(template, layer).menu.interpolate({
-                        data: output
-                    });
-                }
-                else {
-                    return output;
-                }
-            }
-            else {
-                return '';
             }
         }
     },
@@ -1141,6 +1138,27 @@ miniLOL = {
             miniLOL.content.set(output);
 
             return true;
+        },
+
+        parse: function (page, data) {
+            var output = "";
+
+            $A(page.childNodes).each(function (e) {
+                switch (e.nodeType) {
+                    case Node.ELEMENT_NODE:
+                    if (Object.isFunction(miniLOL.page.parsers[e.nodeName])) {
+                        output += miniLOL.page.parsers[e.nodeName](e, data);
+                    }
+                    break;
+        
+                    case Node.CDATA_SECTION_NODE:
+                    case Node.TEXT_NODE:
+                    output += e.nodeValue;
+                    break;
+                }
+            });
+
+            return output;
         },
 
         parsers: {
@@ -1314,27 +1332,6 @@ miniLOL = {
             }
         },
 
-        parse: function (page, data) {
-            var output = "";
-
-            $A(page.childNodes).each(function (e) {
-                switch (e.nodeType) {
-                    case Node.ELEMENT_NODE:
-                    if (Object.isFunction(miniLOL.page.parsers[e.nodeName])) {
-                        output += miniLOL.page.parsers[e.nodeName](e, data);
-                    }
-                    break;
-        
-                    case Node.CDATA_SECTION_NODE:
-                    case Node.TEXT_NODE:
-                    output += e.nodeValue;
-                    break;
-                }
-            });
-
-            return output;
-        },
-
         load: function (path, queries, url) {
             miniLOL.content.set(miniLOL.config["core"].loadingMessage);
 
@@ -1384,6 +1381,7 @@ miniLOL = {
             }
 
             obj.name = name;
+
             obj.root = "#{path}/#{module}".interpolate({
                 path: miniLOL.module.path,
                 module: name
@@ -1426,11 +1424,9 @@ miniLOL = {
 
             miniLOL.modules[name] = obj;
 
-            if (obj.aliases) {
-                for (var i = 0; i < obj.aliases.length; i++) {
-                    miniLOL.modules[obj.aliases[i]] = obj;
-                }
-            }
+            $A(obj.aliases).each(function (alias) {
+                miniLOL.modules[alias] = obj;
+            });
 
             Event.fire(document, ":module.create", obj);
         },
