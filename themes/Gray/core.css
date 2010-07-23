@@ -12,8 +12,7 @@ a {
 
 table td {
     vertical-align: top;
-    padding-right: 5px;
-    padding-bottom: 5px;
+    line-height: 1em;
 }
 
 #siteTitle {

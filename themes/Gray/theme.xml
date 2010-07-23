@@ -99,6 +99,13 @@
         Event.stopObserving(document, ":go", miniLOL.theme.data.current);
     ]]></finalize>
 
+    <list>
+        <global><![CDATA[ <table #{attributes}>#{data}</table> ]]></global>
+
+        <link><![CDATA[<tr><td>#{before}</td><td><a href="#{url}" target="#{target}" #{attributes}>#{text}</a></td><td>#{after}</td></tr>]]></link>
+        <item><![CDATA[<tr><td>#{before}</td><td>#{text}</td><td>#{after}</td></tr>]]></item>
+    </list>
+
     <styles>
         <style name="core"/>
         <style name="menu"/>
