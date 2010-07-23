@@ -78,14 +78,14 @@
                     element.removeClassName("current");
                 });
 
-                while (element.parentNode.getAttribute("id") != "nav") {
+                while (element.parentNode.getAttribute("id") != "menu") {
                     element = element.parentNode;
                 }
 
                 element.addClassName('current');
             }
             else if ($$(".current").length == 0) {
-                $($("nav").getElementsByTagName("li")[0]).addClassName("current");
+                $($("menu").getElementsByTagName("li")[0]).addClassName("current");
             }
         }
 
@@ -98,13 +98,6 @@
 
         Event.stopObserving(document, ":go", miniLOL.theme.data.current);
     ]]></finalize>
-
-    <list>
-        <global><![CDATA[ <table #{attributes}>#{data}</table> ]]></global>
-
-        <link><![CDATA[<tr><td>#{before}</td><td><a href="#{url}" target="#{target}" #{attributes}>#{text}</a></td><td>#{after}</td></tr>]]></link>
-        <item><![CDATA[<tr><td>#{before}</td><td>#{text}</td><td>#{after}</td></tr>]]></item>
-    </list>
 
     <styles>
         <style name="core"/>

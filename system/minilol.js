@@ -689,45 +689,48 @@ miniLOL = {
                     info.styles = [];
 
                     $A(doc.getElementsByTagName("style")).each(function (style) {
-                        info.styles.push(styles.getAttribute("name"));
+                        info.styles.push(style.getAttribute("name"));
                     });
 
-                    var templates = doc.getElementsByTagName("templates")[0];
+                    var templates = doc.getElementsByTagName("templates");
+                    var tmp;
 
-                    $A(template.getElementsByTagName("list")[0].getElementsByTagName("template")).each(function (template) {
-                        var current;
-                        var name = template.getAttribute("name") || "default";
-
-                        miniLOL.theme.template.list[name] = {};
-
-                        if ((current = template.getElementsByTagName("global")).length) {
-                            miniLOL.theme.template.list[name].global = current[0].firstChild.nodeValue;
-                        }
-
-                        if ((current = template.getElementsByTagName("before")).length) {
-                            miniLOL.theme.template.list[name].before = current[0].firstChild.nodeValue;
-                        }
-
-                        if ((current = template.getElementsByTagName("after")).length) {
-                            miniLOL.theme.template.list[name].after = current[0].firstChild.nodeValue;
-                        }
-
-                        if ((current = template.getElementsByTagName("link")).length) {
-                            miniLOL.theme.template.list[name].link = current[0].firstChild.nodeValue;
-                        }
-
-                        if ((current = template.getElementsByTagName("item")).length) {
-                            miniLOL.theme.template.list[name].item = current[0].firstChild.nodeValue;
-                        }
-
-                        if ((current = template.getElementsByTagName("nest")).length) {
-                            miniLOL.theme.template.list[name].nest = current[0].firstChild.nodeValue;
-                        }
-
-                        if ((current = template.getElementsByTagName("data")).length) {
-                            miniLOL.theme.template.list[name].data = current[0].firstChild.nodeValue;
-                        }
-                    })
+                    if (templates && (tmp = templates.getElementsByTagName("list"))) {
+                        $A(tmp.getElementsByTagName("template")).each(function (template) {
+                            var current;
+                            var name = template.getAttribute("name") || "default";
+    
+                            miniLOL.theme.template.list[name] = {};
+    
+                            if ((current = template.getElementsByTagName("global")).length) {
+                                miniLOL.theme.template.list[name].global = current[0].firstChild.nodeValue;
+                            }
+    
+                            if ((current = template.getElementsByTagName("before")).length) {
+                                miniLOL.theme.template.list[name].before = current[0].firstChild.nodeValue;
+                            }
+    
+                            if ((current = template.getElementsByTagName("after")).length) {
+                                miniLOL.theme.template.list[name].after = current[0].firstChild.nodeValue;
+                            }
+    
+                            if ((current = template.getElementsByTagName("link")).length) {
+                                miniLOL.theme.template.list[name].link = current[0].firstChild.nodeValue;
+                            }
+    
+                            if ((current = template.getElementsByTagName("item")).length) {
+                                miniLOL.theme.template.list[name].item = current[0].firstChild.nodeValue;
+                            }
+    
+                            if ((current = template.getElementsByTagName("nest")).length) {
+                                miniLOL.theme.template.list[name].nest = current[0].firstChild.nodeValue;
+                            }
+    
+                            if ((current = template.getElementsByTagName("data")).length) {
+                                miniLOL.theme.template.list[name].data = current[0].firstChild.nodeValue;
+                            }
+                        })
+                    }
                 },
 
                 onFailure: function () {
@@ -795,7 +798,9 @@ miniLOL = {
         },
 
         unload: function (noFinalization) {
-            delete miniLOL.theme.data;
+            if (miniLOL.theme.data) {
+                delete miniLOL.theme.data;
+            }
 
             miniLOL.theme.template.clearCache();
 
@@ -1148,7 +1153,11 @@ miniLOL = {
                 var listArgs     = list.getAttribute("arguments") || data[0].getAttribute("arguments") || ''; list.removeAttribute("arguments");
                 var listType     = list.getAttribute("type") || data[0].getAttribute("type") || ''; list.removeAttribute("type");
                 var listMenu     = list.getAttribute("menu") || data[0].getAttribute("menu"); list.removeAttribute("menu");
-                var listTemplate = list.getAttribute("template") || "default"; list.removeAttribute("template");
+                var listTemplate = list.getAttribute("template"); list.removeAttribute("template");
+
+                if (!miniLOL.theme.template.list[listTemplate]) {
+                    listTemplate = "default";
+                }
     
                 var output = "";
 

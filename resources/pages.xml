@@ -76,11 +76,11 @@ The example below should be self explanatory.
         <![CDATA[
             This is a links collection:<br/>
         ]]>
-        <list before="- " style="margin-left: 10px">
-            <link href="#stuff"                     text="Stuff"     after="&#160;&#160;&#160;&#160; ~ Internal link"/>
-            <link href="separated"                  text="Separated" after=" ~ Internal link but in data/" type="raw"/>
-            <link href="#separated"                 text="Separated" after=" ~ Separated alias'd"/>
-            <link href="http://meh.doesntexist.org" text="meh."      after="&#160;&#160;&#160;&#160;&#160; ~ External link"/>
+        <list template="table" before="- " style="margin-left: 10px">
+            <link href="#stuff"                     text="Stuff"     after="~ Internal link"/>
+            <link href="separated"                  text="Separated" after="~ Internal link but in data/" type="raw"/>
+            <link href="#separated"                 text="Separated" after="~ Separated alias'd"/>
+            <link href="http://meh.doesntexist.org" text="meh."      after="~ External link"/>
         </list>
 
         <![CDATA[<br/>

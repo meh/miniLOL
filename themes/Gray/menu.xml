@@ -14,7 +14,7 @@
 <template>
     <layer id="0">
         <menu><![CDATA[
-            <ul id="nav">#{data}</ul>
+            #{data}
         ]]></menu>
 
         <item><![CDATA[
