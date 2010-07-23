@@ -112,7 +112,7 @@ miniLOL = {
 
                 parse: function (obj, text) {
                     if (text) {
-                        var result = '';
+                        var result = "";
     
                         $A(obj.childNodes).each(function (text) {
                             if (text.nodeType != Node.CDATA_SECTION_NODE && text.nodeType != Node.TEXT_NODE) {
@@ -148,7 +148,7 @@ miniLOL = {
                         else {
                             result[node.nodeName] = this.parse(node);
                         }
-                    });
+                    }.bind(this));
     
                     return result;
                 }
@@ -1595,13 +1595,13 @@ miniLOL = {
                 }));
             }
         }
+        else if (queries.module) {
+            result = miniLOL.module.execute(queries.module, queries, true);
+        }
         else if (queries.page) {
             var page = queries.page; delete queries.page;
             miniLOL.page.load(page, queries, url);
         } 
-        else if (queries.module) {
-            result = miniLOL.module.execute(queries.module, queries, true);
-        }
         else {
             result = miniLOL.go(miniLOL.config["core"].homePage);
         }

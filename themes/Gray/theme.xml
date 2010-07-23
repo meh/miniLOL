@@ -30,7 +30,7 @@
 
         miniLOL.theme.data.resize = function () {
             $('body').setStyle({
-                height: (document.viewport.getHeight()-(80+$('head').getHeight()+20))+"px"
+                height: (document.viewport.getHeight()-(60+$('head').getHeight()+20))+"px"
             });
         };
 

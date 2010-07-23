@@ -27,12 +27,10 @@ pre {
     text-shadow: 1px 3px 2px rgba(0, 0, 0, .3);
 }
 
-#body {
+#container {
     background: #f5f5f5;
-    width: 99%;
-    margin: 10px auto 0 auto;
-    padding: 10px;
-    overflow: auto;
+    width: 98%;
+    margin: -28px auto 0 auto;
 
     font-size: 12px;
 
@@ -45,6 +43,16 @@ pre {
     -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, .3);
     -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, .3);
     box-shadow: 0 1px 3px rgba(0, 0, 0, .3);
+
+    text-align: left;
+}
+
+#body {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    padding: 10px 10px;
+
+    overflow: auto;
 }
 
 #credits {
@@ -69,6 +77,16 @@ pre {
     -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, .3);
     -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, .3);
     box-shadow: 0 1px 3px rgba(0, 0, 0, .3);
+
+    max-height: 1px;
+
+    -webkit-transition: all 0.5s linear;
+}
+
+#credits:hover {
+    max-height: 9001px;
+
+    -webkit-transition: all 1s;
 }
 
 .box {
