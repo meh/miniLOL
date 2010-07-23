@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!DOCTYPE manifest [
+    <!ELEMENT manifest (module, version, license, description, author+, dependencies?, contents)>
+    <!ATTLIST manifest
+        version CDATA   #REQUIRED
+    >
+
+    <!ELEMENT module (#PCDATA)>
+
+    <!ELEMENT version (release, api, stability)>
+
+    <!ELEMENT stability (release, api)>
+
+    <!ELEMENT release (#PCDATA)>
+
+    <!ELEMENT api (#PCDATA)>
+
+    <!ELEMENT description (#PCDATA)>
+
+    <!ELEMENT author (name, email?, homepage?)>
+
+    <!ELEMENT name (#PCDATA)>
+    
+    <!ELEMENT email (#PCDATA)>
+    
+    <!ELEMENT hompeage (#PCDATA)>
+
+    <!ELEMENT dependencies (dependency*)>
+
+    <!ELEMENT dependency EMPTY>
+    <!ATTLIST dependency
+        module  CDATA   #REQUIRED
+        version CDATA   #REQUIRED
+    >
+
+    <!ELEMENT contents (directory*, file*)>
+    
+    <!ELEMENT directory (directory*, file*)>
+    <!ATTLIST directory
+        name    CDATA   #REQUIRED
+    >
+
+    <!ELEMENT file EMPTY>
+    <!ATTLIST file
+        name    CDATA   #REQUIRED
+        md5sum  CDATA   #REQUIRED
+    >
+]>
+
+<manifest version="1.0">
+    <module>Word Filter</module>
+
+    <version>
+        <release>0.1</release>
+        <api>0.1</api>
+
+        <stability>
+            <release>stable</release>
+            <api>stable</api>
+        </stability>
+    </version>
+
+    <license uri="http://sam.zoy.org/wtfpl/">Do What The Fuck You Want To Public License</license>
+
+    <description>Channish word filtering module.</description>
+
+    <author>
+        <name>meh.</name>
+        <email>meh.ffff@gmail.com</email>
+        <homepage>http://meh.doesntexist.org</homepage>
+    </author>
+
+    <contents> 
+        <file name="main.js" md5sum="82cc92da9c6c5f650c56ca6878352244"/>
+
+        <directory name="system">
+            <file name="Filters.js" md5sum="bc42ed2b125521122c952c9f68381139"/>
+        </directory>
+
+        <directory name="resources">
+            <file name="words.xml" md5sum="8ede04340528ad2106fc0051b058d13f"/>
+        </directory>
+    </contents>
+</module>

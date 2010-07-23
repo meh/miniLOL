@@ -28,6 +28,21 @@
     <initialize><![CDATA[
         $('title').update(miniLOL.config["core"].logo || miniLOL.config["core"].siteTitle)
 
+        miniLOL.theme.data.resize = function () {
+            $('body').setStyle({
+                height: (document.viewport.getHeight()-(80+$('head').getHeight()+20))+"px"
+            });
+        };
+
+        Event.observe(window, "resize", miniLOL.theme.data.resize);
+        Event.observe(document, ":module.load", miniLOL.theme.data.resize);
+
+        Event.observe(document, ":initialized", function () {
+            miniLOL.theme.data.resize.delay(0.1);
+        });
+
+        miniLOL.theme.data.resize.defer();
+
         miniLOL.theme.data.current = function (event) {
             var matches = event.memo.match(/(#[^&]*)/)
             var url;
@@ -75,10 +90,12 @@
         }
 
         Event.observe(document, ":go", miniLOL.theme.data.current);
-        Event.observe(document, ":initialized", miniLOL.theme.data.current);
     ]]></initialize>
 
     <finalize><![CDATA[
+        Event.stopObserving(window, "resize", miniLOL.theme.data.resize);
+        Event.stopObserving(document, ":module.load", miniLOL.theme.data.resize);
+
         Event.stopObserving(document, ":go", miniLOL.theme.data.current);
     ]]></finalize>
 

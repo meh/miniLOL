@@ -11,6 +11,8 @@
 *********************************************************************/
 
 miniLOL.module.create("Word Filter", {
+    version: "0.1",
+
     initialize: function () {
         this.filters = miniLOL.utils.require(this.root+"/system/Filters.js");
         this.filters.load(this.root+"/resources/words.xml");
@@ -18,11 +20,22 @@ miniLOL.module.create("Word Filter", {
         Event.observe(document, ":go", this.execute);
 
         Event.observe(document, ":refresh", function () {
-            miniLOL.module.get("Word Filter").filters.reload();
+            try {
+                miniLOL.module.get("Word Filter").filters.reload();
+            }
+            catch (e) {
+                console.log(e)
+            }
         });
     },
 
     execute: function () {
-        miniLOL.content.set(this.filters.apply(miniLOL.content.get()));
+        var filters = this.filters
+        
+        miniLOL.theme.content().getTextDescendants().each(function (text) {
+            text.nodeValue = filters.apply(text.nodeValue).replace(/</g, '\x01<\x01').replace(/>/g, '\x01>\x01')
+        });
+
+        miniLOL.theme.content().innerHTML = miniLOL.theme.content().innerHTML.replace(/\x01&lt;\x01/g, '<').replace(/\x01&gt;\x01/g, '>')
     }
 });

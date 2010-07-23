@@ -95,6 +95,16 @@ The example below should be self explanatory.
 
     <page id="separated" alias="#page=separated"/>
 
+    <page id="new">
+        <![CDATA[
+            The part below is fetched with an HTTP request.
+        ]]>
+
+        <include href="http://google.com"/>
+
+        <include href="data/time.php" update="true"/>
+    </page>
+
     <page id="stuff" type="simple">
         <![CDATA[
             NIGGER NIGGER NIGGER NIGGER NIGGER NIGGER

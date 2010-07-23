@@ -14,6 +14,7 @@
 
 var Filters = {};
 
+Filters._paths   = [];
 Filters._filters = [];
 
 Filters.Filter = Class.create({
@@ -49,7 +50,7 @@ Filters.Filter = Class.create({
 
 Filters.apply = function (text) {
     for (var i = 0; i < this._filters.length; i++) {
-        text = this._filters[i].apply(text);
+        text = Filters._filters[i].apply(text);
     }
 
     return text;
@@ -84,10 +85,12 @@ Filters.load = function (path) {
 }
 
 Filters.reload = function () {
-    this._filters = [];
+    Filters._filters = [];
+    paths            = Filters._paths;
+    Filters._paths   = [];
 
-    for (var i = 0; i < this._paths.length; i++) {
-        Filters.load(this._paths[i]);
+    for (var i = 0; i < paths.length; i++) {
+        Filters.load(paths[i]);
     }
 }
 
