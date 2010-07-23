@@ -1301,8 +1301,8 @@ miniLOL = {
                     }
                 });
 
-                return miniLOL.theme.template.list[listTemplate].global.interpolate(Object.extend(Object.fromAttributes(element.attributes), {
-                    attributes: String.fromAttributes(element.attributes),
+                return miniLOL.theme.template.list[listTemplate].global.interpolate(Object.extend(Object.fromAttributes(list.attributes), {
+                    attributes: String.fromAttributes(list.attributes),
                     data: output
                 }));
             },
