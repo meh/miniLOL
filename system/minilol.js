@@ -1599,13 +1599,13 @@ miniLOL = {
                 }));
             }
         }
-        else if (queries.module) {
-            result = miniLOL.module.execute(queries.module, queries, true);
-        }
         else if (queries.page) {
             var page = queries.page; delete queries.page;
             miniLOL.page.load(page, queries, url);
         } 
+        else if (queries.module) {
+            result = miniLOL.module.execute(queries.module, queries, true);
+        }
         else {
             result = miniLOL.go(miniLOL.config["core"].homePage);
         }

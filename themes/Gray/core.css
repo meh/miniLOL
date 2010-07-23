@@ -15,6 +15,10 @@ table td {
     line-height: 1em;
 }
 
+pre {
+    margin: 0;
+}
+
 #siteTitle {
     width: 100%;
     margin: 30px auto;
