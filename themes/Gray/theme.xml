@@ -26,7 +26,7 @@
     ]]></thanks>
 
     <initialize><![CDATA[
-        $('title').update(miniLOL.config["core"].logo || miniLOL.config["core"].siteTitle)
+        $('siteTitle').update(miniLOL.config["core"].logo || miniLOL.config["core"].siteTitle)
 
         miniLOL.theme.data.resize = function () {
             $('body').setStyle({
