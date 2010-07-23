@@ -1451,6 +1451,7 @@ miniLOL = {
             Event.fire(document, ":module.execute", { name: name, arguments: vars });
 
             var result;
+
             try {
                 result = miniLOL.module.get(name).execute.apply(miniLOL.module.get(name), vars);
             }
@@ -1472,6 +1473,10 @@ miniLOL = {
             }
 
             Event.fire(document, ":module.executed", { name: name, arguments: vars, result: result });
+
+            if (Object.isUndefined(result)) {
+                result = true;
+            }
 
             return result;
         },

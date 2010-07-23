@@ -11,11 +11,32 @@
 
 div.syntaxhighlighter {
     padding: 0 !important;
-    border: 3px solid #8b8b8b !important;
+
+    border: 1px solid #8b8b8b !important;
+
+    border-radius: 1.2em;
+    -webkit-border-radius: 1.2em;
+    -moz-border-radius: 1.2em;
+
+    -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, .3);
+    -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, .3);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .3);
 }
 
 .source div.syntaxhighlighter {
     border: 0 !important;
+}
+
+.lines .line:first-child .content {
+    border-top-right-radius: 1.2em;
+    -webkit-border-top-right-radius: 1.2em;
+    -moz-border-radius-topright: 1.2em;
+}
+
+.lines .line:last-child .content {
+    border-bottom-right-radius: 1.2em;
+    -webkit-border-bottom-right-radius: 1.2em;
+    -moz-border-radius-bottomright: 1.2em;
 }
 
 /* Highlighed line number */
