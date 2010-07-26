@@ -37,8 +37,8 @@ miniLOL = {
         miniLOL.resources   = {};
 
         [function () {
-            Event.observe(document, ":resource.loaded", function  (event) {
-                if (event.memo.name != ":miniLOL.config" || event.memo.arguments[0] != "resources/config.xml") {
+            Event.observe(document, ":resource.loaded", function (event) {
+                if (event.memo.resource.name != "miniLOL.config" || event.memo.arguments[0] != "resources/config.xml") {
                     return;
                 }
 
@@ -68,7 +68,7 @@ miniLOL = {
                 }
             });
 
-            miniLOL.resources.config = new miniLOL.Resource("miniLOL.config", {
+            miniLOL.resource.set(new miniLOL.Resource("miniLOL.config", {
                 initialize: function () {
                     miniLOL.config = this.data;
                 },
@@ -118,7 +118,7 @@ miniLOL = {
                                 return;
                             }
     
-                            if (text.nodeValue.match(/^[\s\n]*$/m)) {
+                            if (text.nodeValue.match(/^[\s\n]*$/)) {
                                 return;
                             }
                             
@@ -144,15 +144,15 @@ miniLOL = {
     
                     return result;
                 }
-            });
+            }));
 
-            miniLOL.resources.config.load("resources/config.xml");
+            miniLOL.resource.get("miniLOL.config").load("resources/config.xml");
 
             $(document.body).update(miniLOL.config["core"].loadingMessage);
         },
 
         function () {
-            miniLOL.resources.menus = new miniLOL.Resource("miniLOL.menus", {
+            miniLOL.resource.set(new miniLOL.Resource("miniLOL.menus", {
                 load: function (path) {
                     new Ajax.Request(path, {
                         method: "get",
@@ -199,13 +199,13 @@ miniLOL = {
                 clear: function () {
                     this.data = miniLOL.menus = {};
                 }
-            });
+            }));
 
-            miniLOL.resources.menus.load("resources/menus.xml");
+            miniLOL.resource.get("miniLOL.menus").load("resources/menus.xml");
         },
 
         function () {
-            miniLOL.resources.pages = new miniLOL.Resource("miniLOL.pages", {
+            miniLOL.resource.set(new miniLOL.Resource("miniLOL.pages", {
                 load: function (path) {
                     new Ajax.Request(path, {
                         method: "get",
@@ -244,15 +244,15 @@ miniLOL = {
                         cache: {}
                     };
                 }
-            });
+            }));
 
-            if (miniLOL.utils.fileExists("resources/pages.xml")) {
-                miniLOL.resources.pages.load("resources/pages.xml");
+            if (miniLOL.utils.exists("resources/pages.xml")) {
+                miniLOL.resource.get("miniLOL.pages").load("resources/pages.xml");
             }
         },
 
         function () {
-            miniLOL.resources.functions = new miniLOL.Resource("miniLOL.functions", {
+            miniLOL.resource.set(new miniLOL.Resource("miniLOL.functions", {
                 load: function (path) {
                     new Ajax.Request(path, {
                         method: "get",
@@ -297,9 +297,9 @@ miniLOL = {
                 clear: function () {
                     miniLOL.functions = this.data = {};
                 }
-            });
+            }));
 
-            miniLOL.resources.functions.load("resources/functions.xml");
+            miniLOL.resource.get("miniLOL.functions").load("resources/functions.xml");
         },
         
         function () {
@@ -321,7 +321,7 @@ miniLOL = {
         function () {
             miniLOL.content.set("Loading modules...");
 
-            miniLOL.resources.modules = new miniLOL.Resource("miniLOL.modules", {
+            miniLOL.resource.set(new miniLOL.Resource("miniLOL.modules", {
                 load: function (path, output) {
                     new Ajax.Request(path, {
                         method: "get",
@@ -370,9 +370,9 @@ miniLOL = {
                 clear: function () {
                     miniLOL.modules = this.data = {};
                 }
-            });
+            }));
 
-            miniLOL.resources.modules.load("resources/modules.xml", true);
+            miniLOL.resource.get("miniLOL.modules").load("resources/modules.xml", true);
         },
 
         function () {
@@ -417,7 +417,9 @@ miniLOL = {
             eval(miniLOL.config["core"].initialization);
         }
 
-        Event.observe(document, ":refresh", miniLOL.refresh);
+        Event.observe(document, ":refresh", function () {
+            miniLOL.resource.reload();
+        });
 
         new PeriodicalExecuter(function () {
             Event.fire(document, ":refresh");
@@ -459,11 +461,38 @@ miniLOL = {
         }
     },
 
+    resource: {
+        set: function (name, resource) {
+            if (Object.isString(name)) {
+                miniLOL.resources[name] = resource;
+            }
+            else {
+                miniLOL.resources[name.name] = name;
+            }
+        },
+
+        get: function (name) {
+            return miniLOL.resources[name];
+        },
+
+        reload: function (what) {
+            if (Object.isArray(what)) {
+                what.each(function (name) {
+                    miniLOL.resource.get(name).reload();
+                })
+            }
+            else if (Object.isString(what)) {
+                miniLOL.resource.get(name).reload();
+            }
+            else {
+                for (var resource in miniLOL.resources) {
+                    resource.reload()
+                }
+            }
+        }
+    },
+
     refresh: function () {
-        miniLOL.resources.config.reload();
-        miniLOL.resources.menus.reload();
-        miniLOL.resources.pages.reload();
-        miniLOL.resources.functions.reload();
     },
 
     theme: {
@@ -625,13 +654,13 @@ miniLOL = {
             Event.fire(document, ":theme.load", { name: name, runtime: Boolean(runtime) });
 
             var error;
-            // Get the informations about the theme and parse the needed data
+            // Get the information about the theme and parse the needed data
             new Ajax.Request("#{path}/theme.xml".interpolate({ path: path, theme: name }), {
                 method: "get",
                 asynchronous: false,
                 
                 onSuccess: function (http) {
-                    var info = miniLOL.theme.informations = {};
+                    var info = miniLOL.theme.information = {};
                     var doc  = miniLOL.utils.fixDOM(http.responseXML);
 
                     info.name     = doc.documentElement.getAttribute("name")     || "Unknown";
@@ -719,7 +748,7 @@ miniLOL = {
                 },
 
                 onFailure: function () {
-                    error = "Could not load theme's informations.";
+                    error = "Could not load theme's information.";
                 }
             });
 
@@ -747,9 +776,9 @@ miniLOL = {
                 return false;
             }
 
-            miniLOL.theme.informations.styles.each(function (style) {
+            miniLOL.theme.information.styles.each(function (style) {
                 if (!miniLOL.theme.style.load(style, false, true)) {
-                    miniLOL.error("Couldn't load `#{style}` style.".interpolate({
+                    miniLOL.error("Couldn't load `#{style}` style/".interpolate({
                         style: style
                     }));
 
@@ -770,7 +799,7 @@ miniLOL = {
 
             // Sadly this has some problems.
             // I didn't find a way to know if the CSSs have already been applied and the initialize
-            // may get wrong informations from stuff that uses sizes set by the CSS.
+            // may get wrong information from stuff that uses sizes set by the CSS.
             //
             // So it's the designer's work to hack that shit and get it working, you can see an example
             // in the original theme initialize.
@@ -801,7 +830,7 @@ miniLOL = {
 
             delete miniLOL.theme.data;
 
-            $A(miniLOL.theme.informations.styles).each(function (style) {
+            $A(miniLOL.theme.information.styles).each(function (style) {
                 miniLOL.theme.style.unload(style);
             });
 
@@ -810,7 +839,7 @@ miniLOL = {
             delete miniLOL.theme.initialize;
             delete miniLOL.theme.finalize;
 
-            delete miniLOL.theme.informations;
+            delete miniLOL.theme.information;
         },
 
         content: function () {
@@ -995,12 +1024,12 @@ miniLOL = {
             item: function (element, template, layer) {
                 item = element.cloneNode(true);
 
-                var itemClass = item.getAttribute("class") || ''; item.removeAttribute("class");
-                var itemId    = item.getAttribute("id") || ''; item.removeAttribute("id");
+                var itemClass = item.getAttribute("class") || ""; item.removeAttribute("class");
+                var itemId    = item.getAttribute("id") || ""; item.removeAttribute("id");
                 var itemSrc   = item.getAttribute("src")
                              || item.getAttribute("href")
                              || item.getAttribute("url")
-                             || '';
+                             || "";
                 
                 item.removeAttribute("src");
                 item.removeAttribute("href");
@@ -1695,8 +1724,8 @@ miniLOL = {
 
                     case Node.CDATA_SECTION_NODE:
                     case Node.TEXT_NODE:
-                    if (!element.nodeValue.match(/^[\s\n]*$/m)) {
-                        result = element.nodeValue;
+                    if (!element.nodeValue.match(/^[\s\n]*$/)) {
+                        result = element.nodeValue.strip();
                         throw $break;
                     }
                     break;
@@ -1706,7 +1735,7 @@ miniLOL = {
             return result;
         },
 
-        fileExists: function (path) {
+        exists: function (path) {
             var result = false;
 
             new Ajax.Request(path, {
@@ -1722,7 +1751,7 @@ miniLOL = {
         },
 
         includeCSS: function (path) {
-            var style = miniLOL.utils.fileExists(path);
+            var style = miniLOL.utils.exists(path);
 
             if (style) {
                 style = new Element("link", {
@@ -1791,127 +1820,5 @@ miniLOL = {
     }
 }
 
-miniLOL.Resource = Class.create({
-    initialize: function (name, wrapper) {
-        if (!wrapper) {
-            throw new Error("No wrapper has been passed.");
-        }
-
-        this.name    = name;
-        this.wrapper = wrapper;
-
-        if (!this.wrapper.clear) {
-            this.wrapper.clear = function () {
-                this.data = {};
-            }
-        }
-
-        for (var func in this.wrapper) {
-            if (Object.isFunction(this.wrapper[func])) {
-                if (this.wrapper[func].parent == this.wrapper) {
-                    break;
-                }
-
-                this.wrapper[func]        = this.wrapper[func].bind(this.wrapper)
-                this.wrapper[func].parent = this.wrapper;
-            }
-        }
-
-        this.clear();
-        this.flush();
-
-        if (this.wrapper.initialize) {
-            this.wrapper.initialize();
-        }
-    },
-
-    load: function () {
-        var result;
-        var args = $A(arguments);
-
-        Event.fire(document, ":resource.load", { resource: this, arguments: args });
-
-        this.calls.push(args);
-
-        try {
-            result = this.wrapper.load.apply(this.wrapper, args);
-        }
-        catch (e) {
-            miniLOL.error("Error while loading `#{name}` resource.\n#{error}".interpolate({
-                name: this.name,
-                error: e.toString()
-            }));
-
-            return false;
-        }
-
-        Event.fire(document, ":resource.loaded", { resource: this, arguments: args });
-
-        return result;
-    },
-
-    reload: function () {
-        Event.fire(document, ":resource.reload", { resource: this });
-
-        this.wrapper.clear();
-
-        var calls = this.flush();
-
-        calls.each(function (call) {
-            this.load.apply(this, call);
-        }, this);
-
-        Event.fire(document, ":resource.reloaded", { resource: this });
-    },
-
-    clear: function () {
-        Event.fire(document, ":resource.clear", { resource: this });
-        this.wrapper.clear();
-    },
-
-    flush: function (call) {
-        Event.fire(document, ":resource.flush", { resource: this, call: call });
-
-        var result;
-
-        if (Object.isArray(call)) {
-            result = this.calls.find(function (current) {
-                if (current.length != call.length) {
-                    return false;
-                }
-
-                var equal = false;
-
-                for (var i = 0; i < current.length; i++) {
-                    if (call[i] == current[i]) {
-                        equal = true;
-                    }
-
-                    if (!equal) {
-                        break;
-                    }
-                }
-
-                return equal;
-            });
-
-            if (result) {
-                this.calls = this.calls.filter(function (current) {
-                    return current != result;
-                });
-            }
-        }
-        else {
-            result     = this.calls;
-            this.calls = [];
-        }
-
-        return result;
-    },
-
-    data: function () {
-        return this.wrapper.data;
-    }
-});
-
+miniLOL.utils.require("system/Resource.js");
 miniLOL.utils.require("system/preparation.js");

@@ -78,4 +78,4 @@ else if (Prototype.Browser.Chrome || Prototype.Browser.Safari) {
     }
 }
 
-miniLOL.utils.require("system/extension.js");
+miniLOL.utils.require("system/extensions.js");
