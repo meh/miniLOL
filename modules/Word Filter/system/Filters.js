@@ -14,33 +14,33 @@
 
 var Filters = {};
 
-Filters._paths   = [];
-Filters._filters = [];
+Filters.paths   = [];
+Filters.filters = [];
 
 Filters.Filter = Class.create({
     initialize: function (node, censor) {
-        this._type = node.getAttribute("type") || "censor";
+        this.type = node.getAttribute("type") || "censor";
 
         if (node.getAttribute("regexp")) {
-            this._regexp = eval(node.getAttribute("regexp"));
+            this.regexp = eval(node.getAttribute("regexp"));
         }
         else if (node.getAttribute("raw")) {
-            this._regexp = new RegExp(node.getAttribute("raw"), "gi");
+            this.regexp = new RegExp(node.getAttribute("raw"), "gi");
         }
 
-        if (this._type == "censor") {
-            this._to = censor || "@#!%$";
+        if (this.type == "censor") {
+            this.to = censor || "@#!%$";
         }
-        else if (this._type == "replace") {
-            this._to = node.getAttribute("to") || "$1";
+        else if (this.type == "replace") {
+            this.to = node.getAttribute("to") || "$1";
         }
         else {
-            this._to = "$1";
+            this.to = "$1";
         }
     },
 
     apply: function (text) {
-        return text.replace(this._regexp, this._to);
+        return text.replace(this.regexp, this.to);
     },
 
     toString: function () {
@@ -49,9 +49,9 @@ Filters.Filter = Class.create({
 });
 
 Filters.apply = function (text) {
-    for (var i = 0; i < this._filters.length; i++) {
-        text = Filters._filters[i].apply(text);
-    }
+    this.filters.each(function (filter) {
+        text = filter.apply(text);
+    });
 
     return text;
 }
@@ -64,34 +64,34 @@ Filters.load = function (path) {
         onSuccess: function (http) {
             var error = miniLOL.utils.checkXML(http.responseXML);
             if (error) {
-                miniLOL.error("Error while parsing `#{filter}`<br/><br/>#{error}".interpolate({
-                    filter: filters[i],
-                    error: error.replace(/\n/g, "<br/>").replace(/ /g, "&nbsp;")
+                miniLOL.error("Error while parsing `#{filter}`\n\n#{error}".interpolate({
+                    filter: path,
+                    error: error
                 }));
 
                 return;
             }
 
-            var dom     = miniLOL.utils.fixDOM(http.responseXML);
-            var filters = dom.getElementsByTagName("filter");
+            var dom = miniLOL.utils.fixDOM(http.responseXML);
             
-            for (var i = 0; i < filters.length; i++) {
-                Filters._filters.push(new Filters.Filter(filters[i], dom.documentElement.getAttribute("censor")));
-            }
+            $A(dom.getElementsByTagName("filter")).each(function (filter) {
+                Filters.filters.push(new Filters.Filter(filter, dom.documentElement.getAttribute("censor")));
+            });
 
-            Filters._paths.push(path);
+            Filters.paths.push(path);
         }
     });
 }
 
 Filters.reload = function () {
-    Filters._filters = [];
-    paths            = Filters._paths;
-    Filters._paths   = [];
+    var paths = Filters.paths;
 
-    for (var i = 0; i < paths.length; i++) {
-        Filters.load(paths[i]);
-    }
+    Filters.filters = [];
+    Filters.paths   = [];
+
+    paths.each(function (path) {
+        Filters.load(path);
+    });
 }
 
 return Filters;

@@ -89,13 +89,19 @@
             }
         }
 
-        miniLOL.theme.data.current.change = function () {
+        miniLOL.theme.data.current.change = function (event) {
+            if (event.name == ":theme.loaded" && event.memo.runtime) {
+                return;
+            }
+
             miniLOL.theme.data.current({ memo: location.href });
         }
 
         Event.observe(document, ":go", miniLOL.theme.data.current);
+
         Event.observe(document, ":menu.change", miniLOL.theme.data.current.change);
         Event.observe(document, ":theme.loaded", miniLOL.theme.data.current.change);
+        Event.observe(document, ":initialized", miniLOL.theme.data.current.change);
     ]]></initialize>
 
     <finalize><![CDATA[
