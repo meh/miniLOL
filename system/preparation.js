@@ -19,10 +19,6 @@
 
 unFocus.History.addEventListener("historyChange", function (query) {
     if (query) {
-        if (query.charAt(0) != '#') {
-            query = '#' + query;
-        }
-
         miniLOL.go(query);
     }
     else {

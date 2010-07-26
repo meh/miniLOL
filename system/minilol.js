@@ -38,7 +38,7 @@ miniLOL = {
 
         [function () {
             Event.observe(document, ":resource.loaded", function  (event) {
-                if (event.memo.name != "miniLOL.config" || event.memo.arguments[0] != "resources/config.xml") {
+                if (event.memo.name != ":miniLOL.config" || event.memo.arguments[0] != "resources/config.xml") {
                     return;
                 }
 
@@ -59,7 +59,7 @@ miniLOL = {
                 }
                 else {
                     if (miniLOL.config["core"].homePage.charAt(0) != '#' && !miniLOL.config["core"].homePage.isURL()) {
-                        miniLOL.config["core"].homePage = '#'+miniLOL.config["core"].homePage;
+                        miniLOL.config["core"].homePage = '#' + miniLOL.config["core"].homePage;
                     }
                 }
                  
@@ -383,6 +383,7 @@ miniLOL = {
         
         function () {
             miniLOL.content.set("Checking dependencies...");
+
             try {
                 miniLOL.module.dependencies.check();
             }
@@ -1564,10 +1565,14 @@ miniLOL = {
         }
     },
 
-    go: function (url) {
+    go: function (url, again) {
         if (!url.startsWith(miniLOL.path) && url.isURL()) {
             location.href = url;
             return true;
+        }
+
+        if (url.charAt(0) != '#') {
+            url = '#' + url;
         }
 
         var queries = url.parseQuery();
@@ -1579,16 +1584,21 @@ miniLOL = {
         }
 
         if (matches) {
-            queries.page = matches[2] || matches[1];
+            queries.page = matches[2] || matches[3];
 
-            if (queries.page && queries.page != '&') {
+            if (queries.page) {
                 result = miniLOL.page.get(queries.page, queries, url);
             }
             else {
-                result = miniLOL.go("#{page}&#{queries}".interpolate({
-                    page:    miniLOL.config["core"].homePage,
-                    queries: Object.toQuery(queries)
-                }));
+                if (again) {
+                    return false;
+                }
+                else {
+                    result = miniLOL.go("#{page}&#{queries}".interpolate({
+                        page:    miniLOL.config["core"].homePage,
+                        queries: Object.toQuery(queries)
+                    }), true);
+                }
             }
         }
         else if (queries.module) {
