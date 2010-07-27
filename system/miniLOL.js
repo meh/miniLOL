@@ -1766,25 +1766,7 @@ miniLOL = {
             return style;
         },
 
-        include: function (path) {
-            var result = null;
-            
-            new Ajax.Request(path, {
-                method: "get",
-                asynchronous: false,
-                evalJS: false,
-                
-                onSuccess: function (http) {
-                    try {
-                        result = window.eval(http.responseText);
-                    } catch (e) { }
-                }
-            });
-            
-            return result;
-        },
-
-        require: function (path) {
+        execute: function (path) {
             var result;
             var error;
             
@@ -1805,7 +1787,12 @@ miniLOL = {
                 },
                 
                 onFailure: function (http) {
-                    error            = new Error("Failed to retrieve the file (#{status} - #{statusText}).".interpolate(http));
+                    error = new Error("Failed to retrieve `#{file}` (#{status} - #{statusText}).".interpolate({
+                        file:       path,
+                        status:     http.status,
+                        statusText: http.statusText
+                    }));
+
                     error.fileName   = path;
                     error.lineNumber = 0;
                 }
@@ -1816,6 +1803,69 @@ miniLOL = {
             }
             
             return result;
+        },
+
+        include: function (path) {
+            var result = false;
+            
+            new Ajax.Request(path, {
+                method: "get",
+                asynchronous: false,
+                evalJS: false,
+                
+                onSuccess: function (http) {
+                    try {
+                        window.eval(http.responseText);
+                        result = true;
+                    } catch (e) {
+                        result = false;
+                    }
+                }
+            });
+            
+            return result;
+        },
+
+        require: function (path) {
+            var error = false;
+            
+            new Ajax.Request(path, {
+                method: "get",
+                asynchronous: false,
+                evalJS: false,
+                
+                onSuccess: function (http) {
+                    try {
+                        window.eval(http.responseText);
+                    } catch (e) {
+                        error             = e;
+                        error.fileName    = path;
+                        error.lineNumber -= 5;
+                    }
+                },
+
+                onFailure: function (http) {
+                    error = new Error("Failed to retrieve `#{file}` (#{status} - #{statusText}).".interpolate({
+                        file:       path,
+                        status:     http.status,
+                        statusText: http.statusText
+                    }));
+
+                    error.fileName   = path;
+                    error.lineNumber = 0;
+
+                    error.http = {
+                        status: http.status,
+                        text:   http.statusText
+                    }
+                }
+            });
+
+            if (error) {
+                throw error;
+            }
+
+            return true;
         }
     }
 }
