@@ -24,8 +24,6 @@ unFocus.History.addEventListener("historyChange", function (query) {
     else {
         miniLOL.go(miniLOL.config["core"].homePage);
     }
-    
-    miniLOL.theme.content().scrollTop = 0;
 });
 
 /* Cross-Browser faggotree */

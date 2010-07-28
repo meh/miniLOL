@@ -411,6 +411,10 @@ miniLOL = {
             return false;
         }
 
+        Event.observe(document, ":go", function () {
+            miniLOL.theme.content().scrollTo();
+        });
+
         miniLOL.go(/[#?]./.test(location.href) ? location.href.replace(/^.*[#?]/, '#') : miniLOL.config["core"].homePage);
 
         if (miniLOL.config["core"].initialization) {
