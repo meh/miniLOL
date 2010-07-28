@@ -14,7 +14,7 @@ miniLOL.module.create("Word Filter", {
     version: "0.1",
 
     initialize: function () {
-        this.filters = miniLOL.utils.require(this.root+"/system/Filters.js");
+        this.filters = miniLOL.utils.execute(this.root+"/system/Filters.js");
         this.filters.load(this.root+"/resources/words.xml");
 
         Event.observe(document, ":go", this.execute);
