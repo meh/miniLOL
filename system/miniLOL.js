@@ -1595,13 +1595,15 @@ miniLOL = {
     },
 
     go: function (url, again) {
-        if (!url.startsWith(miniLOL.path) && url.isURL()) {
-            location.href = url;
-            return true;
+        if (url.isURL()) {
+            if (!url.startsWith(miniLOL.path)) {
+                location.href = url;
+            }
         }
-
-        if (url.charAt(0) != '#') {
-            url = '#' + url;
+        else {
+            if (url.charAt(0) != '#') {
+                url = '#' + url;
+            }
         }
 
         var queries = url.parseQuery();
@@ -1618,16 +1620,11 @@ miniLOL = {
             if (queries.page) {
                 result = miniLOL.page.get(queries.page, queries, url);
             }
-            else {
-                if (again) {
-                    return false;
-                }
-                else {
-                    result = miniLOL.go("#{page}&#{queries}".interpolate({
-                        page:    miniLOL.config["core"].homePage,
-                        queries: Object.toQuery(queries)
-                    }), true);
-                }
+            else if (!again) {
+                result = miniLOL.go("#{page}&#{queries}".interpolate({
+                    page:    miniLOL.config["core"].homePage,
+                    queries: Object.toQuery(queries)
+                }), true);
             }
         }
         else if (queries.module) {
