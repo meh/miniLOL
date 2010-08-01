@@ -266,7 +266,7 @@ miniLOL = {
                             $A(http.responseXML.documentElement.getElementsByTagName("function")).each(function (func) {
                                 try {
                                     miniLOL.functions[func.getAttribute("name")]
-                                        = new Function("var text = arguments[0]; var args = arguments[1]; #{code}; return text;".interpolate({
+                                        = new Function("var text = arguments[0]; var args = arguments[1]; arguments = args; #{code}; return text;".interpolate({
                                             code: func.firstChild.nodeValue
                                         }));
                                 }
@@ -303,6 +303,10 @@ miniLOL = {
         },
         
         function () {
+            $$("link").each(function (css) {
+                miniLOL.theme.style.list[css.getAttribute("href")] = css;
+            });
+
             if (miniLOL.config["core"].theme) {
                 miniLOL.error(!miniLOL.theme.load(miniLOL.config["core"].theme));
                 miniLOL.theme.template.menu();
@@ -1752,9 +1756,17 @@ miniLOL = {
         },
 
         includeCSS: function (path) {
-            var style = miniLOL.utils.exists(path);
+            var style;
 
-            if (style) {
+            if (style = miniLOL.theme.style.list[path]) {
+                return style;
+            }
+            else if (style = $$("link").find(function (css) { css.getAttribute("href") == path })) {
+                miniLOL.theme.style.list[path] = style;
+
+                return style;
+            }
+            else if (style = miniLOL.utils.exists(path)) {
                 style = new Element("link", {
                     rel: "stylesheet",
                     href: path,
@@ -1762,9 +1774,12 @@ miniLOL = {
                 });
 
                 $$("head")[0].insert(style);
-            }
 
-            return style;
+                return style;
+            }
+            else {
+                return false;
+            }
         },
 
         execute: function (path) {
