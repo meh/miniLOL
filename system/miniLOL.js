@@ -1110,7 +1110,7 @@ miniLOL = {
                     queries.title = encodeURIComponent(page.getAttribute("title"));
                 }
 
-                var queries = Object.toQuery(queries);
+                var queries = Object.toQueryString(queries);
                 if (queries) {
                     queries = '&'+queries;
                 }
@@ -1152,7 +1152,7 @@ miniLOL = {
 
             var pageArguments = page.getAttribute("arguments");
             if (pageArguments) {
-                pageArguments = pageArguments.replace(/[ ,]+/g, "&amp;").parseQuery();
+                pageArguments = pageArguments.replace(/[ ,]+/g, "&amp;").toQueryParams();
 
                 for (var key in pageArguments) {
                     if (queries[key] == null) {
@@ -1382,7 +1382,7 @@ miniLOL = {
                 ).interpolate(data);
             }
 
-            new Ajax.Request("data/#{path}?#{queries}".interpolate({ path: path, queries: Object.toQuery(queries) }), {
+            new Ajax.Request("data/#{path}?#{queries}".interpolate({ path: path, queries: Object.toQueryString(queries) }), {
                 method: "get",
         
                 onSuccess: function (http) {
@@ -1614,7 +1614,7 @@ miniLOL = {
             }
         }
 
-        var queries = url.parseQuery();
+        var queries = url.toQueryParams();
         var matches = /#(([^=&]*)&|([^=&]*)$)/.exec(url); // hate WebKit so much.
         var result  = false;
 
@@ -1631,7 +1631,7 @@ miniLOL = {
             else if (!again) {
                 result = miniLOL.go("#{page}&#{queries}".interpolate({
                     page:    miniLOL.config["core"].homePage,
-                    queries: Object.toQuery(queries)
+                    queries: Object.toQueryString(queries)
                 }), true);
             }
         }
@@ -1761,7 +1761,7 @@ miniLOL = {
             if (style = miniLOL.theme.style.list[path]) {
                 return style;
             }
-            else if (style = $$("link").find(function (css) { css.getAttribute("href") == path })) {
+            else if (style = $$("link").find(function (css) { return css.getAttribute("href") == path })) {
                 miniLOL.theme.style.list[path] = style;
 
                 return style;

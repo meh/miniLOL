@@ -44,7 +44,7 @@ Object.extend(Object, {
         return result;
     },
 
-    toQuery: function (query) {
+    toQueryString: function (query) {
         var result = '';
     
         for (var name in query) {
@@ -74,7 +74,7 @@ Object.extend(String, {
 })
 
 Object.extend(String.prototype, {
-    parseQuery: function () {
+    toQueryParams: function () {
         var result  = {};
         var matches = this.match(/[?#](.*)$/);
         
