@@ -92,7 +92,7 @@ miniLOL = {
                         }.bind(this),
         
                         onFailure: function (http) {
-                            miniLOL.error("Error while loading config.xml (#{status} - #{statusText})".interpolate(http));
+                            miniLOL.error("Error while loading config.xml (#{status} - #{statusText})".interpolate(http), true);
                         }
                     });
     
@@ -183,7 +183,7 @@ miniLOL = {
                             });
     
                             if (!miniLOL.menus["default"]) {
-                                miniLOL.error("Error while analyzing menus.xml\n\nNo default menu was found.");
+                                miniLOL.error("Error while analyzing menus.xml\n\nNo default menu was found.", true);
                                 return;
                             }
                         }
@@ -227,7 +227,7 @@ miniLOL = {
                         },
         
                         onFailure: function (http) {
-                            miniLOL.error("Error while loading pages.xml (#{status} - #{statusText})".interpolate(http))
+                            miniLOL.error("Error while loading pages.xml (#{status} - #{statusText})".interpolate(http), true)
                         }
                     });
     
@@ -275,7 +275,7 @@ miniLOL = {
                                         name:  func.getAttribute("name"),
                                         path:  path,
                                         error: e.toString()
-                                    }));
+                                    }), true);
     
                                     return;
                                 }
@@ -283,7 +283,7 @@ miniLOL = {
                         },
             
                         onFailure: function (http) {
-                            miniLOL.error("Error while loading functions.xml (#{status} - #{statusText}})".interpolate(http));
+                            miniLOL.error("Error while loading functions.xml (#{status} - #{statusText}})".interpolate(http), true);
                         }
                     });
     
@@ -338,7 +338,9 @@ miniLOL = {
     
                             miniLOL.module.path = http.responseXML.documentElement.getAttribute("path") || 'modules';
     
-                            var modules = http.responseXML.documentElement.getElementsByTagName("module");
+                            var modules = $A(http.responseXML.documentElement.getElementsByTagName("module")).filter(function (module) {
+                                return module.getAttribute("name");
+                            });
 
                             for (var i = 0, length = modules.length; i < length; i++) {
                                 if (output) {
@@ -360,7 +362,7 @@ miniLOL = {
                         },
             
                         onFailure: function (http) {
-                            miniLOL.error("Error while loading modules.xml (#{status} - #{statusText})".interpolate(http));
+                            miniLOL.error("Error while loading modules.xml (#{status} - #{statusText})".interpolate(http), true);
                         }
                     });
     
@@ -392,14 +394,14 @@ miniLOL = {
                 miniLOL.module.dependencies.check();
             }
             catch (e) {
-                miniLOL.error("`#{module}` requires `#{require}`".interpolate(e));
+                miniLOL.error("`#{module}` requires `#{require}`".interpolate(e), true);
             }
         }].each(function (callback) {
             try {
                 callback();
             }
             catch (e) {
-                miniLOL.error(e.toString());
+                miniLOL.error(e.toString(), true);
             }
 
             if (miniLOL.error()) {
@@ -409,7 +411,7 @@ miniLOL = {
 
         if (miniLOL.error()) {
             if (!document.body.innerHTML) {
-               miniLOL.error("Something went wrong, but nobody told me what :(");
+               miniLOL.error("Something went wrong, but nobody told me what :(", true);
             }
 
             return false;
@@ -439,7 +441,7 @@ miniLOL = {
         miniLOL.initialized = true;
     },
 
-    error: function (text, minor, element) {
+    error: function (text, major, element) {
         if (Object.isUndefined(text)) {
             return Boolean(miniLOL.error.value);
         }
@@ -452,7 +454,7 @@ miniLOL = {
 
         $(element).update("<pre>" + text.replace(/<br\/>/g, '\n').escapeHTML() + "</pre>");
 
-        if (!minor) {
+        if (major) {
             miniLOL.error.value = true;
         }
 
@@ -761,7 +763,7 @@ miniLOL = {
             });
 
             if (error) {
-                miniLOL.error(error);
+                miniLOL.error(error, true);
                 return false;
             }
 
@@ -780,7 +782,7 @@ miniLOL = {
             });
 
             if (error) {
-                miniLOL.error(error);
+                miniLOL.error(error, true);
                 return false;
             }
 
@@ -788,7 +790,7 @@ miniLOL = {
                 if (!miniLOL.theme.style.load(style, false, true)) {
                     miniLOL.error("Couldn't load `#{style}` style/".interpolate({
                         style: style
-                    }));
+                    }), true);
 
                     throw $break;
                 }
@@ -926,7 +928,7 @@ miniLOL = {
                     name: name
                 });
                 
-                miniLOL.error(error);
+                miniLOL.error(error, true);
                 return error;
             }
 
@@ -1410,7 +1412,7 @@ miniLOL = {
     module: {
         create: function (name, obj) {
             if (!obj) {
-                miniLOL.error("Like, do I know how this module is done?");
+                miniLOL.error("Like, do I know how this module is done?", true);
                 return false;
             }
 
@@ -1514,7 +1516,7 @@ miniLOL = {
                     file:  e.fileName,
                     line:  e.lineNumber,
                     error: e.toString()
-                }));
+                }), true);
 
                 return false;
             }
@@ -1558,7 +1560,7 @@ miniLOL = {
                     file:  e.fileName,
                     line:  e.lineNumber,
                     error: e.toString()
-                }));
+                }), true);
 
                 return false;
             }
@@ -1710,7 +1712,7 @@ miniLOL = {
                 miniLOL.error("Error while parsing #{path}\n\n#{error}".interpolate({
                     path:  path,
                     error: error
-                }));
+                }), true);
 
                 return error;
             }
