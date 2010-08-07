@@ -78,6 +78,8 @@ The example below should be self explanatory.
         ]]>
         <list template="table" before="- " style="margin-left: 10px">
             <link href="#stuff"                     text="Stuff"     after="~ Internal link"/>
+            <link href="#markdown"                  text="Markdown"  after="~ Markdown page"/>
+            <link href="#markdown"                  text="Markdown"  after="~ Markdown source page" type="raw"/>
             <link href="separated"                  text="Separated" after="~ Internal link but in data/" type="raw"/>
             <link href="#separated"                 text="Separated" after="~ Separated alias'd"/>
             <link href="http://meh.doesntexist.org" text="meh."      after="~ External link"/>
@@ -104,6 +106,17 @@ The example below should be self explanatory.
 
         <include href="data/time.php" update="true"/>
     </page>
+
+    <page id="markdown" type="markdown"><![CDATA[
+Markdown
+===
+This is a [markdown](http://daringfireball.net/projects/markdown/) page, pretty cool eh? :D
+
+
+Have fun
+---
+With miniLOL
+    ]]></page>
 
     <page id="stuff" type="simple">
         <![CDATA[
