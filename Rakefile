@@ -4,6 +4,20 @@ require 'rake/clean'
 # You need this: http://code.google.com/closure/compiler/
 COMPILER = 'closure' # or java -jar compiler.jar
 
+def minify (file, out=nil)
+    if !File.exists?(file)
+        return
+    end
+
+    if !out
+        out = file.clone; out[out.length - 3, 3] = '.min.js'
+    end
+
+    if !File.exists?(out) || File.mtime(file) > File.mtime(out)
+        sh "#{COMPILER} --js '#{file}' --js_output_file '#{out}'"
+    end
+end
+
 task :default do
     minified = File.new(`mktemp -u`.strip, 'w')
 
@@ -18,7 +32,7 @@ task :default do
     minified.write(whole.join(''))
     minified.close
 
-    sh "#{COMPILER} --js '#{minified.path}' --js_output_file 'system/miniLOL.min.js'"
-    sh "#{COMPILER} --js 'system/prototype.js' --js_output_file 'system/prototype.min.js'"
-    sh "#{COMPILER} --js 'system/cookiejar.js' --js_output_file 'system/cookiejar.min.js'"
+    minify(minified.path, 'system/miniLOL.min.js')
+    minify('system/prototype.js')
+    minify('system/cookiejar.js')
 end

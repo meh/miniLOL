@@ -1534,10 +1534,23 @@ miniLOL = {
             Event.fire(document, ":module.load", name);
 
             try {
-                miniLOL.utils.require("#{path}/#{module}/main.js".interpolate({
-                    path: miniLOL.module.path,
-                    module: name
-                }));
+                try {
+                    miniLOL.utils.require("#{path}/#{module}/main.min.js".interpolate({
+                        path: miniLOL.module.path,
+                        module: name
+                    }));
+                }
+                catch (e) {
+                    if (e.status || e.statusText) {
+                        miniLOL.utils.require("#{path}/#{module}/main.js".interpolate({
+                            path: miniLOL.module.path,
+                            module: name
+                        }));               
+                    }
+                    else {
+                        throw e;
+                    }
+                }
 
                 if (miniLOL.error()) {
                     return false;
