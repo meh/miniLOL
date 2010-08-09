@@ -171,7 +171,7 @@ miniLOL = {
                                 if (menu.nodeType != Node.ELEMENT_NODE) {
                                     return;
                                 }
-    
+                                
                                 var id = menu.getAttribute("id");
     
                                 if (!id && !miniLOL.menus["default"]) {
@@ -216,9 +216,7 @@ miniLOL = {
                                 return;
                             }
     
-                            var dom = miniLOL.utils.fixDOM(http.responseXML);
-    
-                            $A(http.responseXML.documentElement.getElementsByTagName("page")).each(function (page) {
+                            miniLOL.utils.fixDOM(http.responseXML).xpath('//page').each(function (page) {
                                 var id = page.getAttribute("id");
 
                                 delete miniLOL.pages.cache[id];
@@ -263,7 +261,7 @@ miniLOL = {
                                 return;
                             }
     
-                            $A(http.responseXML.documentElement.getElementsByTagName("function")).each(function (func) {
+                            miniLOL.utils.fixDOM(http.responseXML).xpath('//function').each(function (func) {
                                 try {
                                     miniLOL.functions[func.getAttribute("name")]
                                         = new Function("var text = arguments[0]; var args = arguments[1]; arguments = args; #{code}; return text;".interpolate({
@@ -338,7 +336,7 @@ miniLOL = {
     
                             miniLOL.module.path = http.responseXML.documentElement.getAttribute("path") || 'modules';
     
-                            var modules = $A(http.responseXML.documentElement.getElementsByTagName("module")).filter(function (module) {
+                            var modules = miniLOL.utils.fixDOM(http.responseXML).xpath("//module").filter(function (module) {
                                 return module.getAttribute("name");
                             });
 
@@ -712,31 +710,19 @@ miniLOL = {
 
                     info.styles = [];
 
-                    $A(doc.getElementsByTagName("style")).each(function (style) {
+                    doc.xpath("/theme/styles/style").each(function (style) {
                         info.styles.push(style.getAttribute("name"));
                     });
 
-                    var templates = doc.getElementsByTagName("templates");
+                    doc.xpath("/theme/templates/*").each(function (node) {
+                        var name = node.nodeName;
 
-                    if (templates) {
-                        $A(templates[0].childNodes).each(function (node) {
-                            if (node.nodeName != Node.ELEMENT_NODE) {
-                                return;
-                            }
+                        miniLOL.theme.template[name] = {};
 
-                            var name = node.nodeName;
-
-                            miniLOL.theme.template[name] = {};
-
-                            $A(node.childNodes).each(function (node) {
-                                if (node.nodeName != Node.ELEMENT_NODE) {
-                                    return;
-                                }
-
-                                miniLOL.theme.template[name][node.nodeName] = node.firstChild.nodeValue;
-                            }, this);
+                        $A(node.getElementsByTagName("*")).each(function (node) {
+                            miniLOL.theme.template[name][node.nodeName] = node.firstChild.nodeValue;
                         }, this);
-                    }
+                    }, this);
                 },
 
                 onFailure: function () {
@@ -966,7 +952,7 @@ miniLOL = {
                 }
             });
 
-            if (output.replace(/[\s\n]*/g, '')) {
+            if (output.replace(/[\s\n]*/g, "")) {
                 if (layer == 0) {
                     return miniLOL.menu.parsers.layer(template, layer).menu.interpolate({
                         data: output
@@ -989,7 +975,7 @@ miniLOL = {
                 };
 
                 if (template) {
-                    var dom = template.getElementById(layer) || template.getElementById('default');
+                    var dom = template.getElementById(layer) || template.getElementById("default");
 
                     if (dom) {
                         if (dom.getElementsByTagName("menu").length) {
@@ -1087,12 +1073,12 @@ miniLOL = {
 
                 var queries = Object.toQueryString(queries);
                 if (queries) {
-                    queries = '&'+queries;
+                    queries = "&"+queries;
                 }
 
                 page = page.getAttribute("alias");
-                if (!page.isURL() && page.charAt(0) != '#') {
-                    page = '#'+page;
+                if (!page.isURL() && page.charAt(0) != "#") {
+                    page = "#"+page;
                 }
 
                 return miniLOL.go(page+queries);
@@ -1175,10 +1161,10 @@ miniLOL = {
                 list = element.cloneNode(false);
                 data = data || [element];
 
-                var listBefore   = list.getAttribute("before") || data[0].getAttribute("before") || ''; list.removeAttribute("before");
-                var listAfter    = list.getAttribute("after") || data[0].getAttribute("after") || ''; list.removeAttribute("after");
-                var listArgs     = list.getAttribute("arguments") || data[0].getAttribute("arguments") || ''; list.removeAttribute("arguments");
-                var listType     = list.getAttribute("type") || data[0].getAttribute("type") || ''; list.removeAttribute("type");
+                var listBefore   = list.getAttribute("before") || data[0].getAttribute("before") || ""; list.removeAttribute("before");
+                var listAfter    = list.getAttribute("after") || data[0].getAttribute("after") || ""; list.removeAttribute("after");
+                var listArgs     = list.getAttribute("arguments") || data[0].getAttribute("arguments") || ""; list.removeAttribute("arguments");
+                var listType     = list.getAttribute("type") || data[0].getAttribute("type") || ""; list.removeAttribute("type");
                 var listMenu     = list.getAttribute("menu") || data[0].getAttribute("menu"); list.removeAttribute("menu");
                 var listTemplate = list.getAttribute("template"); list.removeAttribute("template");
 
@@ -1197,38 +1183,38 @@ miniLOL = {
 
                             var target = link.getAttribute("target"); link.removeAttribute("target");
                             var text   = link.firstChild.nodeValue || href;
-                            var before = link.getAttribute("before") || listBefore || ''; link.removeAttribute("before");
-                            var after  = link.getAttribute("after") || listAfter || ''; link.removeAttribute("after");
-                            var domain = link.getAttribute("domain") || ''; link.removeAttribute("domain");
+                            var before = link.getAttribute("before") || listBefore || ""; link.removeAttribute("before");
+                            var after  = link.getAttribute("after") || listAfter || ""; link.removeAttribute("after");
+                            var domain = link.getAttribute("domain") || ""; link.removeAttribute("domain");
                             var args   = link.getAttribute("arguments") || listArgs; link.removeAttribute("arguments");
                             var menu   = link.getAttribute("menu") || listMenu; link.removeAttribute("menu");
                             var title  = link.getAttribute("title") || ""; link.removeAttribute("title");
 
                             var out = href.isURL();
             
-                            var linkClass = link.getAttribute("class") || ''; link.removeAttribute("class");
-                            var linkId    = link.getAttribute("id") || ''; link.removeAttribute("id");
+                            var linkClass = link.getAttribute("class") || ""; link.removeAttribute("class");
+                            var linkId    = link.getAttribute("id") || ""; link.removeAttribute("id");
 
                             if (target || out) {
                                 href   = (!out) ? "data/" + href : href;
                                 target = target || "_blank";
                             }
                             else {
-                                var ltype = link.getAttribute("type") || listType || ''; link.removeAttribute("type");
+                                var ltype = link.getAttribute("type") || listType || ""; link.removeAttribute("type");
             
-                                if (domain == "in" || href.charAt(0) == '#') {
-                                    if (href.charAt(0) != '#') {
-                                        href = '#' + href;
+                                if (domain == "in" || href.charAt(0) == "#") {
+                                    if (href.charAt(0) != "#") {
+                                        href = "#" + href;
                                     }
                                 }
                                 else {
                                     href = "#page=" + href;
                                 }
 
-                                args   = args ? '&'+args.replace(/[ ,]+/g, "&amp;") : '';
-                                ltype  = ltype ? "&type="+ltype : '';
-                                menu   = miniLOL.menu.enabled() && menu ? "&amp;menu="+menu : '';
-                                target = '';
+                                args   = args ? "&"+args.replace(/[ ,]+/g, "&amp;") : "";
+                                ltype  = ltype ? "&type="+ltype : "";
+                                menu   = miniLOL.menu.enabled() && menu ? "&amp;menu="+menu : "";
+                                target = "";
 
                                 if (title) {
                                     title = title.interpolate({
@@ -1257,12 +1243,12 @@ miniLOL = {
                         else if (e.nodeName == "item") {
                             var item = e.cloneNode(true);
             
-                            var text   = item.firstChild.nodeValue || '';
-                            var before = item.getAttribute("before") || listBefore || ''; item.removeAttribute("before");
-                            var after  = item.getAttribute("after") || listAfter || ''; item.removeAttribute("after");
+                            var text   = item.firstChild.nodeValue || "";
+                            var before = item.getAttribute("before") || listBefore || ""; item.removeAttribute("before");
+                            var after  = item.getAttribute("after") || listAfter || ""; item.removeAttribute("after");
             
-                            var itemClass = item.getAttribute("class") || ''; item.removeAttribute("class");
-                            var itemId    = item.getAttribute("id") || ''; item.removeAttribute("id");
+                            var itemClass = item.getAttribute("class") || ""; item.removeAttribute("class");
+                            var itemId    = item.getAttribute("id") || ""; item.removeAttribute("id");
 
                             output += miniLOL.theme.template.list[listTemplate].item.interpolate(Object.extend(Object.fromAttributes(item.attributes), {
                                 "class":    itemClass,
@@ -1280,8 +1266,8 @@ miniLOL = {
                             toParse = e.cloneNode(true);
 
                             output += miniLOL.theme.template.list[listTemplate].nest.interpolate({
-                                "class": e.getAttribute("class") || '',
-                                style:   e.getAttribute("style") || '',
+                                "class": e.getAttribute("class") || "",
+                                style:   e.getAttribute("style") || "",
                                 before:  miniLOL.theme.template.list[listTemplate].before.interpolate({ data: before }),
                                 after:   miniLOL.theme.template.list[listTemplate].after.interpolate({ data: after }),
                                 data:    miniLOL.page.parse(toParse, [element])
@@ -1289,7 +1275,7 @@ miniLOL = {
                         }
                     }
                     else if (e.nodeType == Node.CDATA_SECTION_NODE || e.nodeType == Node.TEXT_NODE) {
-                        if (e.nodeValue.replace(/[\s\n]+/g, '')) {
+                        if (e.nodeValue.replace(/[\s\n]+/g, "")) {
                             output += miniLOL.theme.template.list[listTemplate].data.interpolate({
                                 before: miniLOL.theme.template.list[listTemplate].before.interpolate({ data: before }),
                                 after:  miniLOL.theme.template.list[listTemplate].after.interpolate({ data: after }),
@@ -1323,7 +1309,7 @@ miniLOL = {
                     });
                 }
                 else {
-                    output = '<div ';
+                    output = "<div ";
                 }
 
                 return "";
@@ -1444,7 +1430,7 @@ miniLOL = {
             }
 
             if (output) {
-                miniLOL.content.set(miniLOL.config['core'].loadingMessage);
+                miniLOL.content.set(miniLOL.config["core"].loadingMessage);
 
                 var data = {};
                 Object.extend(data, miniLOL.config["core"]);
@@ -1634,7 +1620,7 @@ miniLOL = {
         getElementById: function (id) {
             var result;
 
-            $A(this.getElementsByTagName('*')).each(function (element) {
+            $A(this.getElementsByTagName("*")).each(function (element) {
                 if (element.getAttribute("id") == id) {
                     result = element;
                     throw $break;
@@ -1682,7 +1668,7 @@ miniLOL = {
                 obj.getElementsByTagName = function (name) {
                     return this.real.getElementsByTagName(name);
                 };
-
+                
                 obj.getElementById = function (id) {
                     return miniLOL.utils.getElementById.call(this.real, id);
                 }

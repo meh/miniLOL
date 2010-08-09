@@ -85,7 +85,11 @@
                 element.addClassName('current');
             }
             else if ($$(".current").length == 0) {
-                $($("menu").getElementsByTagName("li")[0]).addClassName("current");
+                var menu = $A($("menu").getElementsByTagName("li")).shift();
+                
+                if (menu) {
+                    $(menu).addClassName("current");
+                }
             }
         }
 
