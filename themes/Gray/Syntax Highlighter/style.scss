@@ -1,0 +1,86 @@
+$background:                    #fff !default;
+ 
+$line_highlighted_background:   #8b8b8b !default;
+$line_highlighted_number:       white !default;
+
+$line_alt2_background:          #f5f5f5 !default;
+ 
+$gutter_text:                   #666 !default;
+$gutter_border_color:           #8b8b8b !default;
+ 
+$code_plain:                    #000000 !default;
+$code_comments:                 #888888 !default;
+$code_string:                   #ff1010 !default;
+$code_keyword:                  #5577dd !default;
+$code_preprocessor:             #18b218 !default;
+$code_variable:                 #18b218 !default;
+$code_value:                    #abab00 !default;
+$code_functions:                #000000 !default;
+$code_constants:                #0066cc !default;
+$code_color1:                   #ff4000 !default;
+$code_color2:                   #ff1493 !default;
+$code_color3:                   #ff0000 !default;
+ 
+@import "_theme_template.scss";
+ 
+.syntaxhighlighter {
+    border: 1px solid #8b8b8b !important;
+
+    overflow: auto !important;
+
+    border-radius: 1.2em;
+    -webkit-border-radius: 1.2em;
+    -moz-border-radius: 1.2em;
+
+    -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, .3);
+    -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, .3);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .3);
+
+    .toolbar {
+        display: none !important;
+    }
+
+    .gutter {
+        .line {
+            border-right: 1px solid #8b8b8b !important;
+        }
+        
+        .line:first-child {
+            border-top-left-radius: 1.2em !important;
+            -webkit-border-top-left-radius: 1.2em !important;
+            -moz-border-radius-topleft: 1.2em !important;
+        }
+
+        .line:last-child {
+            border-bottom-left-radius: 1.2em !important;
+            -webkit-border-bottom-left-radius: 1.2em !important;
+            -moz-border-radius-bottomleft: 1.2em !important;
+        }
+    }
+
+    .code {
+        .line:first-child {
+            border-top-right-radius: 1.2em !important;
+            -webkit-border-top-right-radius: 1.2em !important;
+            -moz-border-radius-topright: 1.2em !important;
+        }
+
+        .line:last-child {
+            border-bottom-right-radius: 1.2em !important;
+            -webkit-border-bottom-right-radius: 1.2em !important;
+            -moz-border-radius-bottomright: 1.2em !important;
+        }
+    }
+
+    .comments {
+        font-style: italic !important;
+    }
+
+    .keyword {
+        font-weight: bold !important;
+    }
+
+    .functions {
+        font-weight: bold !important;
+    }
+}

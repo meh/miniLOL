@@ -458,7 +458,7 @@ miniLOL = {
             miniLOL.error.value = true;
         }
 
-        Event.fire(document, ":error", { text: text, element: element, minor: minor });
+        Event.fire(document, ":error", { text: text, element: element, major: major });
     },
 
     content: {
@@ -717,43 +717,25 @@ miniLOL = {
                     });
 
                     var templates = doc.getElementsByTagName("templates");
-                    var tmp;
 
-                    if (templates && (tmp = templates.getElementsByTagName("list"))) {
-                        $A(tmp.getElementsByTagName("template")).each(function (template) {
-                            var current;
-                            var name = template.getAttribute("name") || "default";
-    
-                            miniLOL.theme.template.list[name] = {};
-    
-                            if ((current = template.getElementsByTagName("global")).length) {
-                                miniLOL.theme.template.list[name].global = current[0].firstChild.nodeValue;
+                    if (templates) {
+                        $A(templates[0].childNodes).each(function (node) {
+                            if (node.nodeName != Node.ELEMENT_NODE) {
+                                return;
                             }
-    
-                            if ((current = template.getElementsByTagName("before")).length) {
-                                miniLOL.theme.template.list[name].before = current[0].firstChild.nodeValue;
-                            }
-    
-                            if ((current = template.getElementsByTagName("after")).length) {
-                                miniLOL.theme.template.list[name].after = current[0].firstChild.nodeValue;
-                            }
-    
-                            if ((current = template.getElementsByTagName("link")).length) {
-                                miniLOL.theme.template.list[name].link = current[0].firstChild.nodeValue;
-                            }
-    
-                            if ((current = template.getElementsByTagName("item")).length) {
-                                miniLOL.theme.template.list[name].item = current[0].firstChild.nodeValue;
-                            }
-    
-                            if ((current = template.getElementsByTagName("nest")).length) {
-                                miniLOL.theme.template.list[name].nest = current[0].firstChild.nodeValue;
-                            }
-    
-                            if ((current = template.getElementsByTagName("data")).length) {
-                                miniLOL.theme.template.list[name].data = current[0].firstChild.nodeValue;
-                            }
-                        })
+
+                            var name = node.nodeName;
+
+                            miniLOL.theme.template[name] = {};
+
+                            $A(node.childNodes).each(function (node) {
+                                if (node.nodeName != Node.ELEMENT_NODE) {
+                                    return;
+                                }
+
+                                miniLOL.theme.template[name][node.nodeName] = node.firstChild.nodeValue;
+                            }, this);
+                        }, this);
                     }
                 },
 
@@ -1032,7 +1014,7 @@ miniLOL = {
             },
 
             item: function (element, template, layer) {
-                item = element.cloneNode(true);
+                var item = element.cloneNode(true);
 
                 var itemClass = item.getAttribute("class") || ""; item.removeAttribute("class");
                 var itemId    = item.getAttribute("id") || ""; item.removeAttribute("id");
@@ -1292,7 +1274,7 @@ miniLOL = {
                             }));
                         }
                         else if (e.nodeName == "list") {
-                            output += miniLOL.page.parse({ childNodes: [e] }, [element]);
+                            output += miniLOL.page.parsers.list(e, [element]);
                         }
                         else if (e.nodeName == "nest") {
                             toParse = e.cloneNode(true);
@@ -1521,7 +1503,7 @@ miniLOL = {
                     }));
                 }
                 catch (e) {
-                    if (e.status || e.statusText) {
+                    if (e.http) {
                         miniLOL.utils.require("#{path}/#{module}/main.js".interpolate({
                             path: miniLOL.module.path,
                             module: name
@@ -1662,9 +1644,31 @@ miniLOL = {
             return result;
         },
 
+        xpath: function (query) {
+            var result = [];
+            var tmp;
+
+            if (Prototype.Browser.IE) {
+                tmp = this.real.selectNodes(query);
+
+                for (var i = 0; i < tmp.length; i++) {
+                    result.push(tmp.item(i));
+                }
+            }
+            else {
+                tmp = this.evaluate(query, this, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+
+                for (var i = 0; i < tmp.snapshotLength; i++) {
+                    result.push(tmp.snapshotItem(i));
+                }
+            }
+
+            return result;
+        },
+
         fixDOM: function (obj) {
-            if (!obj || Prototype.Browser.Good) {
-                return obj;
+            if (!obj) {
+                return;
             }
 
             if (Prototype.Browser.IE) {
@@ -1682,10 +1686,14 @@ miniLOL = {
                 obj.getElementById = function (id) {
                     return miniLOL.utils.getElementById.call(this.real, id);
                 }
+
+                obj.real.setProperty("SelectionLanguage", "XPath");
             }
-            else {
+            else if (!Prototype.Browser.Good) {
                 obj.getElementById = miniLOL.utils.getElementById;
             }
+
+            obj.xpath = miniLOL.utils.xpath;
 
             return obj;
         },

@@ -35,4 +35,5 @@ task :default do
     minify(minified.path, 'system/miniLOL.min.js')
     minify('system/prototype.js')
     minify('system/cookiejar.js')
+    minify('system/xpath.js')
 end

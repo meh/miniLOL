@@ -1,201 +1,103 @@
-/************************************
- * Interface elements.
- ************************************/
-
-.syntaxhighlighter
-{
-	background-color: #FFFFFF !important;
-    margin: 0 !important;
-    overflow: hidden !important;
-}
-
-div.syntaxhighlighter {
-    padding: 0 !important;
-
-    border: 1px solid #8b8b8b !important;
-
-    border-radius: 1.2em;
-    -webkit-border-radius: 1.2em;
-    -moz-border-radius: 1.2em;
-
-    -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, .3);
-    -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, .3);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, .3);
-}
-
-.source div.syntaxhighlighter {
-    border: 0 !important;
-}
-
-.lines .line:first-child .content {
-    border-top-right-radius: 1.2em;
-    -webkit-border-top-right-radius: 1.2em;
-    -moz-border-radius-topright: 1.2em;
-}
-
-.lines .line:last-child .content {
-    border-bottom-right-radius: 1.2em;
-    -webkit-border-bottom-right-radius: 1.2em;
-    -moz-border-radius-bottomright: 1.2em;
-}
-
-/* Highlighed line number */
-.syntaxhighlighter .line.highlighted .number
-{
-	background-color: #8b8b8b !important;
-	color: white !important;
-}
-
-/* Highlighed line */
-.syntaxhighlighter .line.highlighted.alt1 .content,
-.syntaxhighlighter .line.highlighted.alt2 .content
-{
-    background-color: #101010 !important;
-}
-
-/* Gutter line numbers */
-.syntaxhighlighter .line .number
-{
-	color: #b2b2b2 !important;
-}
-
-/* Add border to the lines */
-.syntaxhighlighter .line .content
-{
-	border-left: 3px solid #8b8b8b !important;
-}
-
-.syntaxhighlighter.printing .line .content 
-{
-	border: 0 !important;
-}
-
-/* First line */
-.syntaxhighlighter .line.alt1 .content
-{
-	background-color: #FFFFFF !important;
-    width: 100% !important;
-}
-
-/* Second line */
-.syntaxhighlighter .line.alt2 .content
-{
-	background-color: inherit !important;
-    width: 100% !important;
-}
-
-.syntaxhighlighter .ruler
-{
-	color: silver !important;
-	background-color: #F8F8F8 !important;
-	border-left: 3px solid #8b8b8b !important;
-}
-
-.syntaxhighlighter.nogutter .ruler
-{
-	border: 0 !important;
-}
-
-.syntaxhighlighter div.toolbar
-{
-    font-size: 14px !important;
-
-	background-color: #FFFFFF !important;
-	border-left: #8b8b8b solid 1px !important;
-	border-bottom: #8b8b8b solid 1px !important;
-    opacity: 0.7;
-
-    border-bottom-left-radius: 1.2em;
-    -webkit-border-bottom-left-radius: 1.2em;
-    -moz-border-radius-bottomleft: 1.2em;
-
-    border-top-right-radius: 1.2em;
-    -webkit-border-top-right-radius: 1.2em;
-    -moz-border-radius-topright: 1.2em;
-}
-
-.syntaxhighlighter .toolbar a
-{
-	color: #a0a0a0 !important;
-}
-
-.syntaxhighlighter .toolbar a:hover
-{
-	color: red !important;
-}
-
-/************************************
- * Actual syntax highlighter colors.
- ************************************/
-.syntaxhighlighter .plain,
-.syntaxhighlighter .plain a
-{ 
-	color: #000000 !important;
-}
-
-.syntaxhighlighter .comments,
-.syntaxhighlighter .comments a
-{ 
-	color: #888888 !important;
-}
-
-.syntaxhighlighter .string,
-.syntaxhighlighter .string a
-{
-	color: #FF1010 !important; 
-}
-
-.syntaxhighlighter .keyword
-{ 
-	color: #5577dd !important; 
-	font-weight: bold !important; 
-}
-
-.syntaxhighlighter .preprocessor 
-{ 
-	color: #18b218 !important; 
-}
-
-.syntaxhighlighter .variable 
-{ 
-	color: #18b218 !important; 
-}
-
-.syntaxhighlighter .value
-{ 
-	color: #abab00 !important; 
-}
-
-.syntaxhighlighter .functions
-{ 
-	color: #000000 !important;
+.syntaxhighlighter {
+  background-color: white !important; }
+  .syntaxhighlighter .line.alt1 {
+    background-color: white !important; }
+  .syntaxhighlighter .line.alt2 {
+    background-color: #f5f5f5 !important; }
+  .syntaxhighlighter .line.highlighted.alt1, .syntaxhighlighter .line.highlighted.alt2 {
+    background-color: #8b8b8b !important; }
+  .syntaxhighlighter .line.highlighted.number {
+    color: white !important; }
+  .syntaxhighlighter table caption {
+    color: black !important; }
+  .syntaxhighlighter .gutter {
+    color: #666666 !important; }
+    .syntaxhighlighter .gutter .line {
+      border-right: 3px solid #8b8b8b !important; }
+      .syntaxhighlighter .gutter .line.highlighted {
+        background-color: #8b8b8b !important;
+        color: white !important; }
+  .syntaxhighlighter.printing .line .content {
+    border: none !important; }
+  .syntaxhighlighter.collapsed {
+    overflow: visible !important; }
+    .syntaxhighlighter.collapsed .toolbar {
+      color: blue !important;
+      background: white !important;
+      border: 1px solid #8b8b8b !important; }
+      .syntaxhighlighter.collapsed .toolbar a {
+        color: blue !important; }
+        .syntaxhighlighter.collapsed .toolbar a:hover {
+          color: red !important; }
+  .syntaxhighlighter .toolbar {
+    color: white !important;
+    background: #8b8b8b !important;
+    border: none !important; }
+    .syntaxhighlighter .toolbar a {
+      color: white !important; }
+      .syntaxhighlighter .toolbar a:hover {
+        color: black !important; }
+  .syntaxhighlighter .plain, .syntaxhighlighter .plain a {
+    color: black !important; }
+  .syntaxhighlighter .comments, .syntaxhighlighter .comments a {
+    color: #888888 !important; }
+  .syntaxhighlighter .string, .syntaxhighlighter .string a {
+    color: #ff1010 !important; }
+  .syntaxhighlighter .keyword {
+    color: #5577dd !important; }
+  .syntaxhighlighter .preprocessor {
+    color: #18b218 !important; }
+  .syntaxhighlighter .variable {
+    color: #18b218 !important; }
+  .syntaxhighlighter .value {
+    color: #abab00 !important; }
+  .syntaxhighlighter .functions {
+    color: black !important; }
+  .syntaxhighlighter .constants {
+    color: #0066cc !important; }
+  .syntaxhighlighter .script {
     font-weight: bold !important;
-}
+    color: #5577dd !important;
+    background-color: none !important; }
+  .syntaxhighlighter .color1, .syntaxhighlighter .color1 a {
+    color: #ff4000 !important; }
+  .syntaxhighlighter .color2, .syntaxhighlighter .color2 a {
+    color: #ff1493 !important; }
+  .syntaxhighlighter .color3, .syntaxhighlighter .color3 a {
+    color: red !important; }
 
-.syntaxhighlighter .constants
-{ 
-	color: #0066CC !important; 
-}
-
-.syntaxhighlighter .script
-{ 
-	background-color: #1d1d1d !important;
-}
-
-.syntaxhighlighter .color1,
-.syntaxhighlighter .color1 a
-{ 
-	color: #FF4000 !important; 
-}
-
-.syntaxhighlighter .color2,
-.syntaxhighlighter .color2 a
-{ 
-	color: #ff1493 !important; 
-}
-
-.syntaxhighlighter .color3,
-.syntaxhighlighter .color3 a
-{ 
-	color: red !important; 
-}
+.syntaxhighlighter {
+  border: 1px solid #8b8b8b !important;
+  overflow: auto !important;
+  border-radius: 1.2em;
+  -webkit-border-radius: 1.2em;
+  -moz-border-radius: 1.2em;
+  -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); }
+  .syntaxhighlighter .toolbar {
+    display: none !important; }
+  .syntaxhighlighter .gutter .line {
+    border-right: 1px solid #8b8b8b !important; }
+  .syntaxhighlighter .gutter .line:first-child {
+    border-top-left-radius: 1.2em !important;
+    -webkit-border-top-left-radius: 1.2em !important;
+    -moz-border-radius-topleft: 1.2em !important; }
+  .syntaxhighlighter .gutter .line:last-child {
+    border-bottom-left-radius: 1.2em !important;
+    -webkit-border-bottom-left-radius: 1.2em !important;
+    -moz-border-radius-bottomleft: 1.2em !important; }
+  .syntaxhighlighter .code .line:first-child {
+    border-top-right-radius: 1.2em !important;
+    -webkit-border-top-right-radius: 1.2em !important;
+    -moz-border-radius-topright: 1.2em !important; }
+  .syntaxhighlighter .code .line:last-child {
+    border-bottom-right-radius: 1.2em !important;
+    -webkit-border-bottom-right-radius: 1.2em !important;
+    -moz-border-radius-bottomright: 1.2em !important; }
+  .syntaxhighlighter .comments {
+    font-style: italic !important; }
+  .syntaxhighlighter .keyword {
+    font-weight: bold !important; }
+  .syntaxhighlighter .functions {
+    font-weight: bold !important; }

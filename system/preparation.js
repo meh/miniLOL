@@ -48,7 +48,7 @@ if (Prototype.Browser.IE) {
         return "#{name}: #{description}<br/><br/>#{stack}".interpolate({
             name:        this.name,
             description: this.description,
-            stack:       this.stack.replace(/\n/g, "<br/>")
+            stack:       (this.stack || '').replace(/\n/g, "<br/>")
         });
     };
 }

@@ -64,7 +64,7 @@
 //
 // Showdown namespace
 //
-var Showdown = {};
+Showdown = {};
 
 //
 // converter
