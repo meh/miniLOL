@@ -20,7 +20,7 @@
         type   CDATA #IMPLIED
     >
 
-    <!ELEMENT link EMPTY>
+    <!ELEMENT link (#PCDATA)>
     <!ATTLIST link
         class       CDATA "link"
         id          CDATA ""
@@ -35,11 +35,10 @@
         menu        CDATA #IMPLIED
     >
 
-    <!ELEMENT item EMPTY>
+    <!ELEMENT item (#PCDATA)>
     <!ATTLIST item
         class   CDATA   "item"
         id      CDATA   ""
-        text    CDATA   #REQUIRED
         before  CDATA   #IMPLIED
         after   CDATA   #IMPLIED
     >
@@ -77,21 +76,21 @@ The example below should be self explanatory.
             This is a links collection:<br/>
         ]]>
         <list template="table" before="- " style="margin-left: 10px">
-            <link href="#stuff"                     text="Stuff"     after="~ Internal link"/>
-            <link href="#markdown"                  text="Markdown"  after="~ Markdown page"/>
-            <link href="#markdown"                  text="Markdown"  after="~ Markdown source page" type="raw"/>
-            <link href="separated"                  text="Separated" after="~ Internal link but in data/" type="raw"/>
-            <link href="#separated"                 text="Separated" after="~ Separated alias'd"/>
-            <link href="http://meh.doesntexist.org" text="meh."      after="~ External link"/>
+            <link href="#stuff" after="~ Internal link">Stuff</link>
+            <link href="#markdown" after="~ Markdown page">Markdown</link>
+            <link href="#markdown" after="~ Markdown source page" type="raw">Markdown</link>
+            <link href="separated" after="~ Internal link but in data/" type="raw">Separated</link>
+            <link href="#separated" after="~ Separated alias'd">Separated</link>
+            <link href="http://meh.doesntexist.org" after="~ External link">meh.</link>
         </list>
 
         <![CDATA[<br/>
             This is a simple list created automatically:<br/>
         ]]>
         <list before="# " style="margin-left: 10px">
-            <item text="LOL"/>
-            <item text="WTF"/>
-            <item text="OMG"/>
+            <item>LOL</item>
+            <item>WTF</item>
+            <item>OMG</item>
         </list>
     </page>
 

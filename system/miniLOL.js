@@ -617,7 +617,7 @@ miniLOL = {
                     before: '#{data}',
                     after:  '#{data}',
 
-                    link: '<div class="#{class}" id="#{id}">#{before}<a href="#{url}" target="#{target}" #{attributes}>#{text}</a>#{after}</div>',
+                    link: '<div class="#{class}" id="#{id}">#{before}<a href="#{href}" target="#{target}" #{attributes}>#{text}</a>#{after}</div>',
                     item: '<div class="#{class}" id="#{id}">#{before}<span #{attributes}>#{text}</span>#{after}</div>',
                     nest: '<div class="#{class}" style="#{style}">#{data}</div>',
                     data: '<div class="data">#{before}#{data}#{after}</div>'
@@ -629,7 +629,7 @@ miniLOL = {
                     before: '#{data}',
                     after:  '#{data}',
 
-                    link: '<tr><td>#{before}</td><td><a href="#{url}" target="#{target}" #{attributes}>#{text}</a></td><td>#{after}</td></tr>',
+                    link: '<tr><td>#{before}</td><td><a href="#{href}" target="#{target}" #{attributes}>#{text}</a></td><td>#{after}</td></tr>',
                     item: '<tr><td>#{before}</td><td>#{text}</td><td>#{after}</td></tr>',
                     nest: '<div class="#{class}" style="#{style}">#{data}</div>',
                     data: '<div class="data">#{before}#{data}#{after}</div>'
@@ -1036,21 +1036,12 @@ miniLOL = {
 
                 var itemClass = item.getAttribute("class") || ""; item.removeAttribute("class");
                 var itemId    = item.getAttribute("id") || ""; item.removeAttribute("id");
-                var itemSrc   = item.getAttribute("src")
-                             || item.getAttribute("href")
-                             || item.getAttribute("url")
-                             || "";
-                
-                item.removeAttribute("src");
-                item.removeAttribute("href");
-                item.removeAttribute("url");
+                var itemHref  = item.getAttribute("href") || ""; item.removeAttribute("href");
                 
                 return miniLOL.menu.parsers.layer(template, layer).item.interpolate(Object.extend(Object.fromAttributes(item.attributes), {
                     "class":    itemClass,
                     id:         itemId,
-                    url:        itemSrc,
-                    src:        itemSrc,
-                    href:       itemSrc,
+                    href:       itemHref,
                     attributes: String.fromAttributes(item.attributes),
                     text:       miniLOL.utils.getFirstText(element.childNodes),
                     data:       miniLOL.menu.parse(element, layer + 1)
@@ -1220,17 +1211,10 @@ miniLOL = {
                         if (e.nodeName == "link") {
                             var link = e.cloneNode(true);
             
-                            var src = link.getAttribute("src")
-                                   || link.getAttribute("href")
-                                   || link.getAttribute("url")
-                                   || '';
-                                   
-                            link.removeAttribute("src");
-                            link.removeAttribute("href");
-                            link.removeAttribute("url");
+                            var href = link.getAttribute("href"); link.removeAttribute("href");
 
                             var target = link.getAttribute("target"); link.removeAttribute("target");
-                            var text   = link.getAttribute("text") || ''; link.removeAttribute("text");
+                            var text   = link.firstChild.nodeValue || href;
                             var before = link.getAttribute("before") || listBefore || ''; link.removeAttribute("before");
                             var after  = link.getAttribute("after") || listAfter || ''; link.removeAttribute("after");
                             var domain = link.getAttribute("domain") || ''; link.removeAttribute("domain");
@@ -1238,27 +1222,27 @@ miniLOL = {
                             var menu   = link.getAttribute("menu") || listMenu; link.removeAttribute("menu");
                             var title  = link.getAttribute("title") || ""; link.removeAttribute("title");
 
-                            var out = src.isURL();
+                            var out = href.isURL();
             
                             var linkClass = link.getAttribute("class") || ''; link.removeAttribute("class");
                             var linkId    = link.getAttribute("id") || ''; link.removeAttribute("id");
 
                             if (target || out) {
-                                src    = (!out) ? "data/"+src : src;
+                                href   = (!out) ? "data/" + href : href;
                                 target = target || "_blank";
-                                text   = text || src;
                             }
                             else {
                                 var ltype = link.getAttribute("type") || listType || ''; link.removeAttribute("type");
             
-                                if (domain == "in" || src.charAt(0) == '#') {
-                                    src = (src.charAt(0) == '#') ? src : '#' + src;
+                                if (domain == "in" || href.charAt(0) == '#') {
+                                    if (href.charAt(0) != '#') {
+                                        href = '#' + href;
+                                    }
                                 }
                                 else {
-                                    src = "#page=" + src;
+                                    href = "#page=" + href;
                                 }
 
-                                text   = text || src;
                                 args   = args ? '&'+args.replace(/[ ,]+/g, "&amp;") : '';
                                 ltype  = ltype ? "&type="+ltype : '';
                                 menu   = miniLOL.menu.enabled() && menu ? "&amp;menu="+menu : '';
@@ -1267,15 +1251,13 @@ miniLOL = {
                                 if (title) {
                                     title = title.interpolate({
                                         text: text,
-                                        url:  src,
-                                        href: src,
-                                        src:  src
+                                        href: href
                                     });
+
+                                    title = "&title="+encodeURIComponent(title);
                                 }
 
-                                title = title ? "&title="+encodeURIComponent(title) : '';
-
-                                src = src + args + ltype + menu + title;
+                                href = href + args + ltype + menu + title;
                             }
 
                             output += miniLOL.theme.template.list[listTemplate].link.interpolate(Object.extend(Object.fromAttributes(link.attributes), {
@@ -1284,9 +1266,7 @@ miniLOL = {
                                 attributes: String.fromAttributes(link.attributes),
                                 before:     miniLOL.theme.template.list[listTemplate].before.interpolate({ data: before }),
                                 after:      miniLOL.theme.template.list[listTemplate].after.interpolate({ data: after }),
-                                url:        src,
-                                src:        src,
-                                href:       src,
+                                href:       href,
                                 target:     target,
                                 text:       text,
                                 title:      title
@@ -1295,7 +1275,7 @@ miniLOL = {
                         else if (e.nodeName == "item") {
                             var item = e.cloneNode(true);
             
-                            var text   = item.getAttribute("text") || ''; item.removeAttribute("text");
+                            var text   = item.firstChild.nodeValue || '';
                             var before = item.getAttribute("before") || listBefore || ''; item.removeAttribute("before");
                             var after  = item.getAttribute("after") || listAfter || ''; item.removeAttribute("after");
             
