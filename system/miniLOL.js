@@ -1283,7 +1283,7 @@ miniLOL = {
                         }
 
                         output += miniLOL.theme.template.list[listTemplate].data.interpolate({
-                            data:  e.nodeValue
+                            data: e.nodeValue
                         });
                     }
                 });
@@ -1661,12 +1661,9 @@ miniLOL = {
             }
 
             if (Prototype.Browser.IE) {
-                var tmp = obj;
+                obj = { real: obj };
 
-                obj      = {};
-                obj.real = tmp;
-
-                obj.documentElement = tmp.documentElement;
+                obj.documentElement = obj.real.documentElement;
                 
                 obj.getElementsByTagName = function (name) {
                     return this.real.getElementsByTagName(name);
