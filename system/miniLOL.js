@@ -1265,6 +1265,9 @@ miniLOL = {
                         else if (e.nodeName == "nest") {
                             toParse = e.cloneNode(true);
 
+                            var before = e.getAttribute("before") || listBefore || "";
+                            var after  = e.getAttribute("after") || listAfter || "";
+
                             output += miniLOL.theme.template.list[listTemplate].nest.interpolate({
                                 "class": e.getAttribute("class") || "",
                                 style:   e.getAttribute("style") || "",
@@ -1275,13 +1278,13 @@ miniLOL = {
                         }
                     }
                     else if (e.nodeType == Node.CDATA_SECTION_NODE || e.nodeType == Node.TEXT_NODE) {
-                        if (e.nodeValue.replace(/[\s\n]+/g, "")) {
-                            output += miniLOL.theme.template.list[listTemplate].data.interpolate({
-                                before: miniLOL.theme.template.list[listTemplate].before.interpolate({ data: before }),
-                                after:  miniLOL.theme.template.list[listTemplate].after.interpolate({ data: after }),
-                                data:  e.nodeValue
-                            });
+                        if (!e.nodeValue.replace(/[\s\n]+/g, "")) {
+                            return;
                         }
+
+                        output += miniLOL.theme.template.list[listTemplate].data.interpolate({
+                            data:  e.nodeValue
+                        });
                     }
                 });
 
