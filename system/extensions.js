@@ -152,5 +152,39 @@ Element.addMethods({
         accumulateTextChildren(element);
         
         return result;
+    },
+
+    toObject: function (element) {
+        var on     = element || this;
+        var result = {};
+
+        $A(on.childNodes).each(function (node) {
+            if (node.nodeType != Node.ELEMENT_NODE) {
+                return;
+            }
+
+            if (node.getElementsByTagName('*').length == 0) {
+                var content = "";
+
+                $A(node.childNodes).each(function (text) {
+                    if (text.nodeType != Node.CDATA_SECTION_NODE && text.nodeType != Node.TEXT_NODE) {
+                        return;
+                    }
+    
+                    if (text.nodeValue.match(/^[\s\n]*$/)) {
+                        return;
+                    }
+                    
+                    content += text.nodeValue;
+                });
+
+                result[node.nodeName] = content;
+            }
+            else {
+                result[node.nodeName] = Element.toObject(node);
+            }
+        });
+
+        return result;
     }
 });

@@ -83,12 +83,12 @@ miniLOL = {
                                 return;
                             }
     
-                            http.responseXML = miniLOL.utils.fixDOM(http.responseXML);
+                            var dom = miniLOL.utils.fixDOM(http.responseXML).documentElement;
     
-                            var domain = http.responseXML.documentElement.getAttribute("domain") || "core";
+                            var domain = dom.getAttribute("domain") || "core";
                             var config = miniLOL.config[domain] || {};
-    
-                            miniLOL.config[domain] = Object.extend(config, this.parse(http.responseXML.documentElement));
+
+                            miniLOL.config[domain] = Object.extend(config, Element.toObject(dom));
                         }.bind(this),
         
                         onFailure: function (http) {
@@ -105,44 +105,6 @@ miniLOL = {
 
                 clear: function () {
                     this.data = miniLOL.config = {};
-                },
-
-                parse: function (obj, text) {
-                    var result;
-
-                    if (text) {
-                        result = "";
-
-                        $A(obj.childNodes).each(function (text) {
-                            if (text.nodeType != Node.CDATA_SECTION_NODE && text.nodeType != Node.TEXT_NODE) {
-                                return;
-                            }
-    
-                            if (text.nodeValue.match(/^[\s\n]*$/)) {
-                                return;
-                            }
-                            
-                            result += text.nodeValue;
-                        });
-                    }
-                    else if (obj.nodeType == Node.ELEMENT_NODE) {
-                        result = {};
-        
-                        $A(obj.childNodes).each(function (node) {
-                            if (node.nodeType != Node.ELEMENT_NODE) {
-                                return;
-                            }
-        
-                            if (node.getElementsByTagName('*').length == 0) {
-                                result[node.nodeName] = this.parse(node, true);
-                            }
-                            else {
-                                result[node.nodeName] = this.parse(node);
-                            }
-                        }, this);
-                    }
-    
-                    return result;
                 }
             }));
 
@@ -597,7 +559,7 @@ miniLOL = {
             },
 
             menu: function () {
-                return miniLOL.theme.template.load("menu");
+                return miniLOL.theme.templates.menu;
             },
 
             exists: function (name, path) {
@@ -607,9 +569,11 @@ miniLOL = {
             clearCache: function () {
                 miniLOL.theme.template.cache = {};
 
-                miniLOL.theme.template.list = {}
+                miniLOL.theme.templates = {};
 
-                miniLOL.theme.template.list["default"] = {
+                miniLOL.theme.templates.list = {}
+
+                miniLOL.theme.templates.list["default"] = {
                     global: '<div #{attributes}>#{data}</div>',
 
                     before: '#{data}',
@@ -621,7 +585,7 @@ miniLOL = {
                     data: '<div class="data">#{before}#{data}#{after}</div>'
                 };
 
-                miniLOL.theme.template.list["table"] = {
+                miniLOL.theme.templates.list["table"] = {
                     global: '<table #{attributes}>#{data}</table>',
 
                     before: '#{data}',
@@ -715,13 +679,7 @@ miniLOL = {
                     });
 
                     doc.xpath("/theme/templates/*").each(function (node) {
-                        var name = node.nodeName;
-
-                        miniLOL.theme.template[name] = {};
-
-                        $A(node.getElementsByTagName("*")).each(function (node) {
-                            miniLOL.theme.template[name][node.nodeName] = node.firstChild.nodeValue;
-                        }, this);
+                        miniLOL.theme.templates[node.nodeName] = Element.toObject(node);
                     }, this);
                 },
 
@@ -975,24 +933,14 @@ miniLOL = {
                 };
 
                 if (template) {
-                    var dom = template.getElementById(layer) || template.getElementById("default");
+                    result = Object.extend(result, template.layers["_" + layer] || template.layers["default"] || {});
 
-                    if (dom) {
-                        if (dom.getElementsByTagName("menu").length) {
-                            result.menu = dom.getElementsByTagName("menu")[0].firstChild.nodeValue;
-                        }
+                    if (!result.menu) {
+                        result.menu = "#{data}";
+                    }
 
-                        if (dom.getElementsByTagName("item").length) {
-                            result.item = dom.getElementsByTagName("item")[0].firstChild.nodeValue;
-                        }
-
-                        if (!result.menu) {
-                            result.menu = "#{data}";
-                        }
-
-                        if (!result.item) {
-                            result.item = '<a href="#{href}" #{attributes}>#{text}</a> ';
-                        }
+                    if (!result.item) {
+                        result.item = '<a href="#{href}" #{attributes}>#{text}</a> ';
                     }
                 }
 
@@ -1023,16 +971,12 @@ miniLOL = {
                 if (!data || !template) {
                     return output;
                 }
+
+                var text = template[data.nodeName];
     
-                template = template.getElementsByTagName(data.nodeName);
-                if (template.length == 0) {
+                if (!text) {
                     return output;
                 }
-                else {
-                    template = template[0]
-                }
-    
-                var text = miniLOL.utils.getFirstText(template.childNodes);
     
                 $A(data.childNodes).each(function (e) {
                     if (e.nodeType == Node.ELEMENT_NODE) {
@@ -1168,7 +1112,7 @@ miniLOL = {
                 var listMenu     = list.getAttribute("menu") || data[0].getAttribute("menu"); list.removeAttribute("menu");
                 var listTemplate = list.getAttribute("template"); list.removeAttribute("template");
 
-                if (!miniLOL.theme.template.list[listTemplate]) {
+                if (!miniLOL.theme.templates.list[listTemplate]) {
                     listTemplate = "default";
                 }
     
@@ -1228,12 +1172,12 @@ miniLOL = {
                                 href = href + args + ltype + menu + title;
                             }
 
-                            output += miniLOL.theme.template.list[listTemplate].link.interpolate(Object.extend(Object.fromAttributes(link.attributes), {
+                            output += miniLOL.theme.templates.list[listTemplate].link.interpolate(Object.extend(Object.fromAttributes(link.attributes), {
                                 "class":    linkClass,
                                 id:         linkId,
                                 attributes: String.fromAttributes(link.attributes),
-                                before:     miniLOL.theme.template.list[listTemplate].before.interpolate({ data: before }),
-                                after:      miniLOL.theme.template.list[listTemplate].after.interpolate({ data: after }),
+                                before:     miniLOL.theme.templates.list[listTemplate].before.interpolate({ data: before }),
+                                after:      miniLOL.theme.templates.list[listTemplate].after.interpolate({ data: after }),
                                 href:       href,
                                 target:     target,
                                 text:       text,
@@ -1250,12 +1194,12 @@ miniLOL = {
                             var itemClass = item.getAttribute("class") || ""; item.removeAttribute("class");
                             var itemId    = item.getAttribute("id") || ""; item.removeAttribute("id");
 
-                            output += miniLOL.theme.template.list[listTemplate].item.interpolate(Object.extend(Object.fromAttributes(item.attributes), {
+                            output += miniLOL.theme.templates.list[listTemplate].item.interpolate(Object.extend(Object.fromAttributes(item.attributes), {
                                 "class":    itemClass,
                                 id:         itemId,
                                 attributes: String.fromAttributes(item.attributes),
-                                before:     miniLOL.theme.template.list[listTemplate].before.interpolate({ data: before }),
-                                after:      miniLOL.theme.template.list[listTemplate].after.interpolate({ data: after }),
+                                before:     miniLOL.theme.templates.list[listTemplate].before.interpolate({ data: before }),
+                                after:      miniLOL.theme.templates.list[listTemplate].after.interpolate({ data: after }),
                                 text:       text
                             }));
                         }
@@ -1268,11 +1212,11 @@ miniLOL = {
                             var before = e.getAttribute("before") || listBefore || "";
                             var after  = e.getAttribute("after") || listAfter || "";
 
-                            output += miniLOL.theme.template.list[listTemplate].nest.interpolate({
+                            output += miniLOL.theme.templates.list[listTemplate].nest.interpolate({
                                 "class": e.getAttribute("class") || "",
                                 style:   e.getAttribute("style") || "",
-                                before:  miniLOL.theme.template.list[listTemplate].before.interpolate({ data: before }),
-                                after:   miniLOL.theme.template.list[listTemplate].after.interpolate({ data: after }),
+                                before:  miniLOL.theme.templates.list[listTemplate].before.interpolate({ data: before }),
+                                after:   miniLOL.theme.templates.list[listTemplate].after.interpolate({ data: after }),
                                 data:    miniLOL.page.parse(toParse, [element])
                             });
                         }
@@ -1282,13 +1226,13 @@ miniLOL = {
                             return;
                         }
 
-                        output += miniLOL.theme.template.list[listTemplate].data.interpolate({
+                        output += miniLOL.theme.templates.list[listTemplate].data.interpolate({
                             data: e.nodeValue
                         });
                     }
                 });
 
-                return miniLOL.theme.template.list[listTemplate].global.interpolate(Object.extend(Object.fromAttributes(list.attributes), {
+                return miniLOL.theme.templates.list[listTemplate].global.interpolate(Object.extend(Object.fromAttributes(list.attributes), {
                     attributes: String.fromAttributes(list.attributes),
                     data: output
                 }));
@@ -1581,7 +1525,7 @@ miniLOL = {
         }
 
         var queries = url.toQueryParams();
-        var matches = /#(([^=&]*)&|([^=&]*)$)/.exec(url); // hate WebKit so much.
+        var matches = url.match(/#(([^=&]*)&|([^=&]*)$)/); // hate WebKit so much.
         var result  = false;
 
         if (queries.menu) {

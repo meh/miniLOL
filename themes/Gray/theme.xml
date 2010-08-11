@@ -117,6 +117,36 @@
         Event.stopObserving(document, ":go", miniLOL.theme.data.current);
     ]]></finalize>
 
+    <templates>
+        <menu>
+            <layers>
+                <_0>
+                    <menu><![CDATA[
+                        #{data}
+                    ]]></menu>
+            
+                    <item><![CDATA[
+                        <li><a href="#{href}" #{attributes}>#{text}</a>#{data}</li>
+                    ]]></item>
+                </_0>
+            
+                <default>
+                    <menu><![CDATA[
+                        <ul>#{data}</ul>
+                    ]]></menu>
+            
+                    <item><![CDATA[
+                        <li><a href="#{href}" #{attributes}>#{text}</a>#{data}</li>
+                    ]]></item>
+                </default>
+            </layers>
+        
+            <separator><![CDATA[
+                <div class="separator"></div>
+            ]]></separator>
+        </menu>
+    </templates>
+
     <styles>
         <style name="core"/>
         <style name="menu"/>
