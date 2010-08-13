@@ -1306,8 +1306,8 @@ miniLOL = {
                 method: "get",
         
                 onSuccess: function (http) {
-                    if (miniLOL.functions[queries.type]) {
-                        miniLOL.content.set(miniLOL.functions[queries.type](http.responseText, queries));
+                    if (queries.type) {
+                        miniLOL.content.set(miniLOL.resource.get("miniLOL.functions").render(queries.type, http.responseText, queries));
                     }
                     else {
                         miniLOL.content.set(http.responseText);
