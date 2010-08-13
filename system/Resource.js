@@ -22,6 +22,10 @@ miniLOL.Resource = Class.create({
                 this.wrapper[func]        = this.wrapper[func].bind(this.wrapper)
                 this.wrapper[func].parent = this.wrapper;
             }
+
+            if (Object.isUndefined(this[func])) {
+                this[func] = this.wrapper[func];
+            }
         }
 
         this.clear();

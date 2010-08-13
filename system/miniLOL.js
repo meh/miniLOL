@@ -92,7 +92,11 @@ miniLOL = {
                         }.bind(this),
         
                         onFailure: function (http) {
-                            miniLOL.error("Error while loading config.xml (#{status} - #{statusText})".interpolate(http), true);
+                            miniLOL.error("miniLOL.config: Error while loading #{path} (#{status} - #{statusText})".interpolate({
+                                path:       path,
+                                status:     http.status,
+                                statusText: http.statusText
+                            }), true);
                         }
                     });
     
@@ -187,7 +191,11 @@ miniLOL = {
                         },
         
                         onFailure: function (http) {
-                            miniLOL.error("Error while loading pages.xml (#{status} - #{statusText})".interpolate(http), true)
+                            miniLOL.error("miniLOL.pages: Error while loading #{path} (#{status} - #{statusText})".interpolate({
+                                path:       path,
+                                status:     http.status,
+                                statusText: http.statusText
+                            }, true));
                         }
                     });
     
@@ -243,7 +251,11 @@ miniLOL = {
                         },
             
                         onFailure: function (http) {
-                            miniLOL.error("Error while loading functions.xml (#{status} - #{statusText}})".interpolate(http), true);
+                            miniLOL.error("miniLOL.functions: Error while loading #{path} (#{status} - #{statusText})".interpolate({
+                                path:       path,
+                                status:     http.status,
+                                statusText: http.statusText
+                            }), true);
                         }
                     });
     
@@ -256,6 +268,16 @@ miniLOL = {
 
                 clear: function () {
                     miniLOL.functions = this.data = {};
+                },
+
+                render: function (types, content, args) {
+                    types.split(/\s*,\s*/).each(function (type) {
+                        if (Object.isFunction(this.data[type])) {
+                            content = this.data[type](content, args);
+                        }
+                    }, this);
+
+                    return content;
                 }
             }));
 
@@ -402,12 +424,16 @@ miniLOL = {
     },
 
     error: function (text, major, element) {
+        if (miniLOL.error.major) {
+            return true;
+        }
+
         if (Object.isUndefined(text)) {
-            return Boolean(miniLOL.error.value);
+            return Boolean(miniLOL.error.major);
         }
 
         if (Object.isBoolean(text)) {
-            return miniLOL.error.value = text;
+            return miniLOL.error.major = text;
         }
 
         element = element || miniLOL.theme.content() || document.body;
@@ -415,7 +441,7 @@ miniLOL = {
         $(element).update("<pre>" + text.replace(/<br\/>/g, '\n').escapeHTML() + "</pre>");
 
         if (major) {
-            miniLOL.error.value = true;
+            miniLOL.error.major = true;
         }
 
         Event.fire(document, ":error", { text: text, element: element, major: major });
@@ -460,9 +486,6 @@ miniLOL = {
                 }
             }
         }
-    },
-
-    refresh: function () {
     },
 
     theme: {
@@ -516,7 +539,7 @@ miniLOL = {
         },
 
         template: {
-            load: function (name, path) {
+            load: function (name, path, check) {
                 if (!path && !miniLOL.theme.name) {
                     return 0;
                 }
@@ -530,7 +553,7 @@ miniLOL = {
 
                 var file = "#{path}/#{name}.xml".interpolate({ path: path, name: name });
 
-                if (!Object.isUndefined(miniLOL.theme.template.cache[file])) {
+                if (!check && !Object.isUndefined(miniLOL.theme.template.cache[file])) {
                     return miniLOL.theme.template.cache[file];
                 }
 
@@ -1028,7 +1051,7 @@ miniLOL = {
                 return miniLOL.go(page+queries);
             }
 
-            if (type == null) {
+            if (Object.isUndefined(type)) {
                 type = page.getAttribute("type");
             }
         
@@ -1045,8 +1068,8 @@ miniLOL = {
             }
         
             if (miniLOL.pages.cache[name]) {
-                if (miniLOL.functions[type]) {
-                    miniLOL.content.set(miniLOL.functions[type](miniLOL.pages.cache[name], queries));
+                if (type) {
+                    miniLOL.content.set(miniLOL.resource.get("miniLOL.functions").render(type, miniLOL.pages.cache[name], queries));
                 }
                 else {
                     miniLOL.content.set(miniLOL.pages.cache[name]);
@@ -1070,8 +1093,8 @@ miniLOL = {
 
             miniLOL.pages.cache[name] = output;
 
-            if (miniLOL.functions[type]) {
-                output = miniLOL.functions[type](output, queries);
+            if (type) {
+                output = miniLOL.resource.get("miniLOL.functions").render(type, output, queries);
             }
 
             miniLOL.content.set(output);
