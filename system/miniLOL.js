@@ -988,18 +988,18 @@ miniLOL = {
             },
 
             other: function (data, template) {
-                var output  = "";
-                var outputs = {};
-    
                 if (!data || !template) {
-                    return output;
+                    return "";
                 }
 
                 var text = template[data.nodeName];
     
                 if (!text) {
-                    return output;
+                    return "";
                 }
+
+                var output  = "";
+                var outputs = {};
     
                 $A(data.childNodes).each(function (e) {
                     if (e.nodeType == Node.ELEMENT_NODE) {
