@@ -1149,7 +1149,7 @@ miniLOL = {
                             var href = link.getAttribute("href"); link.removeAttribute("href");
 
                             var target = link.getAttribute("target"); link.removeAttribute("target");
-                            var text   = link.firstChild.nodeValue || href;
+                            var text   = link.getAttribute("text") || (link.firstChild ? link.firstChild.nodeValue : null) || href;
                             var before = link.getAttribute("before") || listBefore || ""; link.removeAttribute("before");
                             var after  = link.getAttribute("after") || listAfter || ""; link.removeAttribute("after");
                             var domain = link.getAttribute("domain") || ""; link.removeAttribute("domain");
