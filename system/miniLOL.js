@@ -1210,7 +1210,7 @@ miniLOL = {
                         else if (e.nodeName == "item") {
                             var item = e.cloneNode(true);
             
-                            var text   = item.firstChild.nodeValue || "";
+                            var text   = link.getAttribute("text") || (link.firstChild ? link.firstChild.nodeValue : null) || href;
                             var before = item.getAttribute("before") || listBefore || ""; item.removeAttribute("before");
                             var after  = item.getAttribute("after") || listAfter || ""; item.removeAttribute("after");
             
