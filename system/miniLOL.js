@@ -323,24 +323,24 @@ miniLOL = {
                             var modules = miniLOL.utils.fixDOM(http.responseXML).xpath("//module").filter(function (module) {
                                 return module.getAttribute("name");
                             });
-
-                            for (var i = 0, length = modules.length; i < length; i++) {
+                            
+                            modules.each(function (module, index) {
                                 if (output) {
                                     miniLOL.content.set("Loading `#{name}`... [#{number}/#{total}]".interpolate({
-                                        name:   modules[i].getAttribute("name"),
-                                        number: i + 1,
+                                        name:   module.getAttribute("name"),
+                                        number: index + 1,
                                         total:  modules.length
                                     }));
                                 }
     
-                                if (!miniLOL.module.load(modules[i].getAttribute("name"))) {
+                                if (!miniLOL.module.load(module.getAttribute("name"))) {
                                     miniLOL.error(true);
                                 }
     
                                 if (miniLOL.error()) {
-                                    break;
+                                    throw $break;
                                 }
-                            }
+                            }, this);
                         },
             
                         onFailure: function (http) {
@@ -1736,6 +1736,10 @@ miniLOL = {
             else {
                 return false;
             }
+        },
+
+        css: function (style) {
+            $$("head").first().appendChild(new Element("style", { type: "text/css" }).update(style));
         },
 
         execute: function (path) {
