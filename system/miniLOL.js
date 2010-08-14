@@ -1149,7 +1149,7 @@ miniLOL = {
                             var href = link.getAttribute("href"); link.removeAttribute("href");
 
                             var target = link.getAttribute("target"); link.removeAttribute("target");
-                            var text   = link.getAttribute("text") || (link.firstChild ? link.firstChild.nodeValue : null) || href;
+                            var text   = link.getAttribute("text") || (link.firstChild ? link.firstChild.nodeValue : href);
                             var before = link.getAttribute("before") || listBefore || ""; link.removeAttribute("before");
                             var after  = link.getAttribute("after") || listAfter || ""; link.removeAttribute("after");
                             var domain = link.getAttribute("domain") || ""; link.removeAttribute("domain");
@@ -1210,7 +1210,7 @@ miniLOL = {
                         else if (e.nodeName == "item") {
                             var item = e.cloneNode(true);
             
-                            var text   = link.getAttribute("text") || (link.firstChild ? link.firstChild.nodeValue : null) || href;
+                            var text   = item.getAttribute("text") || (item.firstChild ? item.firstChild.nodeValue : "")
                             var before = item.getAttribute("before") || listBefore || ""; item.removeAttribute("before");
                             var after  = item.getAttribute("after") || listAfter || ""; item.removeAttribute("after");
             
