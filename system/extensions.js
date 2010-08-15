@@ -61,12 +61,12 @@ Object.extend(Object, {
 if (!Object.isFunction(Object.defineProperty)) {
     // Descriptor has 5 possible variables: value, get, set, writable, configurable, enumerable
     Object.defineProperty = function (object, property, descriptor) {
-        if (Object.isFunction(properties.get) && Object.isFunction(object.__defineGetter__)) {
-            object.__defineGetter__(name, properties.get);
+        if (Object.isFunction(descriptor.get) && Object.isFunction(object.__defineGetter__)) {
+            object.__defineGetter__(property, descriptor.get);
         }
 
-        if (Object.isFunction(properties.set) && Object.isFunction(object.__defineSetter__)) {
-            object.__defineSetter__(name, properties.set);
+        if (Object.isFunction(descriptor.set) && Object.isFunction(object.__defineSetter__)) {
+            object.__defineSetter__(property, descriptor.set);
         }
     }
 }
