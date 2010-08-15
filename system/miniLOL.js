@@ -449,7 +449,11 @@ miniLOL = {
 
     content: {
         set: function (data) {
-            miniLOL.theme.content().update(data);
+            var wrap = { content: data };
+
+            Event.fire(document, ":content.set", wrap);
+
+            miniLOL.theme.content().update(wrap.content);
         },
 
         get: function () {
@@ -1739,7 +1743,11 @@ miniLOL = {
         },
 
         css: function (style) {
-            $$("head").first().appendChild(new Element("style", { type: "text/css" }).update(style));
+            var css = new Element("style", { type: "text/css" }).update(style);
+
+            $$("head").first().appendChild(css);
+
+            return css;
         },
 
         execute: function (path) {

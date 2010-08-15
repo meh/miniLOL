@@ -58,6 +58,37 @@ Object.extend(Object, {
     }
 });
 
+if (!Object.isFunction(Object.defineProperty)) {
+    // Descriptor has 5 possible variables: value, get, set, writable, configurable, enumerable
+    Object.defineProperty = function (object, property, descriptor) {
+        if (Object.isFunction(properties.get) && Object.isFunction(object.__defineGetter__)) {
+            object.__defineGetter__(name, properties.get);
+        }
+
+        if (Object.isFunction(properties.set) && Object.isFunction(object.__defineSetter__)) {
+            object.__defineSetter__(name, properties.set);
+        }
+    }
+}
+
+if (!Object.isFunction(Object.defineProperties)) {
+    Object.defineProperties = function (object, properties) {
+        for (var property in properties) {
+            Object.defineProperty(object, property, properties[property]);
+        }
+    }
+}
+
+if (!Object.isFunction(Object.create)) {
+    Object.create = function (proto, properties) {
+        var obj = new Object(proto);
+
+        Object.defineProperties(obj, properties);
+
+        return obj;
+    }
+}
+
 Object.extend(String, {
     fromAttributes: function (attributes) {
         var result = '';
