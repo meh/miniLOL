@@ -233,10 +233,11 @@ miniLOL = {
     
                             miniLOL.utils.fixDOM(http.responseXML).xpath('//function').each(function (func) {
                                 try {
-                                    miniLOL.functions[func.getAttribute("name")]
-                                        = new Function("var text = arguments[0]; var args = arguments[1]; arguments = args; #{code}; return text;".interpolate({
+                                    miniLOL.functions[func.getAttribute("name")] = new Function(
+                                        "var text = arguments[0]; var args = arguments[1]; arguments = args; #{code}; return text;".interpolate({
                                             code: func.firstChild.nodeValue
-                                        }));
+                                        })
+                                    );
                                 }
                                 catch (e) {
                                     miniLOL.error("Error while creating `#{name}` wrapper from #{path}:\n\n#{error}".interpolate({
@@ -758,8 +759,6 @@ miniLOL = {
                 miniLOL.go(location.href);
             }
 
-            miniLOL.theme.data = {};
-
             // Sadly this has some problems.
             // I didn't find a way to know if the CSSs have already been applied and the initialize
             // may get wrong information from stuff that uses sizes set by the CSS.
@@ -770,7 +769,7 @@ miniLOL = {
             // If someone knows a way to fix this, please contact me.
             // (Already tried XHR and create <style>, but url() would get borked and it only worked in Firefox and Opera)
             if (!noInitialization && miniLOL.theme.initialize) {
-                miniLOL.theme.initialize();
+                miniLOL.theme.initialize.call(miniLOL.theme.data);
             }
 
             Event.fire(document, ":theme.loaded", { name: name, runtime: Boolean(runtime) });
@@ -788,10 +787,10 @@ miniLOL = {
             Event.fire(document, ":theme.unload", { name: miniLOL.theme.name });
 
             if (!noFinalization && miniLOL.theme.finalize) {
-                miniLOL.theme.finalize();
+                miniLOL.theme.finalize.call(miniLOL.theme.data);
             }
 
-            delete miniLOL.theme.data;
+            miniLOL.theme.data = {};
 
             $A(miniLOL.theme.information.styles).each(function (style) {
                 miniLOL.theme.style.unload(style);
