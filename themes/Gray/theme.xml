@@ -28,20 +28,20 @@
     <initialize><![CDATA[
         $('siteTitle').update(miniLOL.config["core"].logo || miniLOL.config["core"].siteTitle)
 
-        miniLOL.theme.data.resize = function () {
+        this.resize = function () {
             $('body').setStyle({
                 height: (document.viewport.getHeight()-(60+$('head').getHeight()+20))+"px"
             });
         };
 
-        Event.observe(window, "resize", miniLOL.theme.data.resize);
-        Event.observe(document, ":module.load", miniLOL.theme.data.resize);
+        Event.observe(window, "resize", this.resize);
+        Event.observe(document, ":module.load", this.resize);
 
         Event.observe(document, ":initialized", function () {
-            miniLOL.theme.data.resize.delay(0.1);
+            this.resize.delay(0.1);
         });
 
-        miniLOL.theme.data.resize.defer();
+        this.resize.defer();
 
         miniLOL.theme.data.current = function (event) {
             var matches = unescape(event.memo).match(/(#[^&]*)/)
@@ -93,28 +93,28 @@
             }
         }
 
-        miniLOL.theme.data.current.change = function (event) {
+        this.current.change = function (event) {
             if (event.name == ":theme.loaded" && event.memo.runtime) {
                 return;
             }
 
-            miniLOL.theme.data.current({ memo: location.href });
-        }
+            this.current({ memo: location.href });
+        }.bind(this)
 
-        Event.observe(document, ":go", miniLOL.theme.data.current);
+        Event.observe(document, ":go", this.current);
 
-        Event.observe(document, ":menu.change", miniLOL.theme.data.current.change);
-        Event.observe(document, ":theme.loaded", miniLOL.theme.data.current.change);
-        Event.observe(document, ":initialized", miniLOL.theme.data.current.change);
+        Event.observe(document, ":menu.change", this.current.change);
+        Event.observe(document, ":theme.loaded", this.current.change);
+        Event.observe(document, ":initialized", this.current.change);
     ]]></initialize>
 
     <finalize><![CDATA[
-        Event.stopObserving(window, "resize", miniLOL.theme.data.resize);
-        Event.stopObserving(document, ":module.load", miniLOL.theme.data.resize);
+        Event.stopObserving(window, "resize", this.resize);
+        Event.stopObserving(document, ":module.load", this.resize);
 
-        Event.stopObserving(document, ":menu.change", miniLOL.theme.data.current.change);
-        Event.stopObserving(document, ":theme.loaded", miniLOL.theme.data.current.change);
-        Event.stopObserving(document, ":go", miniLOL.theme.data.current);
+        Event.stopObserving(document, ":menu.change", this.current.change);
+        Event.stopObserving(document, ":theme.loaded", this.current.change);
+        Event.stopObserving(document, ":go", this.current);
     ]]></finalize>
 
     <templates>

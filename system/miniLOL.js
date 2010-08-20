@@ -759,6 +759,8 @@ miniLOL = {
                 miniLOL.go(location.href);
             }
 
+            miniLOL.theme.data = {};
+
             // Sadly this has some problems.
             // I didn't find a way to know if the CSSs have already been applied and the initialize
             // may get wrong information from stuff that uses sizes set by the CSS.
@@ -787,10 +789,10 @@ miniLOL = {
             Event.fire(document, ":theme.unload", { name: miniLOL.theme.name });
 
             if (!noFinalization && miniLOL.theme.finalize) {
-                miniLOL.theme.finalize.call(miniLOL.theme.data);
+                miniLOL.theme.finalize.call(miniLOL.theme.data || {});
             }
 
-            miniLOL.theme.data = {};
+            delete miniLOL.theme.data;
 
             $A(miniLOL.theme.information.styles).each(function (style) {
                 miniLOL.theme.style.unload(style);
@@ -936,7 +938,7 @@ miniLOL = {
                 }
             });
 
-            if (output.replace(/[\s\n]*/g, "")) {
+            if (!output.isEmpty()) {
                 if (layer == 0) {
                     return miniLOL.menu.parsers.layer(template, layer).menu.interpolate({
                         data: output
@@ -1248,7 +1250,7 @@ miniLOL = {
                         }
                     }
                     else if (e.nodeType == Node.CDATA_SECTION_NODE || e.nodeType == Node.TEXT_NODE) {
-                        if (!e.nodeValue.replace(/[\s\n]+/g, "")) {
+                        if (e.nodeValue.isEmpty()) {
                             return;
                         }
 
@@ -1688,7 +1690,7 @@ miniLOL = {
 
                     case Node.CDATA_SECTION_NODE:
                     case Node.TEXT_NODE:
-                    if (!element.nodeValue.match(/^[\s\n]*$/)) {
+                    if (!element.nodeValue.isEmpty()) {
                         result = element.nodeValue.strip();
                         throw $break;
                     }

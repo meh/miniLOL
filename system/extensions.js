@@ -129,6 +129,10 @@ Object.extend(String.prototype, {
         return result;
     },
 
+    isEmpty: function () {
+        return this == 0;
+    },
+
     isURL: function () {
         var match = this.match(/^mailto:([\w.%+-]+@[\w.]+\.[A-Za-z]{2,4})$/);
         if (match) {
@@ -194,7 +198,7 @@ Element.addMethods({
                 return;
             }
 
-            if (node.getElementsByTagName('*').length == 0) {
+            if (node.getElementsByTagName("*").length == 0) {
                 var content = "";
 
                 $A(node.childNodes).each(function (text) {
@@ -202,7 +206,7 @@ Element.addMethods({
                         return;
                     }
     
-                    if (text.nodeValue.match(/^[\s\n]*$/)) {
+                    if (text.nodeValue.isEmpty()) {
                         return;
                     }
                     
