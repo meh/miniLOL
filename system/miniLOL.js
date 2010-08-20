@@ -1130,8 +1130,8 @@ miniLOL = {
 
         parsers: {
             list: function (element, data) {
-                list = element.cloneNode(false);
-                data = data || [element];
+                var list = element.cloneNode(false);
+                    data = data || [element];
 
                 var listBefore   = list.getAttribute("before") || data[0].getAttribute("before") || ""; list.removeAttribute("before");
                 var listAfter    = list.getAttribute("after") || data[0].getAttribute("after") || ""; list.removeAttribute("after");
@@ -1267,7 +1267,7 @@ miniLOL = {
             },
 
             include: function (element, data) {
-                element = element.cloneNode(false);
+                var include = element.cloneNode(false);
 
                 var href   = element.getAttribute("href"); element.removeAttribute("href");
                 var update = element.getAttribute("update"); element.removeAttribute("update");
