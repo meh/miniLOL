@@ -1297,14 +1297,10 @@ miniLOL = {
             Event.fire(document, ":page.load", { path: path, queries: queries });
 
             if (url) {
-                var data = {};
-                Object.extend(data, miniLOL.config["core"]);
-                Object.extend(data, queries);
-
                 document.title = (
                        queries.title
                     || miniLOL.config["core"].siteTitle
-                ).interpolate(data);
+                ).interpolate(Object.extend(Object.extend({}, miniLOL.config["core"]), queries));
             }
 
             new Ajax.Request("data/#{path}?#{queries}".interpolate({ path: path, queries: Object.toQueryString(queries) }), {
