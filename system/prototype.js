@@ -3446,7 +3446,7 @@ Element.addMethods({
       var newWidth;
       if (width && (positionedWidth === width)) {
         newWidth = getPixelValue(element, 'width', context);
-      } else if (width && (position === 'absolute' || position === 'fixed')) {
+      } else if (position === 'absolute' || position === 'fixed') {
         newWidth = getPixelValue(element, 'width', context);
       } else {
         var parent = element.parentNode, pLayout = $(parent).getLayout();

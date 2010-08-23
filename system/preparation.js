@@ -76,4 +76,28 @@ else if (Prototype.Browser.Chrome || Prototype.Browser.Safari) {
     }
 }
 
+/* TODO: This shit doesn't work properly, it crashed IE 8 and doesn't do anything on IE 6
+if (Prototype.Browser.IE) {
+    (function () {
+        function addBehaviors (style) {
+            $A(style.rules).each(function (rule) {
+                if (rule.style["border-radius"]) {
+                    rule.style["behavior"] = "url(system/PIE.htc)";
+                }
+            });
+        }
+
+        Event.observe(document, ":initialized", function (event) {
+            $A(document.styleSheets).each(function (style) {
+                addBehaviors(style);
+            });
+        });
+
+        Event.observe(document, ":css.create", function (event) {
+            addBehaviors(event.memo);
+        });
+    })();
+}
+*/
+
 miniLOL.utils.require("system/extensions.js");

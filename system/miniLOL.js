@@ -1732,6 +1732,8 @@ miniLOL = {
 
                 $$("head")[0].insert(style);
 
+                Event.fire(document, ":css.include", path);
+
                 return style;
             }
             else {
@@ -1743,6 +1745,8 @@ miniLOL = {
             var css = new Element("style", { type: "text/css" }).update(style);
 
             $$("head").first().appendChild(css);
+
+            Event.fire(document, ":css.create", css);
 
             return css;
         },

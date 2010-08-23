@@ -39,7 +39,7 @@
 
         Event.observe(document, ":initialized", function () {
             this.resize.delay(0.1);
-        });
+        }.bind(this));
 
         this.resize.defer();
 
