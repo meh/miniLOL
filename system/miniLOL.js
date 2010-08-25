@@ -35,6 +35,7 @@ miniLOL = {
         miniLOL.initialized = false;
         miniLOL.path        = location.href.match(/^(.*?)\/[^\/]*?(#|$)/)[1];
         miniLOL.resources   = {};
+        miniLOL.tmp         = {};
 
         [function () {
             Event.observe(document, ":resource.loaded", function (event) {
@@ -400,15 +401,15 @@ miniLOL = {
             return false;
         }
 
-        Event.observe(document, ":go", function () {
+        Event.observe(document, ":go", (miniLOL.tmp.fixScroll = function () {
             miniLOL.theme.content().scrollTo();
-        });
-
-        miniLOL.go(/[#?]./.test(location.href) ? location.href.replace(/^.*[#?]/, '#') : miniLOL.config["core"].homePage);
+        }));
 
         if (miniLOL.config["core"].initialization) {
             eval(miniLOL.config["core"].initialization);
         }
+
+        miniLOL.go(/[#?]./.test(location.href) ? location.href.replace(/^.*[#?]/, '#') : miniLOL.config["core"].homePage);
 
         Event.observe(document, ":refresh", function () {
             miniLOL.resource.reload();
@@ -759,7 +760,7 @@ miniLOL = {
                 miniLOL.go(location.href);
             }
 
-            miniLOL.theme.data = {};
+            miniLOL.theme.tmp = {};
 
             // Sadly this has some problems.
             // I didn't find a way to know if the CSSs have already been applied and the initialize
@@ -771,7 +772,7 @@ miniLOL = {
             // If someone knows a way to fix this, please contact me.
             // (Already tried XHR and create <style>, but url() would get borked and it only worked in Firefox and Opera)
             if (!noInitialization && miniLOL.theme.initialize) {
-                miniLOL.theme.initialize.call(miniLOL.theme.data);
+                miniLOL.theme.initialize.call(miniLOL.theme.tmp);
             }
 
             Event.fire(document, ":theme.loaded", { name: name, runtime: Boolean(runtime) });
@@ -789,10 +790,10 @@ miniLOL = {
             Event.fire(document, ":theme.unload", { name: miniLOL.theme.name });
 
             if (!noFinalization && miniLOL.theme.finalize) {
-                miniLOL.theme.finalize.call(miniLOL.theme.data || {});
+                miniLOL.theme.finalize.call(miniLOL.theme.tmp || {});
             }
 
-            delete miniLOL.theme.data;
+            delete miniLOL.theme.tmp;
 
             $A(miniLOL.theme.information.styles).each(function (style) {
                 miniLOL.theme.style.unload(style);
