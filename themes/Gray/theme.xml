@@ -43,7 +43,7 @@
 
         this.resize.defer();
 
-        miniLOL.theme.data.current = function (event) {
+        this.current = function (event) {
             var matches = unescape(event.memo).match(/(#[^&]*)/)
             var url;
 
