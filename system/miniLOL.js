@@ -37,6 +37,10 @@ miniLOL = {
         miniLOL.resources   = {};
         miniLOL.tmp         = {};
 
+        Event.observe(document, ":go", (miniLOL.tmp.fixScroll = function () {
+            miniLOL.theme.content().scrollTo();
+        }));
+
         [function () {
             Event.observe(document, ":resource.loaded", function (event) {
                 if (event.memo.resource.name != "miniLOL.config" || event.memo.arguments[0] != "resources/config.xml") {
@@ -400,10 +404,6 @@ miniLOL = {
 
             return false;
         }
-
-        Event.observe(document, ":go", (miniLOL.tmp.fixScroll = function () {
-            miniLOL.theme.content().scrollTo();
-        }));
 
         if (miniLOL.config["core"].initialization) {
             eval(miniLOL.config["core"].initialization);
