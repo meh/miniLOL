@@ -1317,7 +1317,7 @@ miniLOL = {
 
                     Event.fire(document, ":page.loaded", http);
 
-                    Event.fire(document, ":go", url);
+                    Event.fire(document, ":go", url.getHashFragment());
                 },
         
                 onFailure: function (http) {
@@ -1582,7 +1582,7 @@ miniLOL = {
         }
 
         if (result) {
-            Event.fire(document, ":go", url);
+            Event.fire(document, ":go", url.getHashFragment());
         }
 
         return result;

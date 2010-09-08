@@ -152,6 +152,12 @@ Object.extend(String.prototype, {
             protocol: match[1],
             uri:      match[2]
         };
+    },
+
+    getHashFragment: function () {
+        var matches = this.match(/(#.*)$/)
+
+        return (matches) ? matches[1] : "";
     }
 });
 
