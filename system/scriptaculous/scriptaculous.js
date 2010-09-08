@@ -1,4 +1,4 @@
-// script.aculo.us scriptaculous.js v1.8.3, Thu Oct 08 11:23:33 +0200 2009
+// script.aculo.us scriptaculous.js v1.8.3, 2010-09-08 16:00:58 +0200
 
 // Copyright (c) 2005-2009 Thomas Fuchs (http://script.aculo.us, http://mir.aculo.us)
 //
@@ -54,7 +54,7 @@ var Scriptaculous = {
         Scriptaculous.REQUIRED_PROTOTYPE);
 
     var js = /scriptaculous\.js(\?.*)?$/;
-    $$('head script[src]').findAll(function(s) {
+    $$('script[src]').findAll(function(s) {
       return s.src.match(js);
     }).each(function(s) {
       var path = s.src.replace(js, ''),
