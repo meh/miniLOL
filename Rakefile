@@ -46,6 +46,7 @@ task :default do
 
     minify('system/prototype.js')
     minify('system/cookiejar.js')
+    minify('system/jstorage.js');
     minify('system/xpath.js')
 
     updated       = false

@@ -29,6 +29,8 @@ else {
     };
 }
 
+miniLOL.storage = $.jStorage;
+
 Object.extend(Object, {
     isBoolean: function (val) {
         return val.constructor === Boolean;
