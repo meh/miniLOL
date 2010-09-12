@@ -684,7 +684,7 @@ miniLOL = {
                         }
                     }
                     catch (e) {
-                        error = 'An error occurred on the theme's initialize function:\n\n' + e.toString();
+                        error = 'An error occurred on the theme#initialize function:\n\n' + e.toString();
                         return false;
                     }
 
@@ -699,7 +699,7 @@ miniLOL = {
                         }
                     }
                     catch (e) {
-                        error = 'An error occurred on the theme's finalize function:\n\n' + e.toString();
+                        error = 'An error occurred on the theme#finalize function:\n\n' + e.toString();
                         return false;
                     }
 
@@ -715,7 +715,7 @@ miniLOL = {
                 },
 
                 onFailure: function () {
-                    error = 'Could not load theme's information.';
+                    error = 'Could not load theme#information.';
                 }
             });
 
@@ -745,7 +745,7 @@ miniLOL = {
 
             miniLOL.theme.information.styles.each(function (style) {
                 if (!miniLOL.theme.style.load(style, false, true)) {
-                    miniLOL.error('Couldn't load `#{style}` style/'.interpolate({
+                    miniLOL.error('Could not load `#{style}` style/'.interpolate({
                         style: style
                     }), true);
 
@@ -881,7 +881,7 @@ miniLOL = {
                 miniLOL.menu.current = name;
             }
             else {
-                var error = 'The menu `#{name}` doesn't exist.'.interpolate({
+                var error = 'The menu `#{name}` does not exist.'.interpolate({
                     name: name
                 });
 
@@ -1397,7 +1397,7 @@ miniLOL = {
 
             if (!miniLOL.module.exists(name)) {
                 if (output) {
-                    miniLOL.error('The module `#{name}` isn't loaded.'.interpolate({ name: name }), true);
+                    miniLOL.error('The module `#{name}` is not loaded.'.interpolate({ name: name }), true);
                 }
 
                 return false;
@@ -1659,7 +1659,7 @@ miniLOL = {
             var error = false;
 
             if (!xml) {
-                error = 'There's a syntax error.';
+                error = 'There is a syntax error.';
             }
 
             if (xml.documentElement.nodeName == 'parsererror') {

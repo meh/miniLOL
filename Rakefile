@@ -2,7 +2,7 @@ require 'rake'
 require 'rake/clean'
 
 # You need this: http://code.google.com/closure/compiler/
-COMPILER = 'closure' # or java -jar compiler.jar
+COMPILER = 'closure-compiler'
 
 def minify (file, out=nil)
     if !File.exists?(file)
