@@ -120,6 +120,8 @@ miniLOL = {
             miniLOL.resource.get("miniLOL.config").load("resources/config.xml");
 
             $(document.body).update(miniLOL.config["core"].loadingMessage);
+
+            Event.fire(document, ":initializing");
         },
 
         function () {
@@ -1742,8 +1744,12 @@ miniLOL = {
             }
         },
 
-        css: function (style) {
+        css: function (style, id) {
             var css = new Element("style", { type: "text/css" }).update(style);
+
+            if (id) {
+                css.setAtribute("id", id);
+            }
 
             $$("head").first().appendChild(css);
 
