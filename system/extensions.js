@@ -21,12 +21,12 @@ if (Prototype.Browser.IE) {
     Function.prototype.clone = function () {
         var func = this.toString();
         return new Function(func.substring(func.indexOf('{') + 1, func.lastIndexOf('}')));
-    }
+    };
 }
 else {
     Function.prototype.clone = function () {
-        return eval('(' + this.toString().replace(/^function .*?\(/, "function (") + ')');
-    }
+        return eval('(' + this.toString().replace(/^function .*?\(/, 'function (') + ')');
+    };
 }
 
 Object.extend(Object, {
@@ -46,14 +46,14 @@ Object.extend(Object, {
 
     toQueryString: function (query) {
         var result = '';
-    
+
         for (var name in query) {
-            result += "#{name}=#{value}&".interpolate({
+            result += '#{name}=#{value}&'.interpolate({
                 name: name,
                 value: query[name]
             });
         }
-    
+
         return result.substr(0, result.length - 1);
     }
 });
@@ -68,7 +68,7 @@ if (!Object.isFunction(Object.defineProperty)) {
         if (Object.isFunction(descriptor.set) && Object.isFunction(object.__defineSetter__)) {
             object.__defineSetter__(property, descriptor.set);
         }
-    }
+    };
 }
 
 if (!Object.isFunction(Object.defineProperties)) {
@@ -76,7 +76,7 @@ if (!Object.isFunction(Object.defineProperties)) {
         for (var property in properties) {
             Object.defineProperty(object, property, properties[property]);
         }
-    }
+    };
 }
 
 if (!Object.isFunction(Object.create)) {
@@ -86,38 +86,38 @@ if (!Object.isFunction(Object.create)) {
         Object.defineProperties(obj, properties);
 
         return obj;
-    }
+    };
 }
 
 Object.extend(String, {
     fromAttributes: function (attributes) {
         var result = '';
-    
+
         for (var i = 0; i < attributes.length; i++) {
             result += '#{name}="#{value}" '.interpolate({
                 name: attributes.item(i).nodeName,
                 value: attributes.item(i).nodeValue
             });
         }
-    
+
         return result;
     }
-})
+});
 
 Object.extend(String.prototype, {
     toQueryParams: function () {
         var result  = {};
         var matches = this.match(/[?#](.*)$/);
-        
+
         if (!matches) {
             return result;
         }
-        
+
         var blocks = matches[1].split(/&/);
         for (var i = 0; i < blocks.length; i++) {
             var parts = blocks[i].split(/=/);
             var name  = decodeURIComponent(parts[0]);
-            
+
             if (parts[1]) {
                 result[name] = decodeURIComponent(parts[1]);
             }
@@ -125,7 +125,7 @@ Object.extend(String.prototype, {
                 result[name] = true;
             }
         }
-        
+
         return result;
     },
 
@@ -137,17 +137,17 @@ Object.extend(String.prototype, {
         var match = this.match(/^mailto:([\w.%+-]+@[\w.]+\.[A-Za-z]{2,4})$/);
         if (match) {
             return {
-                protocol: "mailto",
+                protocol: 'mailto',
                 uri:      match[1]
             };
         }
-    
+
         match = this.match(/^(\w+):(\/\/.+?(:\d)?)(\/)?/);
-    
+
         if (!match) {
             return false;
         }
-    
+
         return {
             protocol: match[1],
             uri:      match[2]
@@ -155,9 +155,9 @@ Object.extend(String.prototype, {
     },
 
     getHashFragment: function () {
-        var matches = this.match(/(#.*)$/)
+        var matches = this.match(/(#.*)$/);
 
-        return (matches) ? matches[1] : "";
+        return (matches) ? matches[1] : '';
     }
 });
 
@@ -173,25 +173,25 @@ Element.addMethods({
 
     getTextDescendants: function (element) {
         var result = [];
-        
+
         function accumulateTextChildren (parent) {
             var child = parent.firstChild;
-            
+
             while (child) {
                 if (Node.TEXT_NODE == child.nodeType) {
                     result.push(child);
                 }
-                
+
                 if (Object.isElement(child)) {
                     accumulateTextChildren(child);
                 }
-                
+
                 child = child.nextSibling;
             }
         }
-        
+
         accumulateTextChildren(element);
-        
+
         return result;
     },
 
@@ -204,18 +204,18 @@ Element.addMethods({
                 return;
             }
 
-            if (node.getElementsByTagName("*").length == 0) {
-                var content = "";
+            if (node.getElementsByTagName('*').length == 0) {
+                var content = '';
 
                 $A(node.childNodes).each(function (text) {
                     if (text.nodeType != Node.CDATA_SECTION_NODE && text.nodeType != Node.TEXT_NODE) {
                         return;
                     }
-    
+
                     if (text.nodeValue.isEmpty()) {
                         return;
                     }
-                    
+
                     content += text.nodeValue;
                 });
 

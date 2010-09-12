@@ -17,12 +17,12 @@
  * along with miniLOL.  If not, see <http://www.gnu.org/licenses/>.         *
  ****************************************************************************/
 
-unFocus.History.addEventListener("historyChange", function (query) {
+unFocus.History.addEventListener('historyChange', function (query) {
     if (query) {
         miniLOL.go(query);
     }
     else {
-        miniLOL.go(miniLOL.config["core"].homePage);
+        miniLOL.go(miniLOL.config['core'].homePage);
     }
 });
 
@@ -45,35 +45,35 @@ else {
 
 if (Prototype.Browser.IE) {
     Error.prototype.toString = function () {
-        return "#{name}: #{description}<br/><br/>#{stack}".interpolate({
+        return '#{name}: #{description}<br/><br/>#{stack}'.interpolate({
             name:        this.name,
             description: this.description,
-            stack:       (this.stack || '').replace(/\n/g, "<br/>")
+            stack:       (this.stack || '').replace(/\n/g, '<br/>')
         });
     };
 }
 else if (Prototype.Browser.Opera) {
     Error.prototype.toString = function () {
-        return "#{name}: #{message}".interpolate(this);
-    }
+        return '#{name}: #{message}'.interpolate(this);
+    };
 }
 else if (Prototype.Browser.Gecko) {
     Error.prototype.toString = function () {
-        return "#{name}: #{message}<br/><br/>#{stack}".interpolate({
+        return '#{name}: #{message}<br/><br/>#{stack}'.interpolate({
             name:       this.name,
             message:    this.message,
-            stack:      this.stack.replace(/\n/g, "<br/>")
+            stack:      this.stack.replace(/\n/g, '<br/>')
         });
-    }
+    };
 }
 else if (Prototype.Browser.Chrome || Prototype.Browser.Safari) {
     Error.prototype.toString = function () {
-        return "#{name}: #{message}<br/><br/>#{stack}".interpolate({
+        return '#{name}: #{message}<br/><br/>#{stack}'.interpolate({
             name:    this.name,
             message: this.message,
-            stack:   this.stack.replace(/\n/g, "<br/>")
+            stack:   this.stack.replace(/\n/g, '<br/>')
         });
-    }
+    };
 }
 
 /* TODO: This shit doesn't work properly, it crashed IE 8 and doesn't do anything on IE 6
@@ -81,23 +81,23 @@ if (Prototype.Browser.IE) {
     (function () {
         function addBehaviors (style) {
             $A(style.rules).each(function (rule) {
-                if (rule.style["border-radius"]) {
-                    rule.style["behavior"] = "url(system/PIE.htc)";
+                if (rule.style['border-radius']) {
+                    rule.style['behavior'] = 'url(system/PIE.htc)';
                 }
             });
         }
 
-        Event.observe(document, ":initialized", function (event) {
+        Event.observe(document, ':initialized', function (event) {
             $A(document.styleSheets).each(function (style) {
                 addBehaviors(style);
             });
         });
 
-        Event.observe(document, ":css.create", function (event) {
+        Event.observe(document, ':css.create', function (event) {
             addBehaviors(event.memo);
         });
     })();
 }
 */
 
-miniLOL.utils.require("system/extensions.js");
+miniLOL.utils.require('system/extensions.js');
