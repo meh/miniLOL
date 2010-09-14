@@ -29,11 +29,23 @@ else {
     };
 }
 
-miniLOL.storage = $.jStorage;
-
 Object.extend(Object, {
     isBoolean: function (val) {
         return val.constructor === Boolean;
+    },
+
+    isXML: function (val) {
+        if (typeof val !== 'object') {
+            return false;
+        }
+
+        val = val.ownerDocument || val;
+
+        if (!val.documentElement) {
+            return false;
+        }
+
+        return val.documentElement.nodeName != "HTML";
     },
 
     fromAttributes: function (attributes) {
@@ -103,6 +115,14 @@ Object.extend(String, {
         }
 
         return result;
+    },
+    
+    fromXML: function (node) {
+        if (!Object.isXML(node)) {
+            return false;
+        }
+
+        return new XMLSerializer().serializeToString(node);
     }
 });
 
@@ -129,6 +149,10 @@ Object.extend(String.prototype, {
         }
 
         return result;
+    },
+
+    toXML: function () {
+        return new DOMParser().parseFromString(this, 'text/xml');
     },
 
     isEmpty: function () {

@@ -100,4 +100,27 @@ if (Prototype.Browser.IE) {
 }
 */
 
+if (Prototype.Browser.IE) {
+    if (!window.DOMParser) {
+        window.DOMParser = Class.create({
+            parseFromString: function (string) {
+                var xml = new AciveXObject('Microsoft.XMLDOM');
+
+                xml.async = 'false';
+                xml.loadXML(string);
+
+                return xml;
+            }
+        });
+    }
+
+    if (!window.XMLSerializer) {
+        window.XMLSerializer = Class.create({
+            serializeToString: function (node) {
+                return node.xml
+            }
+        });
+    }
+}
+
 miniLOL.utils.require('system/extensions.js');

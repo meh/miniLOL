@@ -22,12 +22,17 @@ task :default do
     minified = File.new(`mktemp -u`.strip, 'w')
 
     updated = false
-    ['miniLOL', 'Resource', 'preparation', 'extensions'].each {|file|
-        if File.mtime("system/#{file}.js") >= File.mtime('system/miniLOL.min.js')
-            updated = true
-            break
-        end
-    }
+
+    if !File.exists?('system/miniLOL.min.js')
+        updated = true
+    else
+        ['miniLOL', 'Resource', 'Storage', 'preparation', 'extensions'].each {|file|
+            if File.mtime("system/#{file}.js") >= File.mtime('system/miniLOL.min.js')
+                updated = true
+                break
+            end
+        }
+    end
 
     if updated
         whole = File.read('system/miniLOL.js').lines.to_a
