@@ -1748,7 +1748,7 @@ miniLOL = {
             var css = new Element('style', { type: 'text/css' }).update(style);
 
             if (id) {
-                css.setAtribute('id', id);
+                css.setAttribute('id', id);
             }
 
             $$('head').first().appendChild(css);
@@ -1863,4 +1863,6 @@ miniLOL = {
 };
 
 miniLOL.utils.require('system/Resource.js');
+miniLOL.utils.require('system/Storage.js');
+
 miniLOL.utils.require('system/preparation.js');

@@ -31,9 +31,9 @@ task :default do
 
     if updated
         whole = File.read('system/miniLOL.js').lines.to_a
-        whole.pop
-        whole.pop
+        whole.pop 4
         whole.insert(-1, *File.read('system/Resource.js').lines.to_a)
+        whole.insert(-1, *File.read('system/Storage.js').lines.to_a)
         whole.insert(-1, *File.read('system/preparation.js').lines.to_a)
         whole.pop
         whole.insert(-1, *File.read('system/extensions.js').lines.to_a)
