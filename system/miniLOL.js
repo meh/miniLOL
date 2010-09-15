@@ -34,6 +34,7 @@ miniLOL = {
 
         miniLOL.initialized = false;
         miniLOL.path        = location.href.match(/^(.*?)\/[^\/]*?(#|$)/)[1];
+        miniLOL.storage     = new miniLOL.Storage('miniLOL.core');
         miniLOL.resources   = {};
         miniLOL.tmp         = {};
 
@@ -601,10 +602,12 @@ miniLOL = {
                 miniLOL.theme.template.cache = {};
 
                 miniLOL.theme.templates = {};
+            },
 
+            setDefaults: function () {
                 miniLOL.theme.templates.list = {};
 
-                miniLOL.theme.templates.list['default'] = {
+                miniLOL.theme.templates.list['default'] = Object.extend({
                     global: '<div #{attributes}>#{data}</div>',
 
                     before: '#{data}',
@@ -614,9 +617,9 @@ miniLOL = {
                     item: '<div class="#{class}" id="#{id}2>#{before}<span #{attributes}>#{text}</span>#{after}</div>',
                     nest: '<div class="#{class}" style="#{style}">#{data}</div>',
                     data: '<div class="data">#{before}#{data}#{after}</div>'
-                };
+                }, miniLOL.theme.templates.list['default']);
 
-                miniLOL.theme.templates.list['table'] = {
+                miniLOL.theme.templates.list['table'] = Object.extend({
                     global: '<table #{attributes}>#{data}</table>',
 
                     before: '#{data}',
@@ -626,7 +629,7 @@ miniLOL = {
                     item: '<tr><td>#{before}</td><td>#{text}</td><td>#{after}</td></tr>',
                     nest: '<div class="#{class}" style="#{style}">#{data}</div>',
                     data: '<div class="data">#{before}#{data}#{after}</div>'
-                };
+                }, miniLOL.theme.templates.list['table']);
             }
         },
 
@@ -712,6 +715,8 @@ miniLOL = {
                     doc.xpath('/theme/templates/*').each(function (node) {
                         miniLOL.theme.templates[node.nodeName] = Element.toObject(node);
                     }, this);
+
+                    miniLOL.theme.template.setDefaults();
                 },
 
                 onFailure: function () {
@@ -838,7 +843,7 @@ miniLOL = {
 
             miniLOL.utils.includeCSS('resources/style.css');
 
-            miniLOL.theme.template.clearCache();
+            miniLOL.theme.template.setDefaults();
 
             return true;
         }
@@ -1358,6 +1363,8 @@ miniLOL = {
                     obj[func] = obj[func].bind(obj);
                 }
             }
+
+            obj.storage = new miniLOL.Storage('module.' + name);
 
             if (obj.initialize) {
                 try {
