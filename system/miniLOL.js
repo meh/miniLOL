@@ -617,7 +617,7 @@ miniLOL = {
                     item: '<div class="#{class}" id="#{id}2>#{before}<span #{attributes}>#{text}</span>#{after}</div>',
                     nest: '<div class="#{class}" style="#{style}">#{data}</div>',
                     data: '<div class="data">#{before}#{data}#{after}</div>'
-                }, miniLOL.theme.templates.list['default']);
+                }, miniLOL.theme.templates.list['default'] || {});
 
                 miniLOL.theme.templates.list['table'] = Object.extend({
                     global: '<table #{attributes}>#{data}</table>',
@@ -629,7 +629,7 @@ miniLOL = {
                     item: '<tr><td>#{before}</td><td>#{text}</td><td>#{after}</td></tr>',
                     nest: '<div class="#{class}" style="#{style}">#{data}</div>',
                     data: '<div class="data">#{before}#{data}#{after}</div>'
-                }, miniLOL.theme.templates.list['table']);
+                }, miniLOL.theme.templates.list['table'] || {});
             }
         },
 
