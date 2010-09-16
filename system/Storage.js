@@ -102,7 +102,7 @@ miniLOL.Storage.unserialize = function (string) {
 
 miniLOL.Storage.Backend = Class.create({
     initialize: function (name) {
-        this.name = name;
+        this.name = name.replace(/ /g, '');
         this.size = 0;
         this.data = {};
     },
@@ -169,12 +169,15 @@ miniLOL.Storage.Backends = {
     LocalStorage: Class.create(miniLOL.Storage.Backend, {
         initialize: function ($super, name) {
             $super(name);
+            
+            var raw = window.localStorage['__miniLOL.storage.' + this.name] || '{}'
 
-            this.data = miniLOL.Storage.unserialize(window.localStorage['__miniLOL.storage.' + name]) || {};
+            this.data = miniLOL.Storage.unserialize(raw);
+            this.size = raw.length;
         },
 
         save: function () {
-            var raw = miniLOL.Storage.serialize(this.data);
+            var raw = miniLOL.Storage.serialize(this.data) || '{}';
 
             this.size = raw.length;
 
@@ -186,11 +189,14 @@ miniLOL.Storage.Backends = {
         initialize: function ($super, name) {
             $super(name);
 
-            this.data = miniLOL.Storage.unserialize(window.globalStorage[window.location.hostname]['__miniLOL.storage.' + name]) || {};
+            var raw = window.globalStorage[window.location.hostname]['__miniLOL.storage.' + this.name] || '{}'
+
+            this.data = miniLOL.Storage.unserialize(raw);
+            this.size = raw.length;
         },
 
         save: function () {
-            var raw = miniLOL.Storage.serialize(this.data);
+            var raw = miniLOL.Storage.serialize(this.data) || '{}';
 
             this.size = raw.length;
 
@@ -207,16 +213,16 @@ miniLOL.Storage.Backends = {
             this.element.addBehavior('#default#userData');
             $$('head')[0].appendChild(this.element);
 
-            this.element.load('__miniLOL.storage.' + name);
+            this.element.load('__miniLOL.storage.' + this.name);
 
-            var raw = this.element.getAttribute('__miniLOL.storage.' + name);
+            var raw = this.element.getAttribute('__miniLOL.storage.' + this.name) || '{}';
 
             this.data = miniLOL.Storage.unserialize(raw);
             this.size = raw.length;
         },
 
         save: function () {
-            var raw = miniLOL.Storage.serialize(this.data);
+            var raw = miniLOL.Storage.serialize(this.data) || '{}';
 
             this.size = raw.length;
 
@@ -231,14 +237,14 @@ miniLOL.Storage.Backends = {
 
             this.jar = new CookieJar({ expires: 60 * 60 * 24 * 365 });
 
-            var raw = this.jar.get('__miniLOL.storage.' + name);
+            var raw = this.jar.get('__miniLOL.storage.' + this.name) || '{}';
 
             this.data = miniLOL.Storage.unserialize(raw);
             this.size = raw.length;
         },
 
         save: function () {
-            var raw = miniLOL.Storage.serialize(this.data);
+            var raw = miniLOL.Storage.serialize(this.data) || '{}';
 
             this.size = raw.length;
 
