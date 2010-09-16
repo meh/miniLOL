@@ -17,17 +17,26 @@
  * along with miniLOL.  If not, see <http://www.gnu.org/licenses/>.         *
  ****************************************************************************/
 
-if (Prototype.Browser.IE) {
-    Function.prototype.clone = function () {
-        var func = this.toString();
-        return new Function(func.substring(func.indexOf('{') + 1, func.lastIndexOf('}')));
-    };
-}
-else {
-    Function.prototype.clone = function () {
-        return eval('(' + this.toString().replace(/^function .*?\(/, 'function (') + ')');
-    };
-}
+Object.extend(Function, {
+    parse: function (string) {
+        matches = string.match(/^function\s*\((.*?)\)[\s\n]*\{([\s\S]*)\}[\s\n]*/m);
+
+        if (!matches) {
+            return null;
+        }
+
+        var signature = matches[1].split(/\s*,\s*/);
+        var body      = matches[2];
+
+        return new Function(signature, body);
+    }
+});
+
+Object.extend(Function.prototype, {
+    clone: function () {
+        return Function.parse(this.toString());
+    }
+});
 
 Object.extend(Object, {
     isBoolean: function (val) {

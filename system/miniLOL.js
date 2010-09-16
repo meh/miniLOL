@@ -1350,6 +1350,10 @@ miniLOL = {
                 module: name
             });
 
+            if (!Object.isArray(obj.dependencies)) {
+                obj.dependencies = [];
+            }
+
             if (!obj.type) {
                 obj.type = 'active';
             }

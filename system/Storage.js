@@ -44,7 +44,7 @@ miniLOL.Storage = Class.create({
     }
 });
 
-miniLOL.Storage.serializeXML = function (obj) {
+miniLOL.Storage.serializeSpecial = function (obj) {
     if (typeof obj !== 'object') {
         return obj;
     }
@@ -53,17 +53,20 @@ miniLOL.Storage.serializeXML = function (obj) {
 
     for (var key in obj) {
         if (Object.isXML(obj[key])) {
-            obj[key] = { __miniLOL_is_xml: true, xml: String.fromXML(obj[key]) };
+            obj[key] = { __miniLOL_is_xml: true, value: String.fromXML(obj[key]) };
+        }
+        else if (Object.isFunction(obj[key])) {
+            obj[key] = { __miniLOL_is_function: true, value: obj[key].toString() };
         }
         else {
-            obj[key] = miniLOL.Storage.serializeXML(obj[key]);
+            obj[key] = miniLOL.Storage.serializeSpecial(obj[key]);
         }
     }
 
     return obj;
 };
 
-miniLOL.Storage.unserializeXML = function (obj) {
+miniLOL.Storage.unserializeSpecial = function (obj) {
     if (typeof obj !== 'object') {
         return obj;
     }
@@ -72,10 +75,13 @@ miniLOL.Storage.unserializeXML = function (obj) {
 
     for (var key in obj) {
         if (obj[key].__miniLOL_is_xml) {
-            obj[key] = obj[key].xml.toXML();
+            obj[key] = obj[key].value.toXML();
+        }
+        else if (obj[key].__miniLOL_is_function) {
+            obj[key] = Function.parse(obj[key].value);
         }
         else {
-            obj[key] = miniLOL.Storage.unserializeXML(obj[key]);
+            obj[key] = miniLOL.Storage.unserializeSpecial(obj[key]);
         }
     }
 
@@ -83,7 +89,7 @@ miniLOL.Storage.unserializeXML = function (obj) {
 };
 
 miniLOL.Storage.serialize = function (obj) {
-    return Object.toJSON(miniLOL.Storage.serializeXML(obj));
+    return Object.toJSON(miniLOL.Storage.serializeSpecial(obj));
 };
 
 miniLOL.Storage.unserialize = function (string) {
@@ -91,7 +97,7 @@ miniLOL.Storage.unserialize = function (string) {
         return;
     }
 
-    return miniLOL.Storage.unserializeXML(string.evalJSON());
+    return miniLOL.Storage.unserializeSpecial(string.evalJSON());
 };
 
 miniLOL.Storage.Backend = Class.create({
