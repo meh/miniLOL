@@ -206,7 +206,23 @@ Element.addMethods({
         }
     },
 
+    xpath: function (element, query) {
+        element = (Object.isElement(element)) ? element : this;
+        query   = (Object.isElement(element)) ? query : element;
+
+        return miniLOL.utils.XML.xpath.call(element, query);
+    },
+
+    select: function (element, query) {
+        element = (Object.isElement(element)) ? element : this;
+        query   = (Object.isElement(element)) ? query : element;
+
+        return miniLOL.utils.XML.select.call(element, query);
+    },
+
     getTextDescendants: function (element) {
+        element = element || this;
+
         var result = [];
 
         function accumulateTextChildren (parent) {
@@ -231,10 +247,11 @@ Element.addMethods({
     },
 
     toObject: function (element) {
-        var on     = element || this;
+        element = element || this;
+
         var result = {};
 
-        $A(on.childNodes).each(function (node) {
+        $A(element.childNodes).each(function (node) {
             if (node.nodeType != Node.ELEMENT_NODE) {
                 return;
             }

@@ -10,17 +10,17 @@
 *  0. You just DO WHAT THE FUCK YOU WANT TO.                         *
 *********************************************************************/
 
-miniLOL.module.create("Word Filter", {
-    version: "0.1",
+miniLOL.module.create('Word Filter', {
+    version: '0.1',
 
     initialize: function () {
-        this.filters = miniLOL.utils.execute(this.root+"/system/Filters.min.js");
-        this.filters.load(this.root+"/resources/words.xml");
+        this.filters = miniLOL.utils.execute(this.root + '/system/Filters.min.js');
+        this.filters.load(this.root + '/resources/words.xml');
 
-        Event.observe(document, ":go", this.execute);
+        Event.observe(document, ':go', this.execute);
 
-        Event.observe(document, ":refresh", function () {
-            miniLOL.module.get("Word Filter").filters.reload();
+        Event.observe(document, ':refresh', function () {
+            miniLOL.module.get('Word Filter').filters.reload();
         });
     },
 

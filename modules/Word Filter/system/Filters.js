@@ -19,23 +19,23 @@ Filters.filters = [];
 
 Filters.Filter = Class.create({
     initialize: function (node, censor) {
-        this.type = node.getAttribute("type") || "censor";
+        this.type = node.getAttribute('type') || 'censor';
 
-        if (node.getAttribute("regexp")) {
-            this.regexp = eval(node.getAttribute("regexp"));
+        if (node.getAttribute('regexp')) {
+            this.regexp = eval(node.getAttribute('regexp'));
         }
-        else if (node.getAttribute("raw")) {
-            this.regexp = new RegExp(node.getAttribute("raw"), "gi");
+        else if (node.getAttribute('raw')) {
+            this.regexp = new RegExp(node.getAttribute('raw'), 'gi');
         }
 
-        if (this.type == "censor") {
-            this.to = censor || "@#!%$";
+        if (this.type == 'censor') {
+            this.to = censor || '@#!%$';
         }
-        else if (this.type == "replace") {
-            this.to = node.getAttribute("to") || "$1";
+        else if (this.type == 'replace') {
+            this.to = node.getAttribute('to') || '$1';
         }
         else {
-            this.to = "$1";
+            this.to = '$1';
         }
     },
 
@@ -44,7 +44,7 @@ Filters.Filter = Class.create({
     },
 
     toString: function () {
-        return "s/#{_regexp}/#{_to}/gi".interpolate(this);
+        return 's/#{regexp}/#{to}/gi'.interpolate(this);
     }
 });
 
@@ -58,13 +58,13 @@ Filters.apply = function (text) {
 
 Filters.load = function (path) {
     new Ajax.Request(path, {
-        method: "get",
+        method: 'get',
         asynchronous: false,
 
         onSuccess: function (http) {
-            var error = miniLOL.utils.checkXML(http.responseXML);
+            var error = miniLOL.utils.XML.check(http.responseXML);
             if (error) {
-                miniLOL.error("Error while parsing `#{filter}`\n\n#{error}".interpolate({
+                miniLOL.error('Error while parsing `#{filter}`\n\n#{error}'.interpolate({
                     filter: path,
                     error: error
                 }));
@@ -72,10 +72,10 @@ Filters.load = function (path) {
                 return;
             }
 
-            var dom = miniLOL.utils.fixDOM(http.responseXML);
+            var dom = miniLOL.utils.XML.fix(http.responseXML);
             
-            $A(dom.getElementsByTagName("filter")).each(function (filter) {
-                Filters.filters.push(new Filters.Filter(filter, dom.documentElement.getAttribute("censor")));
+            dom.xpath('/filters/filter').each(function (filter) {
+                Filters.filters.push(new Filters.Filter(filter, dom.documentElement.getAttribute('censor')));
             });
 
             Filters.paths.push(path);
