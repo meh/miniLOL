@@ -38,6 +38,10 @@ miniLOL = {
         miniLOL.resources   = {};
         miniLOL.tmp         = {};
 
+        Event.observe(document, 'unload', function (event) {
+            Event.fire(document, ':finalization', event);
+        });
+
         Event.observe(document, ':go', (miniLOL.tmp.fixScroll = function () {
             miniLOL.theme.content().scrollTo();
         }));
@@ -122,7 +126,7 @@ miniLOL = {
 
             $(document.body).update(miniLOL.config['core'].loadingMessage);
 
-            Event.fire(document, ':initializing');
+            Event.fire(document, ':initialization');
         },
 
         function () {
@@ -1349,6 +1353,8 @@ miniLOL = {
                 return false;
             }
 
+            Event.fire(document, ':module.create', { name: name, module: obj });
+
             obj.name = name;
 
             obj.root = '#{path}/#{module}'.interpolate({
@@ -1403,7 +1409,7 @@ miniLOL = {
                 miniLOL.modules[alias] = obj;
             });
 
-            Event.fire(document, ':module.create', obj);
+            Event.fire(document, ':module.created', obj);
 
             return obj;
         },
@@ -1761,7 +1767,7 @@ miniLOL = {
 
                 $$('head')[0].insert(style);
 
-                Event.fire(document, ':css.include', path);
+                Event.fire(document, ':css.included', path);
 
                 return style;
             }
@@ -1779,7 +1785,7 @@ miniLOL = {
 
             $$('head').first().appendChild(css);
 
-            Event.fire(document, ':css.create', css);
+            Event.fire(document, ':css.created', css);
 
             return css;
         },
