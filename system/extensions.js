@@ -39,6 +39,10 @@ Object.extend(Function.prototype, {
 });
 
 Object.extend(Object, {
+    isDocument: function (val) {
+        return val.toString().include('Document');
+    },
+
     isBoolean: function (val) {
         return val.constructor === Boolean;
     },
@@ -207,15 +211,15 @@ Element.addMethods({
     },
 
     xpath: function (element, query) {
-        element = (Object.isElement(element)) ? element : this;
-        query   = (Object.isElement(element)) ? query : element;
+        element = (Object.isElement(element) || Object.isDocument(element)) ? element : this;
+        query   = (Object.isElement(element) || Object.isDocument(element)) ? query : element;
 
         return miniLOL.utils.XML.xpath.call(element, query);
     },
 
     select: function (element, query) {
-        element = (Object.isElement(element)) ? element : this;
-        query   = (Object.isElement(element)) ? query : element;
+        element = (Object.isElement(element) || Object.isDocument(element)) ? element : this;
+        query   = (Object.isElement(element) || Object.isDocument(element)) ? query : element;
 
         return miniLOL.utils.XML.select.call(element, query);
     },
@@ -250,6 +254,10 @@ Element.addMethods({
         element = element || this;
 
         var result = {};
+
+        if (!Object.isElement(element) && !Object.isDocument(element)) {
+            return result;
+        }
 
         $A(element.childNodes).each(function (node) {
             if (node.nodeType != Node.ELEMENT_NODE) {
