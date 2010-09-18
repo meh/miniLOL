@@ -1,7 +1,7 @@
 require 'rake'
 require 'rake/clean'
 
-CLEAN.include(FileList['**/*.min.js'])
+CLEAN.include(FileList['system/**/*.min.js'])
 
 # You need this: http://code.google.com/closure/compiler/
 COMPILER = 'closure-compiler'
@@ -59,12 +59,16 @@ task :default do
     updated       = false
     scriptaculous = ['effects', 'builder', 'sound', 'slider', 'controls', 'dragdrop']
 
-    scriptaculous.each {|file|
-        if File.mtime("system/scriptaculous/#{file}.js") >= File.mtime('system/scriptaculous.min.js')
-            updated = true
-            break
-        end
-    }
+    if !File.exists?('system/scriptaculous.min.js')
+        updated = true
+    else
+        scriptaculous.each {|file|
+            if File.mtime("system/scriptaculous/#{file}.js") >= File.mtime('system/scriptaculous.min.js')
+                updated = true
+                break
+            end
+        }
+    end
 
     if updated
         minified = File.new(`mktemp -u`.strip, 'w')
