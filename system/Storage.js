@@ -18,29 +18,33 @@
  ****************************************************************************/
 
 miniLOL.Storage = Class.create({
-    initialize: function (name) {
+    initialize: function (name, backend) {
         this.name    = name;
-        this.backend = new (miniLOL.Storage.Backends.available())(name);
+        this.backend = new (backend || miniLOL.Storage.Backends.available())(name);
     },
 
     get: function (key) {
         return this.backend.get(key.toString());
     },
 
-    set: function (key, value) {
-        return this.backend.set(key.toString(), value);
+    set: function (key, value, noSave) {
+        return this.backend.set(key.toString(), value, noSave);
     },
 
-    remove: function (key) {
-        return this.backend.remove(key.toString());
+    remove: function (key, noSave) {
+        return this.backend.remove(key.toString(), noSave);
     },
 
-    clear: function () {
-        return this.backend.clear();
+    clear: function (noSave) {
+        return this.backend.clear(noSave);
     },
 
     size: function () {
         return this.backend.size;
+    },
+
+    save: function () {
+        this.backend.save();
     }
 });
 

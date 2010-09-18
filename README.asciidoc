@@ -40,5 +40,5 @@ Well, I *DO NOT WANT* to be indexed, but I know most do, so there's a _Static_ m
 It's modular as well, so you can get module adapters that make real modules work in the _Static_ version and there are
 even _Static_ modules, like _URL Rewrite_ that enables Apache URL rewriting.
 
-It's obviously less powerfull than the real one, but you should use it just to give content to search engines or text browsers,
+It's obviously less powerful than the real one, but you should use it just to give content to search engines or text browsers,
 so deal with it.
