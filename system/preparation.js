@@ -17,15 +17,6 @@
  * along with miniLOL.  If not, see <http://www.gnu.org/licenses/>.         *
  ****************************************************************************/
 
-Event.observe(document, ':url.change', function (event) {
-    if (event.memo) {
-        miniLOL.go(event.memo);
-    }
-    else {
-        miniLOL.go(miniLOL.config['core'].homePage);
-    }
-});
-
 /* Cross-Browser faggotree */
 
 if (navigator.userAgent.match(/Chrome/)) {

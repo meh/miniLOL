@@ -193,7 +193,7 @@ miniLOL = {
 
         function () {
             miniLOL.resource.set(new miniLOL.Resource('miniLOL.pages', {
-                load: function (path) {
+                load: function (path, ignore) {
                     new Ajax.Request(path, {
                         method: 'get',
                         asynchronous: false,
@@ -212,6 +212,10 @@ miniLOL = {
                         },
 
                         onFailure: function (http) {
+                            if (ignore) {
+                                return;
+                            }
+
                             miniLOL.error('miniLOL.pages: Error while loading #{path} (#{status} - #{statusText})'.interpolate({
                                 path:       path,
                                 status:     http.status,
@@ -235,9 +239,7 @@ miniLOL = {
                 }
             }));
 
-            if (miniLOL.utils.exists('resources/pages.xml')) {
-                miniLOL.resource.get('miniLOL.pages').load('resources/pages.xml');
-            }
+            miniLOL.resource.get('miniLOL.pages').load('resources/pages.xml', true);
         },
 
         function () {
@@ -1776,7 +1778,7 @@ miniLOL = {
 
                 $$('head')[0].insert(style);
 
-                Event.fire(document, ':css.included', path);
+                Event.fire(document, ':css.included', style);
 
                 return style;
             }
