@@ -42,6 +42,15 @@ miniLOL = {
             Event.fire(document, ':finalization', event);
         });
 
+        Event.observe(document, ':url.change', function (event) {
+            if (event.memo) {
+                miniLOL.go(event.memo);
+            }
+            else {
+                miniLOL.go(miniLOL.config['core'].homePage);
+            }
+        });
+
         Event.observe(document, ':go', (miniLOL.tmp.fixScroll = function () {
             miniLOL.theme.content().scrollTo();
         }));
