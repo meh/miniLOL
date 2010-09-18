@@ -21,6 +21,8 @@ miniLOL.History = {
     interval: 0.2,
 
     initialize: function () {
+        miniLOL.History.current = miniLOL.History.hash();
+
         Event.observe(document, ':url.change', function (event) {
             miniLOL.History.current = event.memo;
         });
