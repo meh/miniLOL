@@ -21,7 +21,7 @@ miniLOL.History = {
     interval: 0.2,
 
     initialize: function () {
-        miniLOL.History.current = miniLOL.History.hash();
+        miniLOL.History.current = window.location.hash;
 
         Event.observe(document, ':url.change', function (event) {
             miniLOL.History.current = event.memo;
@@ -36,13 +36,11 @@ miniLOL.History = {
     },
 
     check: function () {
-        var hash = miniLOL.History.hash();
-
-        if (miniLOL.History.current == hash) {
+        if (miniLOL.History.current == window.location.hash) {
             return;
         }
 
-        Event.fire(document, ':url.change', hash);
+        Event.fire(document, ':url.change', window.location.hash.replace(/^#/, ''));
     },
 
     reset: function (interval) {
@@ -54,11 +52,7 @@ miniLOL.History = {
             clearInterval(miniLOL.History.timer);
         }
 
-        miniLOL.History.timer = setInterval(miniLOL.History.check, miniLOL.History.timer * 1000);
-    },
-
-    hash: function () {
-        return window.location.hash.replace(/^#/, '');
+        miniLOL.History.timer = setInterval(miniLOL.History.check, miniLOL.History.interval * 1000);
     }
 }
 

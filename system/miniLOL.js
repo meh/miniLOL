@@ -33,7 +33,7 @@ miniLOL = {
         }
 
         miniLOL.initialized = false;
-        miniLOL.path        = location.href.match(/^(.*?)\/[^\/]*?(#|$)/)[1];
+        miniLOL.path        = location.href.match(/^\w+:\/\/.*?(\/.*?)(#|$)/)[1];
         miniLOL.storage     = new miniLOL.Storage('miniLOL.core');
         miniLOL.resources   = {};
         miniLOL.tmp         = {};
