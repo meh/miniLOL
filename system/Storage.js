@@ -174,7 +174,7 @@ miniLOL.Storage.Backends = {
         initialize: function ($super, name) {
             $super(name);
             
-            var raw = window.localStorage['__miniLOL.storage.' + this.name] || '{}'
+            var raw = window.localStorage['__miniLOL.storage.' + this.name] || '{}';
 
             this.data = miniLOL.Storage.unserialize(raw);
             this.size = raw.length;
@@ -193,7 +193,7 @@ miniLOL.Storage.Backends = {
         initialize: function ($super, name) {
             $super(name);
 
-            var raw = window.globalStorage[window.location.hostname]['__miniLOL.storage.' + this.name] || '{}'
+            var raw = window.globalStorage[window.location.hostname]['__miniLOL.storage.' + this.name] || '{}';
 
             this.data = miniLOL.Storage.unserialize(raw);
             this.size = raw.length;

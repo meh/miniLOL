@@ -1084,9 +1084,9 @@ miniLOL = {
                 Object.extend(data, queries);
 
                 document.title = (
-                       queries.title
-                    || page.getAttribute('title')
-                    || miniLOL.config['core'].siteTitle
+                       queries.title ||
+                       page.getAttribute('title') ||
+                       miniLOL.config['core'].siteTitle
                 ).interpolate(data);
             }
 
@@ -1316,8 +1316,8 @@ miniLOL = {
 
             if (url) {
                 document.title = (
-                       queries.title
-                    || miniLOL.config['core'].siteTitle
+                       queries.title ||
+                       miniLOL.config['core'].siteTitle
                 ).interpolate(Object.extend(Object.extend({}, miniLOL.config['core']), queries));
             }
 
@@ -1436,9 +1436,9 @@ miniLOL = {
                 Object.extend(data, vars);
 
                 document.title = (
-                       vars.title
-                    || miniLOL.module.get(name).title
-                    || miniLOL.config['core'].siteTitle
+                       vars.title ||
+                       miniLOL.module.get(name).title ||
+                       miniLOL.config['core'].siteTitle
                 ).interpolate(data);
             }
 
@@ -1896,5 +1896,6 @@ miniLOL = {
 
 miniLOL.utils.require('system/Resource.js');
 miniLOL.utils.require('system/Storage.js');
+miniLOL.utils.require('system/History.js');
 
 miniLOL.utils.require('system/preparation.js');

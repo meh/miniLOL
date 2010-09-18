@@ -1,6 +1,8 @@
 require 'rake'
 require 'rake/clean'
 
+CLEAN.include(FileList['**/*.min.js'])
+
 # You need this: http://code.google.com/closure/compiler/
 COMPILER = 'closure-compiler'
 
@@ -26,7 +28,7 @@ task :default do
     if !File.exists?('system/miniLOL.min.js')
         updated = true
     else
-        ['miniLOL', 'Resource', 'Storage', 'preparation', 'extensions'].each {|file|
+        ['miniLOL', 'Resource', 'Storage', 'History', 'preparation', 'extensions'].each {|file|
             if File.mtime("system/#{file}.js") >= File.mtime('system/miniLOL.min.js')
                 updated = true
                 break
@@ -36,9 +38,10 @@ task :default do
 
     if updated
         whole = File.read('system/miniLOL.js').lines.to_a
-        whole.pop 4
+        whole.pop 5
         whole.insert(-1, *File.read('system/Resource.js').lines.to_a)
         whole.insert(-1, *File.read('system/Storage.js').lines.to_a)
+        whole.insert(-1, *File.read('system/History.js').lines.to_a)
         whole.insert(-1, *File.read('system/preparation.js').lines.to_a)
         whole.pop
         whole.insert(-1, *File.read('system/extensions.js').lines.to_a)
@@ -51,7 +54,6 @@ task :default do
 
     minify('system/prototype.js')
     minify('system/cookiejar.js')
-    minify('system/jstorage.js');
     minify('system/xpath.js')
 
     updated       = false

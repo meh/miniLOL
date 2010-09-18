@@ -17,9 +17,9 @@
  * along with miniLOL.  If not, see <http://www.gnu.org/licenses/>.         *
  ****************************************************************************/
 
-unFocus.History.addEventListener('historyChange', function (query) {
-    if (query) {
-        miniLOL.go(query);
+Event.observe(document, ':url.change', function (event) {
+    if (event.memo) {
+        miniLOL.go(event.memo);
     }
     else {
         miniLOL.go(miniLOL.config['core'].homePage);
