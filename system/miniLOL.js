@@ -42,7 +42,7 @@ miniLOL = {
             Event.fire(document, ':finalization', event);
         });
 
-        Event.observe(document, ':url.change', function (event) {
+        Event.observe(document, 'hashchange', function (event) {
             if (event.memo) {
                 miniLOL.go(event.memo);
             }
@@ -1905,8 +1905,4 @@ miniLOL = {
     }
 };
 
-miniLOL.utils.require('system/Resource.js');
-miniLOL.utils.require('system/Storage.js');
-miniLOL.utils.require('system/History.js');
-
-miniLOL.utils.require('system/preparation.js');
+miniLOL.utils.require('system/miniLOL-framework.js');

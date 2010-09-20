@@ -4,31 +4,50 @@ require 'rake/clean'
 CLEAN.include(FileList['system/**/*.min.js'])
 
 # You need this: http://code.google.com/closure/compiler/
-COMPILER = 'closure-compiler'
+COMPILER = 'closure-compiler' # --compilation_level ADVANCED_OPTIMIZATIONS'
 
 def minify (file, out=nil)
     if !File.exists?(file)
-        return
+        return false
     end
 
     if !out
-        out = file.clone; out[out.length - 3, 3] = '.min.js'
+        out = file.clone;
+        out[out.length - 3, 3] = '.min.js'
     end
 
     if !File.exists?(out) || File.mtime(file) > File.mtime(out)
-        sh "#{COMPILER} --js '#{file}' --js_output_file '#{out}'"
+        result = `#{COMPILER} --js '#{file}' --js_output_file '#{out}'`
+
+        if $? != 0
+            File.delete(out) rescue nil
+
+            return false
+        end
+    else
+        return 1
     end
+
+    return true
 end
 
-task :default do
-    minified = File.new(`mktemp -u`.strip, 'w')
+def miniHeader (file)
+    content = File.read(file)
 
+    file = File.new(file, 'w');
+    file.puts '/* miniLOL is released under AGPLv3. Copyleft meh. [http://meh.doesntexist.org | meh.ffff@gmail.com] */'
+    file.write content
+    file.close
+end
+
+
+task :default do
     updated = false
 
     if !File.exists?('system/miniLOL.min.js')
         updated = true
     else
-        ['miniLOL', 'Resource', 'Storage', 'History', 'preparation', 'extensions'].each {|file|
+        ['miniLOL', 'miniLOL-framework'].each {|file|
             if File.mtime("system/#{file}.js") >= File.mtime('system/miniLOL.min.js')
                 updated = true
                 break
@@ -37,46 +56,16 @@ task :default do
     end
 
     if updated
+        minified = File.new(`mktemp -u`.strip, 'w')
+
         whole = File.read('system/miniLOL.js').lines.to_a
-        whole.pop 5
-        whole.insert(-1, *File.read('system/Resource.js').lines.to_a)
-        whole.insert(-1, *File.read('system/Storage.js').lines.to_a)
-        whole.insert(-1, *File.read('system/History.js').lines.to_a)
-        whole.insert(-1, *File.read('system/preparation.js').lines.to_a)
-        whole.pop
-        whole.insert(-1, *File.read('system/extensions.js').lines.to_a)
+        whole.pop 1
+        whole.insert(-1, *File.read('system/miniLOL-framework.js').lines.to_a)
 
         minified.write(whole.join(''))
         minified.close
 
-        minify(minified.path, 'system/miniLOL.min.js')
-    end
-
-    minify('system/prototype.js')
-    minify('system/cookiejar.js')
-    minify('system/xpath.js')
-
-    updated       = false
-    scriptaculous = ['effects', 'builder', 'sound', 'slider', 'controls', 'dragdrop']
-
-    if !File.exists?('system/scriptaculous.min.js')
-        updated = true
-    else
-        scriptaculous.each {|file|
-            if File.mtime("system/scriptaculous/#{file}.js") >= File.mtime('system/scriptaculous.min.js')
-                updated = true
-                break
-            end
-        }
-    end
-
-    if updated
-        minified = File.new(`mktemp -u`.strip, 'w')
-        scriptaculous.each {|file|
-            minified.write(File.read("system/scriptaculous/#{file}.js"))
-        }
-        minified.close
-
-        minify(minified.path, 'system/scriptaculous.min.js')
+        minify(minified.path, 'system/miniLOL.min.js') || exit
+        miniHeader('system/miniLOL.min.js')
     end
 end
