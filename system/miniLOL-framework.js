@@ -116,6 +116,7 @@ if (Prototype.Browser.IE) {
 }
 
 
+
 Object.extend(Function, {
     parse: function (string) {
         matches = string.match(/^function\s*\((.*?)\)[\s\n]*\{([\s\S]*)\}[\s\n]*/m);
@@ -139,7 +140,7 @@ Object.extend(Function.prototype, {
 
 Object.extend(Object, {
     isBoolean: function (val) {
-        return val.constructor === Boolean;
+        return typeof val == 'boolean' || val.constructor === Boolean;
     },
 
     isObject: function (val) {
@@ -253,10 +254,10 @@ Object.extend(String.prototype, {
         var blocks = matches[1].split(/&/);
         for (var i = 0; i < blocks.length; i++) {
             var parts = blocks[i].split(/=/);
-            var name  = decodeURIComponent(parts[0]);
+            var name  = parts[0].decodeURIComponent();
 
             if (parts[1]) {
-                result[name] = decodeURIComponent(parts[1]);
+                result[name] = parts[1].decodeURIComponent();
             }
             else {
                 result[name] = true;
@@ -268,10 +269,6 @@ Object.extend(String.prototype, {
 
     toXML: function () {
         return new DOMParser().parseFromString(this, 'text/xml');
-    },
-
-    isEmpty: function () {
-        return this == 0;
     },
 
     isURL: function () {
@@ -295,10 +292,30 @@ Object.extend(String.prototype, {
         };
     },
 
+    blank: function () {
+        return this == 0;
+    },
+
     getHashFragment: function () {
         var matches = this.match(/(#.*)$/);
 
         return (matches) ? matches[1] : '';
+    },
+
+    encodeURI: function () {
+        return encodeURI(this);
+    },
+
+    decodeURI: function () {
+        return decodeURI(this);
+    },
+
+    encodeURIComponent: function () {
+        return encodeURIComponent(this);
+    },
+
+    decodeURIComponent: function () {
+        return decodeURIComponent(this);
     }
 });
 
@@ -316,14 +333,32 @@ Element.addMethods({
         element = (Object.isElement(element) || Object.isDocument(element)) ? element : this;
         query   = (Object.isElement(element) || Object.isDocument(element)) ? query : element;
 
-        return miniLOL.utils.XML.xpath.call(element, query);
+        var result = [];
+        var tmp;
+
+        if (Prototype.Browser.IE) {
+            tmp = element.real.selectNodes(query);
+
+            for (var i = 0; i < tmp.length; i++) {
+                result.push(tmp.item(i));
+            }
+        }
+        else {
+            tmp = (element.ownerDocument || element).evaluate(query, element, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+
+            for (var i = 0; i < tmp.snapshotLength; i++) {
+                result.push(tmp.snapshotItem(i));
+            }
+        }
+
+        return result;
     },
 
     select: function (element, query) {
         element = (Object.isElement(element) || Object.isDocument(element)) ? element : this;
         query   = (Object.isElement(element) || Object.isDocument(element)) ? query : element;
 
-        return miniLOL.utils.XML.select.call(element, query);
+        return Prototype.Selector.select(query, element);
     },
 
     getTextDescendants: function (element) {
@@ -348,6 +383,38 @@ Element.addMethods({
         }
 
         accumulateTextChildren(element);
+
+        return result;
+    },
+
+    getFirstText: function (elements) {
+        elements = elements || this;
+
+        var result = '';
+
+        if (Object.isElement(elements)) {
+            elements = $A(elements.childNodes);
+        }
+        else if (!Object.isArray(elements)) {
+            elements = $A(elements);
+        }
+
+
+        elements.each(function (element) {
+            switch (element.nodeType) {
+                case Node.ELEMENT_NODE:
+                throw $break;
+                break;
+
+                case Node.CDATA_SECTION_NODE:
+                case Node.TEXT_NODE:
+                if (!element.nodeValue.blank()) {
+                    result = element.nodeValue.strip();
+                    throw $break;
+                }
+                break;
+            }
+        });
 
         return result;
     },
@@ -392,11 +459,235 @@ Element.addMethods({
     }
 });
 
+if (!Object.isObject(window.Document)) {
+    window.Document = {};
+}
+
+Object.extend(Document, {
+    fix: function (obj) {
+        if (!obj) {
+            return;
+        }
+
+        if (Prototype.Browser.IE) {
+            obj = { real: obj };
+
+            obj.documentElement = obj.real.documentElement;
+
+            obj.getElementsByTagName = function (name) {
+                return this.real.getElementsByTagName(name);
+            };
+
+            obj.getElementById = function (id) {
+                return miniLOL.utils.XML.getElementById.call(this.real, id);
+            };
+
+            obj.real.setProperty('SelectionLanguage', 'XPath');
+        }
+        else if (!Prototype.Browser.Good) {
+            obj.getElementById = function (id) {
+                return this.xpath("//*[@id='#{0}']".interpolate([id])).first();
+            };
+        }
+
+        obj.xpath  = Element.xpath;
+        obj.select = Element.select;
+
+        return obj;
+    },
+
+    check: function (xml, path) {
+        var error = false;
+
+        if (!xml) {
+            error = 'There is a syntax error.';
+        }
+
+        if (xml.documentElement.nodeName == 'parsererror') {
+            error = xml.documentElement.textContent;
+        }
+
+        if (path && error) {
+            miniLOL.error('Error while parsing #{path}\n\n#{error}'.interpolate({
+                path:  path,
+                error: error
+            }), true);
+
+            return error;
+        }
+
+        return error;
+    }
+});
+
 if (!Object.isObject(window.miniLOL)) {
     window.miniLOL = {
         error: Prototype.emptyFunction
     };
 }
+
+
+miniLOL.utils = {
+    exists: function (path) {
+        var result = false;
+
+        new Ajax.Request(path, {
+            method: 'head',
+            asynchronous: false,
+
+            onSuccess: function () {
+                result = true;
+            }
+        });
+
+        return result;
+    },
+
+    includeCSS: function (path) {
+        var style;
+
+        if (style = miniLOL.theme.style.list[path]) {
+            return style;
+        }
+        else if (style = $$('link').find(function (css) { return css.getAttribute('href') == path })) {
+            miniLOL.theme.style.list[path] = style;
+
+            return style;
+        }
+        else if (style = miniLOL.utils.exists(path)) {
+            style = new Element('link', {
+                rel: 'stylesheet',
+                href: path,
+                type: 'text/css'
+            });
+
+            $$('head')[0].insert(style);
+
+            Event.fire(document, ':css.included', style);
+
+            return style;
+        }
+        else {
+            return false;
+        }
+    },
+
+    css: function (style, id) {
+        var css = new Element('style', { type: 'text/css' }).update(style);
+
+        if (id) {
+            css.setAttribute('id', id);
+        }
+
+        $$('head').first().appendChild(css);
+
+        Event.fire(document, ':css.created', css);
+
+        return css;
+    },
+
+    execute: function (path) {
+        var result;
+        var error;
+
+        new Ajax.Request(path, {
+            method: 'get',
+            asynchronous: false,
+            evalJS: false,
+
+            onSuccess: function (http) {
+                try {
+                    result = window.eval(http.responseText);
+                }
+                catch (e) {
+                    error             = e;
+                    error.fileName    = path;
+                    error.lineNumber -= 5;
+                }
+            },
+
+            onFailure: function (http) {
+                error = new Error('Failed to retrieve `#{file}` (#{status} - #{statusText}).'.interpolate({
+                    file:       path,
+                    status:     http.status,
+                    statusText: http.statusText
+                }));
+
+                error.fileName   = path;
+                error.lineNumber = 0;
+            }
+        });
+
+        if (error) {
+            throw error;
+        }
+
+        return result;
+    },
+
+    include: function (path) {
+        var result = false;
+
+        new Ajax.Request(path, {
+            method: 'get',
+            asynchronous: false,
+            evalJS: false,
+
+            onSuccess: function (http) {
+                try {
+                    window.eval(http.responseText);
+                    result = true;
+                } catch (e) {
+                    result = false;
+                }
+            }
+        });
+
+        return result;
+    },
+
+    require: function (path) {
+        var error = false;
+
+        new Ajax.Request(path, {
+            method: 'get',
+            asynchronous: false,
+            evalJS: false,
+
+            onSuccess: function (http) {
+                try {
+                    window.eval(http.responseText);
+                } catch (e) {
+                    error             = e;
+                    error.fileName    = path;
+                    error.lineNumber -= 5;
+                }
+            },
+
+            onFailure: function (http) {
+                error = new Error('Failed to retrieve `#{file}` (#{status} - #{statusText}).'.interpolate({
+                    file:       path,
+                    status:     http.status,
+                    statusText: http.statusText
+                }));
+
+                error.fileName   = path;
+                error.lineNumber = 0;
+
+                error.http = {
+                    status: http.status,
+                    text:   http.statusText
+                };
+            }
+        });
+
+        if (error) {
+            throw error;
+        }
+
+        return true;
+    }
+};
 
 
 miniLOL.History = {
@@ -713,7 +1004,7 @@ miniLOL.JSON.unserialize = function (string) {
 miniLOL.Cookie = {
     get: function (key, options) {
         var options = miniLOL.Cookie.options(options);
-        var matches = window.document.cookie.match(RegExp.escape(encodeURIComponent(key)) + '=([^;]*)', 'g');
+        var matches = window.document.cookie.match(RegExp.escape(key.encodeURIComponent()) + '=([^;]*)', 'g');
 
         if (!matches) {
             return;
@@ -722,7 +1013,7 @@ miniLOL.Cookie = {
         var result = [];
 
         $A(matches).each(function (cookie) {
-            cookie = decodeURIComponent(cookie.match(/^.*?=(.*)$/)[1]);
+            cookie = cookie.match(/^.*?=(.*)$/)[1].decodeURIComponent();
 
             result.push((options.raw) ? cookie : miniLOL.JSON.unserialize(cookie) || cookie);
         });
@@ -772,8 +1063,8 @@ miniLOL.Cookie = {
 
     encode: function (key, value, options) {
         return "#{key}=#{value}; #{maxAge}#{expires}#{path}#{domain}#{secure}".interpolate({
-            key:  encodeURIComponent(key),
-            value: encodeURIComponent(value),
+            key:   key.encodeURIComponent(),
+            value: value.encodeURIComponent(),
 
             maxAge:  (!Object.isUndefined(options.maxAge))  ? 'max-age=#{0}; '.interpolate([options.maxAge]) : '',
             expires: (!Object.isUndefined(options.expires)) ? 'expires=#{0}; '.interpolate([options.expires.toUTCString()]) : '',
@@ -799,7 +1090,12 @@ miniLOL.Cookie = {
 miniLOL.Storage = Class.create({
     initialize: function (name, backend) {
         this.name    = name;
-        this.backend = new (backend || miniLOL.Storage.Backends.available())(name);
+
+        this.backend = (miniLOL.Storage.Instances[name])
+            ? miniLOL.Storage.Instances[name]
+            : new (backend || miniLOL.Storage.Backends.available())(name);
+
+        miniLOL.Storage.Instances[name] = this.backend;
     },
 
     get: function (key) {
@@ -826,6 +1122,8 @@ miniLOL.Storage = Class.create({
         this.backend.save();
     }
 });
+
+miniLOL.Storage.Instances = {};
 
 miniLOL.Storage.Backend = Class.create(miniLOL.JSON, {
     initialize: function ($super, name, data) {

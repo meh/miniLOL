@@ -1,10 +1,10 @@
 require 'rake'
 require 'rake/clean'
 
-CLEAN.include(FileList['system/**/*.min.js'])
-
 # You need this: http://code.google.com/closure/compiler/
 COMPILER = 'closure-compiler' # --compilation_level ADVANCED_OPTIMIZATIONS'
+
+CLEAN.include('system/miniLOL.min.js')
 
 def minify (file, out=nil)
     if !File.exists?(file)
@@ -40,7 +40,6 @@ def miniHeader (file)
     file.close
 end
 
-
 task :default do
     updated = false
 
@@ -57,12 +56,7 @@ task :default do
 
     if updated
         minified = File.new(`mktemp -u`.strip, 'w')
-
-        whole = File.read('system/miniLOL.js').lines.to_a
-        whole.pop 1
-        whole.insert(-1, *File.read('system/miniLOL-framework.js').lines.to_a)
-
-        minified.write(whole.join(''))
+        minified.write(File.read('system/miniLOL.js') + File.read('system/miniLOL-framework.js'))
         minified.close
 
         minify(minified.path, 'system/miniLOL.min.js') || exit

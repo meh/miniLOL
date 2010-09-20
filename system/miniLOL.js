@@ -98,11 +98,11 @@ miniLOL = {
                         asynchronous: false,
 
                         onSuccess: function (http) {
-                            if (miniLOL.utils.XML.check(http.responseXML, path)) {
+                            if (Document.check(http.responseXML, path)) {
                                 return;
                             }
 
-                            var dom = miniLOL.utils.XML.fix(http.responseXML).documentElement;
+                            var dom = Document.fix(http.responseXML).documentElement;
 
                             var domain = dom.getAttribute('domain') || 'core';
                             var config = miniLOL.config[domain] || {};
@@ -146,11 +146,11 @@ miniLOL = {
                         asynchronous: false,
 
                         onSuccess: function (http) {
-                            if (miniLOL.utils.XML.check(http.responseXML, path)) {
+                            if (Document.check(http.responseXML, path)) {
                                 return;
                             }
 
-                            var response = miniLOL.utils.XML.fix(http.responseXML);
+                            var response = Document.fix(http.responseXML);
 
                             miniLOL.menus['default'] = response.getElementById('default');
 
@@ -199,11 +199,11 @@ miniLOL = {
                         asynchronous: false,
 
                         onSuccess: function (http) {
-                            if (miniLOL.utils.XML.check(http.responseXML, path)) {
+                            if (Document.check(http.responseXML, path)) {
                                 return;
                             }
 
-                            miniLOL.utils.XML.fix(http.responseXML).xpath('//page').each(function (page) {
+                            Document.fix(http.responseXML).xpath('//page').each(function (page) {
                                 var id = page.getAttribute('id');
 
                                 delete miniLOL.pages.cache[id];
@@ -250,11 +250,11 @@ miniLOL = {
                         asynchronous: false,
 
                         onSuccess: function (http) {
-                            if (miniLOL.utils.XML.check(http.responseXML, path)) {
+                            if (Document.check(http.responseXML, path)) {
                                 return;
                             }
 
-                            miniLOL.utils.XML.fix(http.responseXML).xpath('//function').each(function (func) {
+                            Document.fix(http.responseXML).xpath('//function').each(function (func) {
                                 try {
                                     miniLOL.functions[func.getAttribute('name')] = new Function(
                                         'var text = arguments[0]; var args = arguments[1]; arguments = args; #{code}; return text;'.interpolate({
@@ -338,13 +338,13 @@ miniLOL = {
                         asynchronous: false,
 
                         onSuccess: function (http) {
-                            if (miniLOL.utils.XML.check(http.responseXML, path)) {
+                            if (Document.check(http.responseXML, path)) {
                                 return;
                             }
 
                             miniLOL.module.path = http.responseXML.documentElement.getAttribute('path') || 'modules';
 
-                            var modules = miniLOL.utils.XML.fix(http.responseXML).xpath('//module').filter(function (module) {
+                            var modules = Document.fix(http.responseXML).xpath('//module').filter(function (module) {
                                 return module.getAttribute('name');
                             });
 
@@ -592,11 +592,11 @@ miniLOL = {
                     asynchronous: false,
 
                     onSuccess: function (http) {
-                        if (miniLOL.utils.XML.check(http.responseXML, file)) {
+                        if (Document.check(http.responseXML, file)) {
                             return;
                         }
 
-                        miniLOL.theme.template.cache[file] = miniLOL.utils.XML.fix(http.responseXML);
+                        miniLOL.theme.template.cache[file] = Document.fix(http.responseXML);
                     },
 
                     onFailure: function () {
@@ -688,7 +688,7 @@ miniLOL = {
 
                 onSuccess: function (http) {
                     var info = miniLOL.theme.information = {};
-                    var doc  = miniLOL.utils.XML.fix(http.responseXML);
+                    var doc  = Document.fix(http.responseXML);
 
                     info.name     = doc.documentElement.getAttribute('name')     || 'Unknown';
                     info.author   = doc.documentElement.getAttribute('author')   || 'Anonymous';
@@ -967,7 +967,7 @@ miniLOL = {
                 }
             });
 
-            if (!output.isEmpty()) {
+            if (!output.blank()) {
                 if (layer == 0) {
                     return miniLOL.menu.parsers.layer(template, layer).menu.interpolate({
                         data: output
@@ -1016,7 +1016,7 @@ miniLOL = {
                     id:         itemId,
                     href:       itemHref,
                     attributes: String.fromAttributes(item.attributes),
-                    text:       miniLOL.utils.XML.getFirstText(element.childNodes),
+                    text:       Element.getFirstText(element),
                     data:       miniLOL.menu.parse(element, layer + 1)
                 }));
             },
@@ -1041,7 +1041,7 @@ miniLOL = {
                     }
                 });
 
-                outputs['text'] = miniLOL.utils.XML.getFirstText(data.childNodes);
+                outputs['text'] = Element.getFirstText(data);
 
                 return text.interpolate(Object.extend(outputs, Object.fromAttributes(data.attributes)));
             }
@@ -1069,7 +1069,7 @@ miniLOL = {
                 delete queries.page;
 
                 if (!queries.title && page.getAttribute('title')) {
-                    queries.title = encodeURIComponent(page.getAttribute('title'));
+                    queries.title = page.getAttribute('title').encodeURIComponent();
                 }
 
                 var queries = Object.toQueryString(queries);
@@ -1223,7 +1223,7 @@ miniLOL = {
                                         href: href
                                     });
 
-                                    title = '&title=' + encodeURIComponent(title);
+                                    title = '&title=' + title.encodeURIComponent();
                                 }
 
                                 href = href + args + ltype + menu + title;
@@ -1279,7 +1279,7 @@ miniLOL = {
                         }
                     }
                     else if (e.nodeType == Node.CDATA_SECTION_NODE || e.nodeType == Node.TEXT_NODE) {
-                        if (e.nodeValue.isEmpty()) {
+                        if (e.nodeValue.blank()) {
                             return;
                         }
 
@@ -1624,285 +1624,5 @@ miniLOL = {
         }
 
         return result;
-    },
-
-    utils: {
-        XML: {
-            getElementById: function (id) {
-                var result;
-    
-                $A(this.getElementsByTagName('*')).each(function (element) {
-                    if (element.getAttribute('id') == id) {
-                        result = element;
-                        throw $break;
-                    }
-                });
-    
-                return result;
-            },
-    
-            xpath: function (query) {
-                var result = [];
-                var tmp;
-    
-                if (Prototype.Browser.IE) {
-                    tmp = this.real.selectNodes(query);
-    
-                    for (var i = 0; i < tmp.length; i++) {
-                        result.push(tmp.item(i));
-                    }
-                }
-                else {
-                    tmp = (this.ownerDocument || this).evaluate(query, this, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
-    
-                    for (var i = 0; i < tmp.snapshotLength; i++) {
-                        result.push(tmp.snapshotItem(i));
-                    }
-                }
-    
-                return result;
-            },
-
-            select: function (query) {
-                return Prototype.Selector.select(query, this);
-            },
-    
-            fix: function (obj) {
-                if (!obj) {
-                    return;
-                }
-    
-                if (Prototype.Browser.IE) {
-                    obj = { real: obj };
-    
-                    obj.documentElement = obj.real.documentElement;
-    
-                    obj.getElementsByTagName = function (name) {
-                        return this.real.getElementsByTagName(name);
-                    };
-    
-                    obj.getElementById = function (id) {
-                        return miniLOL.utils.XML.getElementById.call(this.real, id);
-                    }
-    
-                    obj.real.setProperty('SelectionLanguage', 'XPath');
-                }
-                else if (!Prototype.Browser.Good) {
-                    obj.getElementById = miniLOL.utils.XML.getElementById;
-                }
-    
-                obj.xpath = miniLOL.utils.XML.xpath;
-                obj.css   = miniLOL.utils.XML.css;
-    
-                return obj;
-            },
-    
-            check: function (xml, path) {
-                var error = false;
-    
-                if (!xml) {
-                    error = 'There is a syntax error.';
-                }
-    
-                if (xml.documentElement.nodeName == 'parsererror') {
-                    error = xml.documentElement.textContent;
-                }
-    
-                if (path && error) {
-                    miniLOL.error('Error while parsing #{path}\n\n#{error}'.interpolate({
-                        path:  path,
-                        error: error
-                    }), true);
-    
-                    return error;
-                }
-    
-                return error;
-            },
-    
-            getFirstText: function (elements) {
-                var result = '';
-    
-                (Object.isArray(elements) ? elements : $A(elements)).each(function (element) {
-                    switch (element.nodeType) {
-                        case Node.ELEMENT_NODE:
-                        throw $break;
-                        break;
-    
-                        case Node.CDATA_SECTION_NODE:
-                        case Node.TEXT_NODE:
-                        if (!element.nodeValue.isEmpty()) {
-                            result = element.nodeValue.strip();
-                            throw $break;
-                        }
-                        break;
-                    }
-                });
-    
-                return result;
-            }
-        },
-
-        exists: function (path) {
-            var result = false;
-
-            new Ajax.Request(path, {
-                method: 'head',
-                asynchronous: false,
-
-                onSuccess: function () {
-                    result = true;
-                }
-            });
-
-            return result;
-        },
-
-        includeCSS: function (path) {
-            var style;
-
-            if (style = miniLOL.theme.style.list[path]) {
-                return style;
-            }
-            else if (style = $$('link').find(function (css) { return css.getAttribute('href') == path })) {
-                miniLOL.theme.style.list[path] = style;
-
-                return style;
-            }
-            else if (style = miniLOL.utils.exists(path)) {
-                style = new Element('link', {
-                    rel: 'stylesheet',
-                    href: path,
-                    type: 'text/css'
-                });
-
-                $$('head')[0].insert(style);
-
-                Event.fire(document, ':css.included', style);
-
-                return style;
-            }
-            else {
-                return false;
-            }
-        },
-
-        css: function (style, id) {
-            var css = new Element('style', { type: 'text/css' }).update(style);
-
-            if (id) {
-                css.setAttribute('id', id);
-            }
-
-            $$('head').first().appendChild(css);
-
-            Event.fire(document, ':css.created', css);
-
-            return css;
-        },
-
-        execute: function (path) {
-            var result;
-            var error;
-
-            new Ajax.Request(path, {
-                method: 'get',
-                asynchronous: false,
-                evalJS: false,
-
-                onSuccess: function (http) {
-                    try {
-                        result = window.eval(http.responseText);
-                    }
-                    catch (e) {
-                        error             = e;
-                        error.fileName    = path;
-                        error.lineNumber -= 5;
-                    }
-                },
-
-                onFailure: function (http) {
-                    error = new Error('Failed to retrieve `#{file}` (#{status} - #{statusText}).'.interpolate({
-                        file:       path,
-                        status:     http.status,
-                        statusText: http.statusText
-                    }));
-
-                    error.fileName   = path;
-                    error.lineNumber = 0;
-                }
-            });
-
-            if (error) {
-                throw error;
-            }
-
-            return result;
-        },
-
-        include: function (path) {
-            var result = false;
-
-            new Ajax.Request(path, {
-                method: 'get',
-                asynchronous: false,
-                evalJS: false,
-
-                onSuccess: function (http) {
-                    try {
-                        window.eval(http.responseText);
-                        result = true;
-                    } catch (e) {
-                        result = false;
-                    }
-                }
-            });
-
-            return result;
-        },
-
-        require: function (path) {
-            var error = false;
-
-            new Ajax.Request(path, {
-                method: 'get',
-                asynchronous: false,
-                evalJS: false,
-
-                onSuccess: function (http) {
-                    try {
-                        window.eval(http.responseText);
-                    } catch (e) {
-                        error             = e;
-                        error.fileName    = path;
-                        error.lineNumber -= 5;
-                    }
-                },
-
-                onFailure: function (http) {
-                    error = new Error('Failed to retrieve `#{file}` (#{status} - #{statusText}).'.interpolate({
-                        file:       path,
-                        status:     http.status,
-                        statusText: http.statusText
-                    }));
-
-                    error.fileName   = path;
-                    error.lineNumber = 0;
-
-                    error.http = {
-                        status: http.status,
-                        text:   http.statusText
-                    };
-                }
-            });
-
-            if (error) {
-                throw error;
-            }
-
-            return true;
-        }
     }
 };
-
-miniLOL.utils.require('system/miniLOL-framework.js');
