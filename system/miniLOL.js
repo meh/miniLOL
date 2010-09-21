@@ -42,7 +42,7 @@ miniLOL = {
             Event.fire(document, ':finalization', event);
         });
 
-        Event.observe(document, 'hashchange', function (event) {
+        Event.observe(window, 'hashchange', function (event) {
             if (event.memo) {
                 miniLOL.go(event.memo);
             }

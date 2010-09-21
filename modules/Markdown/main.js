@@ -1,21 +1,14 @@
-/****************************************************************************
- * Copyleft meh. [http://meh.doesntexist.org | meh.ffff@gmail.com]          *
- *                                                                          *
- * This file is part of miniLOL. A blog module.                             *
- *                                                                          *
- * miniLOL is free software: you can redistribute it and/or modify          *
- * it under the terms of the GNU Affero General Public License as           *
- * published by the Free Software Foundation, either version 3 of the       *
- * License, or (at your option) any later version.                          *
- *                                                                          *
- * miniLOL is distributed in the hope that it will be useful,               *
- * but WITHOUT ANY WARRANTY; without even the implied warranty of           *
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            *
- * GNU Affero General Public License for more details.                      *
- *                                                                          *
- * You should have received a copy of the GNU Affero General Public License *
- * along with miniLOL.  If not, see <http://www.gnu.org/licenses/>.         *
- ****************************************************************************/
+/*********************************************************************
+*           DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE              *
+*                   Version 2, December 2004                         *
+*                                                                    *
+*  Copyleft meh. [http://meh.doesntexist.org | meh.ffff@gmail.com]   *
+*                                                                    *
+*           DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE              *
+*  TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION   *
+*                                                                    *
+*  0. You just DO WHAT THE FUCK YOU WANT TO.                         *
+*********************************************************************/
 
 miniLOL.module.create("Markdown", {
     version: "0.1",
@@ -27,6 +20,16 @@ miniLOL.module.create("Markdown", {
 
         miniLOL.resource.get("miniLOL.config").load(this.root+"/resources/config.xml");
         miniLOL.resource.get("miniLOL.functions").load(this.root+"/resources/functions.xml");
+
+        Event.observe(document, ":resource.loaded", function (event) {
+            if (event.memo.resource.name != "miniLOL.config") {
+                return;
+            }
+
+            if (!miniLOL.config["Markdown"]["class"]) {
+                miniLOL.config["Markdown"]["class"] = "markdown";
+            }
+        });
 
         Event.observe(document, ":go", function () {
             this.execute()
