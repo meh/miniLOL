@@ -42,7 +42,7 @@ miniLOL = {
             Event.fire(document, ':finalization', event);
         });
 
-        Event.observe(window, 'hashchange', function (event) {
+        Event.observe(document, ':url.change', function (event) {
             if (event.memo) {
                 miniLOL.go(event.memo);
             }
@@ -512,7 +512,7 @@ miniLOL = {
             }
             else {
                 for (var resource in miniLOL.resources) {
-                    resource.reload();
+                    miniLOL.resource.get(resource).reload();
                 }
             }
         }

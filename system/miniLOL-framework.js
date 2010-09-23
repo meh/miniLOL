@@ -19,6 +19,11 @@
 
 
 /* Cross-Browser faggotree */
+(function () {
+
+if (Prototype.Browser.Gecko) {
+    Prototype.Browser.Mozilla = true;
+}
 
 if (navigator.userAgent.match(/Chrome/)) {
     Prototype.Browser.Chrome = true;
@@ -28,11 +33,30 @@ if (navigator.userAgent.match(/Safari/) && !Prototype.Browser.Chrome) {
     Prototype.Browser.Safari = true;
 }
 
-if (Prototype.Browser.Gecko || Prototype.Browser.Opera) {
+if (Prototype.Browser.Mozilla || Prototype.Browser.Opera) {
     Prototype.Browser.Good = true;
 }
 else {
     Prototype.Browser.Bad = true;
+}
+
+Prototype.Browser.Name = window.navigator.appName;
+
+var version = window.navigator.appVersion;
+
+try {
+    if (Prototype.Browser.IE) {
+        Prototype.Browser.Version = parseFloat(version.match(/MSIE ([^;]*)/)[1]);
+    }
+    else if (Prototype.Browser.Mozilla) {
+        Prototype.Browser.Version = parseFloat(version);
+    }
+    else {
+        throw null;
+    }
+}
+catch (e) {
+    Prototype.Browser.Version = 0;
 }
 
 if (Prototype.Browser.IE) {
@@ -114,6 +138,8 @@ if (Prototype.Browser.IE) {
         });
     }
 }
+
+})();
 
 
 
@@ -672,8 +698,8 @@ miniLOL.History = {
     initialize: function () {
         miniLOL.History.current = window.location.hash;
 
-        Event.observe(window, 'hashchange', function (event) {
-            miniLOL.History.current = event.memo = event.memo || window.location.hash.replace(/^#/, '');
+        Event.observe(document, ':url.change', function (event) {
+            miniLOL.History.current = event.memo;
         });
 
         miniLOL.History.Initializers.get().call()
@@ -693,19 +719,27 @@ miniLOL.History = {
 
     Initializers: {
         get: function () {
-            if ('onhashchange' in window && !navigator.userAgent.include('MSIE 7')) {
+            if ('onhashchange' in window && !(Prototype.Browser.IE && Prototype.Browser.Version == 7)) {
                 return miniLOL.History.Initializers.Default;
             }
             else {
                 return miniLOL.History.Initializers.Unsupported;
             }
-
         },
 
-        Default: Prototype.emptyFunction,
+        Default: function () {
+            Event.observe(window, 'hashchange', function (event) {
+                 Event.fire(document, ':url.change', (Prototype.Browser.Mozilla)
+                    ? window.location.hash.replace(/^#/, '')
+                    : decodeURIComponent(window.location.hash.replace(/^#/, ''))
+                );
+            });
+        },
 
         Unsupported: function () {
-            miniLOL.History.reset(miniLOL.History.interval, miniLOL.History.Checkers.get());
+            document.observe('dom:loaded', function () {
+                miniLOL.History.reset(miniLOL.History.interval, miniLOL.History.Checkers.get());
+            });
         }
     },
 
@@ -724,7 +758,10 @@ miniLOL.History = {
                 return;
             }
 
-            Event.fire(window, 'hashchange', window.location.hash.replace(/^#/, ''));
+            Event.fire(document, ':url.change', (Prototype.Browser.Mozilla)
+                ? window.location.hash.replace(/^#/, '')
+                : decodeURIComponent(window.location.hash.replace(/^#/, ''))
+            );
         },
 
         InternetExplorer: function () {
@@ -732,7 +769,7 @@ miniLOL.History = {
                 return;
             }
 
-            Event.fire(window, 'hashchange', window.location.hash.replace(/^#/, ''));
+            Event.fire(document, ':url.change', decodeURIComponent(window.location.hash.replace(/^#/, '')));
         }
     }
 }
