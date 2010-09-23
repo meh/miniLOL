@@ -117,8 +117,8 @@ if (Prototype.Browser.IE) {
 
 
 
-Object.extend(Function, {
-    parse: function (string) {
+Object.extend(Function, (function () {
+    function parse (string) {
         matches = string.match(/^function\s*\((.*?)\)[\s\n]*\{([\s\S]*)\}[\s\n]*/m);
 
         if (!matches) {
@@ -130,28 +130,36 @@ Object.extend(Function, {
 
         return new Function(signature, body);
     }
-});
 
-Object.extend(Function.prototype, {
-    clone: function () {
+    return {
+        parse: parse
+    };
+})());
+
+Object.extend(Function.prototype, (function () {
+    function clone () {
         return Function.parse(this.toString());
     }
-});
 
-Object.extend(Object, {
-    isBoolean: function (val) {
+    return {
+        clone: clone
+    };
+})());
+
+Object.extend(Object, (function () {
+    function isBoolean (val) {
         return typeof val == 'boolean' || val.constructor === Boolean;
-    },
+    }
 
-    isObject: function (val) {
+    function isObject (val) {
         return typeof val == 'object';
-    },
+    }
 
-    isDocument: function (val) {
+    function isDocument (val) {
         return val.toString().include('Document');
-    },
+    }
 
-    isXML: function (val) {
+    function isXML (val) {
         if (typeof val !== 'object') {
             return false;
         }
@@ -163,9 +171,9 @@ Object.extend(Object, {
         }
 
         return val.documentElement.nodeName != "HTML";
-    },
+    }
 
-    fromAttributes: function (attributes) {
+    function fromAttributes (attributes) {
         var result = {};
 
         for (var i = 0; i < attributes.length; i++) {
@@ -173,9 +181,9 @@ Object.extend(Object, {
         }
 
         return result;
-    },
+    }
 
-    toQueryString: function (query) {
+    function toQueryString (query) {
         var result = '';
 
         for (var name in query) {
@@ -187,40 +195,64 @@ Object.extend(Object, {
 
         return result.substr(0, result.length - 1);
     }
-});
 
-if (!Object.isFunction(Object.defineProperty)) {
-    Object.defineProperty = function (object, property, descriptor) {
-        if (Object.isFunction(descriptor.get) && Object.isFunction(object.__defineGetter__)) {
-            object.__defineGetter__(property, descriptor.get);
+    if (!Object.isFunction(Object.defineProperty)) {
+        function defineProperty (object, property, descriptor) {
+            if (Object.isFunction(descriptor.get) && Object.isFunction(object.__defineGetter__)) {
+                object.__defineGetter__(property, descriptor.get);
+            }
+
+            if (Object.isFunction(descriptor.set) && Object.isFunction(object.__defineSetter__)) {
+                object.__defineSetter__(property, descriptor.set);
+            }
         }
+    }
+    else {
+        var defineProperty = Object.defineProperty;
+    }
 
-        if (Object.isFunction(descriptor.set) && Object.isFunction(object.__defineSetter__)) {
-            object.__defineSetter__(property, descriptor.set);
-        }
+    if (!Object.isFunction(Object.defineProperties)) {
+        Object.defineProperties = function (object, properties) {
+            for (var property in properties) {
+                Object.defineProperty(object, property, properties[property]);
+            }
+        };
+    }
+    else {
+        var defineProperties = Object.defineProperties;
+    }
+
+    if (!Object.isFunction(Object.create)) {
+        Object.create = function (proto, properties) {
+            var obj = new Object(proto);
+
+            Object.defineProperties(obj, properties);
+
+            return obj;
+        };
+    }
+    else {
+        var create = Object.create;
+    }
+
+    return {
+        isBoolean:  isBoolean,
+        isObject:   isObject,
+        isDocument: isDocument,
+        isXML:      isXML,
+
+        fromAttributes: fromAttributes,
+        toQueryString:  toQueryString,
+
+        defineProperty:   defineProperty,
+        defineProperties: defineProperties,
+        create:           create
     };
-}
+})());
 
-if (!Object.isFunction(Object.defineProperties)) {
-    Object.defineProperties = function (object, properties) {
-        for (var property in properties) {
-            Object.defineProperty(object, property, properties[property]);
-        }
-    };
-}
 
-if (!Object.isFunction(Object.create)) {
-    Object.create = function (proto, properties) {
-        var obj = new Object(proto);
-
-        Object.defineProperties(obj, properties);
-
-        return obj;
-    };
-}
-
-Object.extend(String, {
-    fromAttributes: function (attributes) {
+Object.extend(String, (function () {
+    function fromAttributes (attributes) {
         var result = '';
 
         for (var i = 0; i < attributes.length; i++) {
@@ -231,19 +263,24 @@ Object.extend(String, {
         }
 
         return result;
-    },
+    }
 
-    fromXML: function (node) {
+    function fromXML (node) {
         if (!Object.isXML(node)) {
             return false;
         }
 
         return new XMLSerializer().serializeToString(node);
     }
-});
 
-Object.extend(String.prototype, {
-    toQueryParams: function () {
+    return {
+        fromAttributes: fromAttributes,
+        fromXML:        fromXML
+    };
+})());
+
+Object.extend(String.prototype, (function () {
+    function toQueryParams () {
         var result  = {};
         var matches = this.match(/[?#](.*)$/);
 
@@ -265,13 +302,13 @@ Object.extend(String.prototype, {
         }
 
         return result;
-    },
+    }
 
-    toXML: function () {
+    function toXML () {
         return new DOMParser().parseFromString(this, 'text/xml');
-    },
+    }
 
-    isURL: function () {
+    function isURL () {
         var match = this.match(/^mailto:([\w.%+-]+@[\w.]+\.[A-Za-z]{2,4})$/);
         if (match) {
             return {
@@ -290,82 +327,112 @@ Object.extend(String.prototype, {
             protocol: match[1],
             uri:      match[2]
         };
-    },
+    }
 
-    blank: function () {
+    function blank () {
         return this == 0;
-    },
+    }
 
-    getHashFragment: function () {
+    function getHashFragment () {
         var matches = this.match(/(#.*)$/);
 
         return (matches) ? matches[1] : '';
-    },
-
-    encodeURI: function () {
-        return encodeURI(this);
-    },
-
-    decodeURI: function () {
-        return decodeURI(this);
-    },
-
-    encodeURIComponent: function () {
-        return encodeURIComponent(this);
-    },
-
-    decodeURIComponent: function () {
-        return decodeURIComponent(this);
     }
-});
 
-Element.addMethods({
-    load: function (path, options) {
+    var _encodeURI          = window.encodeURI;
+    var _decodeURI          = window.decodeURI;
+    var _encodeURIComponent = window.encodeURIComponent;
+    var _decodeURIComponent = window.decodeURIComponent;
+
+    function encodeURI () {
+        return _encodeURI(this);
+    }
+
+    function decodeURI () {
+        return _decodeURI(this);
+    }
+
+    function encodeURIComponent () {
+        return _encodeURIComponent(this);
+    }
+
+    function decodeURIComponent () {
+        return _decodeURIComponent(this);
+    }
+
+    return {
+        toQueryParams: toQueryParams,
+        toXML:         toXML,
+
+        isURL: isURL,
+        blank: blank,
+
+        getHashFragment: getHashFragment,
+
+        encodeURI:          encodeURI,
+        decodeURI:          decodeURI,
+        encodeURIComponent: encodeURIComponent,
+        decodeURIComponent: decodeURIComponent
+    };
+})());
+
+window.Element.addMethods((function () {
+    function load (path, options) {
         if (options && !Object.isUndefined(options.frequency)) {
             new Ajax.PeriodicalUpdater(this, path, options);
         }
         else {
             new Ajax.Updater(this, path, options);
         }
-    },
+    }
 
-    xpath: function (element, query) {
-        if (Object.isUndefined(query)) {
-            query   = element;
-            element = this;
-        }
+    var xpath;
 
-        var result = [];
-        var tmp;
+    if (Prototype.Browser.IE) {
+        xpath = function (element, query) {
+            if (Object.isUndefined(query)) {
+                query   = element;
+                element = this;
+            }
 
-        if (Prototype.Browser.IE) {
-            tmp = element.real.selectNodes(query);
+            var result = [];
+            var tmp    = element.selectNodes(query);
 
             for (var i = 0; i < tmp.length; i++) {
                 result.push(tmp.item(i));
             }
+
+            return result;
         }
-        else {
-            tmp = (element.ownerDocument || element).evaluate(query, element, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+    }
+    else {
+        xpath = function (element, query) {
+            if (Object.isUndefined(query)) {
+                query   = element;
+                element = this;
+            }
+
+            var result = [];
+            var tmp    = (element.ownerDocument || element).evaluate(query, element, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
 
             for (var i = 0; i < tmp.snapshotLength; i++) {
                 result.push(tmp.snapshotItem(i));
             }
+
+            return result;
         }
+    }
 
-        return result;
-    },
-
-    select: function (element, query) {
+    function select (element, query) {
         if (Object.isUndefined(query)) {
             query   = element;
             element = this;
         }
 
         return Prototype.Selector.select(query, element);
-    },
+    }
 
-    getTextDescendants: function (element) {
+    function getTextDescendants (element) {
         element = element || this;
 
         var result = [];
@@ -389,9 +456,9 @@ Element.addMethods({
         accumulateTextChildren(element);
 
         return result;
-    },
+    }
 
-    getFirstText: function (elements) {
+    function getFirstText (elements) {
         elements = elements || this;
 
         var result = '';
@@ -421,9 +488,9 @@ Element.addMethods({
         });
 
         return result;
-    },
+    }
 
-    toObject: function (element) {
+    function toObject (element) {
         element = element || this;
 
         var result = {};
@@ -461,68 +528,16 @@ Element.addMethods({
 
         return result;
     }
-});
 
-if (!Object.isObject(window.Document)) {
-    window.Document = {};
-}
-
-Object.extend(Document, {
-    fix: function (obj) {
-        if (!obj) {
-            return;
-        }
-
-        if (Prototype.Browser.IE) {
-            obj = { real: obj };
-
-            obj.documentElement = obj.real.documentElement;
-
-            obj.getElementsByTagName = function (name) {
-                return this.real.getElementsByTagName(name);
-            };
-
-            obj.getElementById = function (id) {
-                return miniLOL.utils.XML.getElementById.call(this.real, id);
-            };
-
-            obj.real.setProperty('SelectionLanguage', 'XPath');
-        }
-        else if (!Prototype.Browser.Good) {
-            obj.getElementById = function (id) {
-                return this.xpath("//*[@id='#{0}']".interpolate([id])).first();
-            };
-        }
-
-        obj.xpath  = Element.xpath;
-        obj.select = Element.select;
-
-        return obj;
-    },
-
-    check: function (xml, path) {
-        var error = false;
-
-        if (!xml) {
-            error = 'There is a syntax error.';
-        }
-
-        if (xml.documentElement.nodeName == 'parsererror') {
-            error = xml.documentElement.textContent;
-        }
-
-        if (path && error) {
-            miniLOL.error('Error while parsing #{path}\n\n#{error}'.interpolate({
-                path:  path,
-                error: error
-            }), true);
-
-            return error;
-        }
-
-        return error;
-    }
-});
+    return {
+        load:               load,
+        xpath:              xpath,
+        select:             select,
+        getTextDescendants: getTextDescendants,
+        getFirstText:       getFirstText,
+        toObject:           toObject
+    };
+})());
 
 if (!Object.isObject(window.miniLOL)) {
     window.miniLOL = {
@@ -545,49 +560,6 @@ miniLOL.utils = {
         });
 
         return result;
-    },
-
-    includeCSS: function (path) {
-        var style;
-
-        if (style = miniLOL.theme.style.list[path]) {
-            return style;
-        }
-        else if (style = $$('link').find(function (css) { return css.getAttribute('href') == path })) {
-            miniLOL.theme.style.list[path] = style;
-
-            return style;
-        }
-        else if (style = miniLOL.utils.exists(path)) {
-            style = new Element('link', {
-                rel: 'stylesheet',
-                href: path,
-                type: 'text/css'
-            });
-
-            $$('head')[0].insert(style);
-
-            Event.fire(document, ':css.included', style);
-
-            return style;
-        }
-        else {
-            return false;
-        }
-    },
-
-    css: function (style, id) {
-        var css = new Element('style', { type: 'text/css' }).update(style);
-
-        if (id) {
-            css.setAttribute('id', id);
-        }
-
-        $$('head').first().appendChild(css);
-
-        Event.fire(document, ':css.created', css);
-
-        return css;
     },
 
     execute: function (path) {
@@ -756,6 +728,11 @@ miniLOL.History = {
         },
 
         InternetExplorer: function () {
+            if (miniLOL.History.current == window.location.hash) {
+                return;
+            }
+
+            Event.fire(window, 'hashchange', window.location.hash.replace(/^#/, ''));
         }
     }
 }
@@ -1289,3 +1266,130 @@ miniLOL.Storage.Backends = {
         save: Prototype.emptyFunction
     })
 };
+
+
+miniLOL.Document = (function () {
+    var fix;
+
+    if (Prototype.Browser.IE) {
+        fix = function (obj) {
+            if (!obj) {
+                return;
+            }
+
+            obj = { real: obj };
+
+            obj.documentElement = obj.real.documentElement;
+
+            obj.getElementsByTagName = function (name) {
+                return this.real.getElementsByTagName(name);
+            };
+
+            obj.getElementById = (function (id) {
+                return Element.xpath(this, "//*[@id='#{0}']".interpolate([id])).first();
+            }).bind(obj.real);
+
+            obj.real.setProperty('SelectionLanguage', 'XPath');
+
+            obj.xpath  = Element.xpath.bind(obj.real);
+            obj.select = Element.select.bind(obj.real);
+
+            return obj;
+        }
+    }
+    else if (!Prototype.Browser.Good) {
+        fix = function (obj) {
+            if (!obj) {
+                return;
+            }
+
+            obj.getElementById = function (id) {
+                return this.xpath("//*[@id='#{0}']".interpolate([id])).first();
+            };
+
+            obj.xpath  = Element.xpath;
+            obj.select = Element.select;
+
+            return obj;
+        }
+    }
+    else {
+        fix = function (obj) {
+            if (!obj) {
+                return;
+            }
+
+            obj.xpath  = Element.xpath;
+            obj.select = Element.select;
+
+            return obj;
+        }
+    }
+
+    function check (xml, path) {
+        var error = false;
+
+        if (!xml) {
+            error = 'There is a syntax error.';
+        }
+
+        if (xml.documentElement.nodeName == 'parsererror') {
+            error = xml.documentElement.textContent;
+        }
+
+        if (path && error) {
+            miniLOL.error('Error while parsing #{path}\n\n#{error}'.interpolate({
+                path:  path,
+                error: error
+            }), true);
+
+            return error;
+        }
+
+        return error;
+    }
+
+    return {
+        fix:   fix,
+        check: check
+    };
+})();
+
+miniLOL.CSS = (function () {
+    function include (path) {
+        var style = false;
+
+        if (!(style = $$('link').find(function (css) { return css.getAttribute('href') == path })) && miniLOL.utils.exists(path)) {
+            style = new Element('link', {
+                rel: 'stylesheet',
+                href: path,
+                type: 'text/css'
+            });
+
+            $$('head')[0].insert(style);
+
+            Event.fire(document, ':css.included', style);
+        }
+
+        return style;
+    }
+
+    function create (style, id) {
+        var css = new Element('style', { type: 'text/css' }).update(style);
+
+        if (id) {
+            css.setAttribute('id', id);
+        }
+
+        $$('head').first().appendChild(css);
+
+        Event.fire(document, ':css.created', css);
+
+        return css;
+    }
+
+    return {
+        include: include,
+        create:  create
+    };
+})();

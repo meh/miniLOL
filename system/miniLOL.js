@@ -98,11 +98,11 @@ miniLOL = {
                         asynchronous: false,
 
                         onSuccess: function (http) {
-                            if (Document.check(http.responseXML, path)) {
+                            if (miniLOL.Document.check(http.responseXML, path)) {
                                 return;
                             }
 
-                            var dom = Document.fix(http.responseXML).documentElement;
+                            var dom = miniLOL.Document.fix(http.responseXML).documentElement;
 
                             var domain = dom.getAttribute('domain') || 'core';
                             var config = miniLOL.config[domain] || {};
@@ -146,11 +146,11 @@ miniLOL = {
                         asynchronous: false,
 
                         onSuccess: function (http) {
-                            if (Document.check(http.responseXML, path)) {
+                            if (miniLOL.Document.check(http.responseXML, path)) {
                                 return;
                             }
 
-                            var response = Document.fix(http.responseXML);
+                            var response = miniLOL.Document.fix(http.responseXML);
 
                             miniLOL.menus['default'] = response.getElementById('default');
 
@@ -199,11 +199,11 @@ miniLOL = {
                         asynchronous: false,
 
                         onSuccess: function (http) {
-                            if (Document.check(http.responseXML, path)) {
+                            if (miniLOL.Document.check(http.responseXML, path)) {
                                 return;
                             }
 
-                            Document.fix(http.responseXML).xpath('//page').each(function (page) {
+                            miniLOL.Document.fix(http.responseXML).xpath('//page').each(function (page) {
                                 var id = page.getAttribute('id');
 
                                 delete miniLOL.pages.cache[id];
@@ -250,11 +250,11 @@ miniLOL = {
                         asynchronous: false,
 
                         onSuccess: function (http) {
-                            if (Document.check(http.responseXML, path)) {
+                            if (miniLOL.Document.check(http.responseXML, path)) {
                                 return;
                             }
 
-                            Document.fix(http.responseXML).xpath('//function').each(function (func) {
+                            miniLOL.Document.fix(http.responseXML).xpath('//function').each(function (func) {
                                 try {
                                     miniLOL.functions[func.getAttribute('name')] = new Function(
                                         'var text = arguments[0]; var args = arguments[1]; arguments = args; #{code}; return text;'.interpolate({
@@ -338,13 +338,13 @@ miniLOL = {
                         asynchronous: false,
 
                         onSuccess: function (http) {
-                            if (Document.check(http.responseXML, path)) {
+                            if (miniLOL.Document.check(http.responseXML, path)) {
                                 return;
                             }
 
                             miniLOL.module.path = http.responseXML.documentElement.getAttribute('path') || 'modules';
 
-                            var modules = Document.fix(http.responseXML).xpath('//module').filter(function (module) {
+                            var modules = miniLOL.Document.fix(http.responseXML).xpath('//module').filter(function (module) {
                                 return module.getAttribute('name');
                             });
 
@@ -537,7 +537,7 @@ miniLOL = {
                 }
 
                 var file  = '#{path}/#{style}.css'.interpolate({ path: path, style: name });
-                var style = miniLOL.utils.includeCSS(file);
+                var style = miniLOL.CSS.include(file);
 
                 if (!style) {
                     return false;
@@ -592,11 +592,11 @@ miniLOL = {
                     asynchronous: false,
 
                     onSuccess: function (http) {
-                        if (Document.check(http.responseXML, file)) {
+                        if (miniLOL.Document.check(http.responseXML, file)) {
                             return;
                         }
 
-                        miniLOL.theme.template.cache[file] = Document.fix(http.responseXML);
+                        miniLOL.theme.template.cache[file] = miniLOL.Document.fix(http.responseXML);
                     },
 
                     onFailure: function () {
@@ -688,7 +688,7 @@ miniLOL = {
 
                 onSuccess: function (http) {
                     var info = miniLOL.theme.information = {};
-                    var doc  = Document.fix(http.responseXML);
+                    var doc  = miniLOL.Document.fix(http.responseXML);
 
                     info.name     = doc.documentElement.getAttribute('name')     || 'Unknown';
                     info.author   = doc.documentElement.getAttribute('author')   || 'Anonymous';
@@ -862,7 +862,7 @@ miniLOL = {
                 }
             });
 
-            miniLOL.utils.includeCSS('resources/style.css');
+            miniLOL.CSS.include('resources/style.css');
 
             miniLOL.theme.template.setDefaults();
 
@@ -1420,7 +1420,7 @@ miniLOL = {
                 miniLOL.modules[alias] = obj;
             });
 
-            Event.fire(document, ':module.created', obj);
+            document.fire(':module.created', obj);
 
             return obj;
         },

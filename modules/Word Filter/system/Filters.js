@@ -62,7 +62,7 @@ Filters.load = function (path) {
         asynchronous: false,
 
         onSuccess: function (http) {
-            var error = Document.check(http.responseXML);
+            var error = miniLOL.Document.check(http.responseXML);
             if (error) {
                 miniLOL.error('Error while parsing `#{filter}`\n\n#{error}'.interpolate({
                     filter: path,
@@ -72,7 +72,7 @@ Filters.load = function (path) {
                 return;
             }
 
-            var dom = Document.fix(http.responseXML);
+            var dom = miniLOL.Document.fix(http.responseXML);
             
             dom.xpath('/filters/filter').each(function (filter) {
                 Filters.filters.push(new Filters.Filter(filter, dom.documentElement.getAttribute('censor')));
