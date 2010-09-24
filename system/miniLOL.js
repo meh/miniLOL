@@ -133,7 +133,7 @@ miniLOL = {
 
             miniLOL.resource.get('miniLOL.config').load('resources/config.xml');
 
-            $(document.body).update(miniLOL.config['core'].loadingMessage);
+            $('__miniLOL.content').update(miniLOL.config['core'].loadingMessage);
 
             Event.fire(document, ':initialization');
         },
@@ -416,7 +416,7 @@ miniLOL = {
         });
 
         if (miniLOL.error()) {
-            if (!document.body.innerHTML) {
+            if (!$('__miniLOL.content').innerHTML) {
                miniLOL.error('Something went wrong, but nobody told me what :(', true);
             }
 
@@ -1576,6 +1576,10 @@ miniLOL = {
     },
 
     go: function (url, again) {
+        if (!Object.isString(url)) {
+            return false;
+        }
+
         if (url.isURL()) {
             if (!url.startsWith(miniLOL.path)) {
                 location.href = url;
