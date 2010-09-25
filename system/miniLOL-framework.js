@@ -343,8 +343,9 @@ Object.extend(String.prototype, (function () {
     }
 
     function parseURL () {
-        var match = this.match(/^mailto:(([\w.%+-]+)@([\w.]+\.[A-Za-z]{2,4}))$/);
-        if (match) {
+        var match;
+
+        if (match = this.match(/^mailto:(([\w.%+-]+)@([\w.]+\.[A-Za-z]{2,4}))$/)) {
             return {
                 protocol: 'mailto',
                 uri:      match[1],
@@ -353,21 +354,19 @@ Object.extend(String.prototype, (function () {
             };
         }
 
-        match = this.match(/^((\w+):\/\/(((.+?)(:(\d+)?))(\/?.*)))$/);
-
-        if (!match) {
-            return false;
+        if (match = this.match(/^((\w+):\/\/(((.+?)(:(\d+))?)(\/.*)?))$/)) {
+            return {
+                full:     match[1],
+                protocol: match[2],
+                uri:      match[3],
+                host:     match[4],
+                hostname: match[5],
+                port:     match[7],
+                path:     match[8]
+            };
         }
 
-        return {
-            full:     match[1],
-            protocol: match[2],
-            uri:      match[3],
-            host:     match[4],
-            hostname: match[5],
-            port:     match[7],
-            path:     match[8]
-        };
+        return false;
     }
 
     function blank () {
