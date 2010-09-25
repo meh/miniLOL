@@ -1474,7 +1474,14 @@ miniLOL.CSS = (function () {
     }
 
     function create (style, id) {
-        var css = new Element('style', { type: 'text/css' }).update(style);
+        var css = new Element('style', { type: 'text/css' });
+
+        if (Prototype.Browser.IE) {
+            css.styleSheet.cssText = style;
+        }
+        else {
+            css.update(style);
+        }
 
         if (id) {
             css.setAttribute('id', id);
