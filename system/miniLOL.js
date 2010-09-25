@@ -133,7 +133,7 @@ miniLOL = {
 
             miniLOL.resource.get('miniLOL.config').load('resources/config.xml');
 
-            $('__miniLOL.content').update(miniLOL.config['core'].loadingMessage);
+            $(document.body).update(miniLOL.config['core'].loadingMessage);
 
             Event.fire(document, ':initialization');
         },
@@ -416,10 +416,6 @@ miniLOL = {
         });
 
         if (miniLOL.error()) {
-            if (!$('__miniLOL.content').innerHTML) {
-               miniLOL.error('Something went wrong, but nobody told me what :(', true);
-            }
-
             return false;
         }
 
@@ -431,6 +427,9 @@ miniLOL = {
 
         Event.observe(document, ':refresh', function () {
             miniLOL.resource.reload();
+
+            miniLOL.menu.change(miniLOL.menu.current, true);
+            miniLOL.go(location.href);
         });
 
         new PeriodicalExecuter(function () {
@@ -1581,8 +1580,13 @@ miniLOL = {
         }
 
         if (url.isURL()) {
-            if (!url.startsWith(miniLOL.path)) {
-                location.href = url;
+            url = url.parseURL();
+
+            if (url.host != location.host || !url.path.startsWith(miniLOL.path)) {
+                location.href = url.full;
+            }
+            else {
+                url = url.full.replace(new RegExp('^.*' + miniLOL.path), '');
             }
         }
         else {

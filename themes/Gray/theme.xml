@@ -26,18 +26,18 @@
     ]]></thanks>
 
     <initialize><![CDATA[
-        $('siteTitle').update(miniLOL.config["core"].logo || miniLOL.config["core"].siteTitle)
+        $('siteTitle').update(miniLOL.config['core'].logo || miniLOL.config['core'].siteTitle)
 
         this.resize = function () {
             $('body').setStyle({
-                height: (document.viewport.getHeight()-(60+$('head').getHeight()+20))+"px"
+                height: (document.viewport.getHeight()-(60+$('head').getHeight()+20))+'px'
             });
         };
 
-        Event.observe(window, "resize", this.resize);
-        Event.observe(document, ":module.load", this.resize);
+        Event.observe(window, 'resize', this.resize);
+        Event.observe(document, ':module.load', this.resize);
 
-        Event.observe(document, ":initialized", function () {
+        Event.observe(document, ':initialized', function () {
             this.resize.delay(0.1);
         }.bind(this));
 
@@ -51,20 +51,20 @@
                 url = matches[1];
             }
             else {
-                url = miniLOL.config["core"].homePage
+                url = miniLOL.config['core'].homePage
             }
 
-            if (url[0] != '#') {
-                url = "#" + url;
+            if (url.charAt(0) != '#') {
+                url = '#' + url;
             }
 
             var element;
 
-            $A(miniLOL.theme.menu().getElementsByTagName("a")).each(function (item) {
-                if (item.getAttribute("href").include(url)) {
+            $A(miniLOL.theme.menu().getElementsByTagName('a')).each(function (item) {
+                if (item.getAttribute('href').include(url)) {
                     element = item;
                 }
-                else if (url == miniLOL.config["core"].homePage && item.getAttribute("href") == "#") {
+                else if (url == miniLOL.config['core'].homePage && item.getAttribute('href') == '#') {
                     element = item;
                 }
 
@@ -74,47 +74,49 @@
             });
 
             if (element) {
-                $$(".current").each(function (element) {
-                    element.removeClassName("current");
+                element = $(element);
+
+                $$('.current').each(function (element) {
+                    element.removeClassName('current');
                 });
 
-                while (element.parentNode.getAttribute("id") != "menu") {
-                    element = element.parentNode;
+                while (element.parentNode.getAttribute('id') != 'menu') {
+                    element = $(element.parentNode);
                 }
 
                 element.addClassName('current');
             }
-            else if ($$(".current").length == 0) {
-                var menu = $A($("menu").getElementsByTagName("li")).shift();
+            else if ($$('.current').length == 0) {
+                var menu = $A($('menu').getElementsByTagName('li')).shift();
                 
                 if (menu) {
-                    $(menu).addClassName("current");
+                    $(menu).addClassName('current');
                 }
             }
         }
 
         this.current.change = function (event) {
-            if (event.name == ":theme.loaded" && event.memo.runtime) {
+            if (event.name == ':theme.loaded' && event.memo.runtime) {
                 return;
             }
 
             this.current({ memo: location.href });
         }.bind(this)
 
-        Event.observe(document, ":go", this.current);
+        Event.observe(document, ':go', this.current);
 
-        Event.observe(document, ":menu.change", this.current.change);
-        Event.observe(document, ":theme.loaded", this.current.change);
-        Event.observe(document, ":initialized", this.current.change);
+        Event.observe(document, ':menu.change', this.current.change);
+        Event.observe(document, ':theme.loaded', this.current.change);
+        Event.observe(document, ':initialized', this.current.change);
     ]]></initialize>
 
     <finalize><![CDATA[
-        Event.stopObserving(window, "resize", this.resize);
-        Event.stopObserving(document, ":module.load", this.resize);
+        Event.stopObserving(window, 'resize', this.resize);
+        Event.stopObserving(document, ':module.load', this.resize);
 
-        Event.stopObserving(document, ":menu.change", this.current.change);
-        Event.stopObserving(document, ":theme.loaded", this.current.change);
-        Event.stopObserving(document, ":go", this.current);
+        Event.stopObserving(document, ':menu.change', this.current.change);
+        Event.stopObserving(document, ':theme.loaded', this.current.change);
+        Event.stopObserving(document, ':go', this.current);
     ]]></finalize>
 
     <templates>
