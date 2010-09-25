@@ -426,10 +426,7 @@ miniLOL = {
         miniLOL.go(/[#?]./.test(location.href) ? location.href.replace(/^.*[#?]/, '#') : miniLOL.config['core'].homePage);
 
         Event.observe(document, ':refresh', function () {
-            miniLOL.resource.reload();
-
-            miniLOL.menu.change(miniLOL.menu.current, true);
-            miniLOL.go(location.href);
+            miniLOL.resource.reload('miniLOL.config', 'miniLOL.pages', 'miniLOL.menus');
         });
 
         new PeriodicalExecuter(function () {
@@ -501,6 +498,10 @@ miniLOL = {
         },
 
         reload: function (what) {
+            if (arguments.length > 1) {
+                what = $A(arguments);
+            }
+
             if (Object.isArray(what)) {
                 what.each(function (name) {
                     miniLOL.resource.get(name).reload();
