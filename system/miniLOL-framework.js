@@ -719,7 +719,7 @@ miniLOL.History = {
         }
 
         Event.observe(document, ':url.change', function (event) {
-            miniLOL.History.current = event.memo;
+            miniLOL.History.current = (Object.isString(event.memo)) ? event.memo : '';
         });
 
         miniLOL.History.Initializers.get().call()
@@ -794,10 +794,8 @@ miniLOL.History = {
                     element: new Element('iframe', { id: '__miniLOL.History', style: 'display: none !important; z-index: -9001 !important;', src: 'javascript:false;' })
                 };
 
-                var first = miniLOL.History.current;
-
                 $(document.body).insert({ top: miniLOL.History.IE.element });
-                miniLOL.History.IE.put(first);
+                miniLOL.History.IE.put(miniLOL.History.current);
                 miniLOL.History.reset(miniLOL.History.interval, miniLOL.History.Checkers.InternetExplorer);
             });
         }
@@ -818,7 +816,7 @@ miniLOL.History = {
         InternetExplorer: function () {
             var hashes = {
                 iframe: miniLOL.History.IE.get(),
-                actual: window.location.hash,
+                actual: window.location.hash || '#',
                 current: miniLOL.History.current
             };
 
