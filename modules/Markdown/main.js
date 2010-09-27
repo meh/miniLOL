@@ -2,7 +2,7 @@
 *           DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE              *
 *                   Version 2, December 2004                         *
 *                                                                    *
-*  Copyleft meh. [http://meh.doesntexist.org | meh.ffff@gmail.com]   *
+*  Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]    *
 *                                                                    *
 *           DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE              *
 *  TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION   *

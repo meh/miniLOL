@@ -1,22 +1,38 @@
-/*
- Copyleft meh. [http://meh.doesntexist.org | meh.ffff@gmail.com]
+/* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
+ *
+ * This file is part of miniLOL.
+ *
+ * miniLOL is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
+ *
+ * miniLOL is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with miniLOL. If not, see <http://www.gnu.org/licenses/>.
+ ****************************************************************************/
 
- This file is part of miniLOL.
-
- miniLOL is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as
- published by the Free Software Foundation, either version 3 of the
- License, or (at your option) any later version.
-
- miniLOL is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with miniLOL.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
+/* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
+ *
+ * This file is part of miniLOL.
+ *
+ * miniLOL is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
+ *
+ * miniLOL is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with miniLOL. If not, see <http://www.gnu.org/licenses/>.
+ ****************************************************************************/
 
 /* Cross-Browser faggotree */
 (function () {
@@ -145,7 +161,41 @@ if (Prototype.Browser.IE) {
 
 })();
 
+/* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
+ *
+ * This file is part of miniLOL.
+ *
+ * miniLOL is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
+ *
+ * miniLOL is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with miniLOL. If not, see <http://www.gnu.org/licenses/>.
+ ****************************************************************************/
 
+/* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
+ *
+ * This file is part of miniLOL.
+ *
+ * miniLOL is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
+ *
+ * miniLOL is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with miniLOL. If not, see <http://www.gnu.org/licenses/>.
+ ****************************************************************************/
 
 Object.extend(Function, (function () {
     function parse (string) {
@@ -175,6 +225,23 @@ Object.extend(Function.prototype, (function () {
         clone: clone
     };
 })());
+/* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
+ *
+ * This file is part of miniLOL.
+ *
+ * miniLOL is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
+ *
+ * miniLOL is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with miniLOL. If not, see <http://www.gnu.org/licenses/>.
+ ****************************************************************************/
 
 Object.extend(Object, (function () {
     function isBoolean (val) {
@@ -280,6 +347,23 @@ Object.extend(Object, (function () {
     };
 })());
 
+/* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
+ *
+ * This file is part of miniLOL.
+ *
+ * miniLOL is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
+ *
+ * miniLOL is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with miniLOL. If not, see <http://www.gnu.org/licenses/>.
+ ****************************************************************************/
 
 Object.extend(String, (function () {
     function fromAttributes (attributes) {
@@ -310,21 +394,37 @@ Object.extend(String, (function () {
 })());
 
 Object.extend(String.prototype, (function () {
-    function toQueryParams () {
+
+    function toQueryParams (separator) {
+        if (!Object.isRegExp(separator)) {
+            separator = /&/;
+        }
+
         var result  = {};
-        var matches = this.match(/[?#](.*)$/);
+        var matches = this.match(/[?#](.*?)([#?]|$)/);
 
         if (!matches) {
             return result;
         }
 
-        var blocks = matches[1].split(/&/);
+        var blocks = matches[1].split(separator);
         for (var i = 0; i < blocks.length; i++) {
             var parts = blocks[i].split(/=/);
             var name  = parts[0].decodeURIComponent();
+            var value = parts[1]
 
-            if (parts[1]) {
-                result[name] = parts[1].decodeURIComponent();
+            if (value) {
+                if (!Object.isUndefined(result[name])) {
+                    if (!Object.isArray(result[name])) {
+                        result[name] = [result[name], value];
+                    }
+                    else {
+                        result[name].push(value)
+                    }
+                }
+                else {
+                    result[name] = value.decodeURIComponent();
+                }
             }
             else {
                 result[name] = true;
@@ -379,6 +479,89 @@ Object.extend(String.prototype, (function () {
         return (matches) ? matches[1] : '';
     }
 
+    function splitEvery (num) {
+        var result = new Array;
+
+        for (var i = 0; i < this.length; i += num) {
+            result.push(this.substr(i, num));
+        }
+
+        return result;
+    }
+
+    function test (pattern) {
+        return pattern.test(this);
+    }
+
+    function commonChars (string) {
+        return this.toArray().intersect(string.toArray());
+    }
+
+    function format (template) {
+        var formatted = this;
+
+        for (var i in template) {
+            formatted = formatted.replace(new RegExp('\\{' + i + '\\}', 'g'), template[i].toString());
+        }
+
+        return formatted;
+    }
+
+    function reverse () {
+        return this.toArray().reverse().join('');
+    }
+
+    function translate (table, second) {
+        var result = this;
+
+        if (second) {
+            for (key in table) {
+                if (!second[key]) {
+                    throw new Error("The second table value is missing.");
+                }
+
+                if (table[key].is(RegExp)) {
+                    result = result.replace(eval(table[key].global ? table[key].toString() : table[key].toString() + "g"));
+                }
+                else {
+                    result = result.replace(new RegExp(table[key], "g"), second[key]);
+                }
+            }
+        }
+        else {
+            for each (match in table) {
+                if (match.length != 2) {
+                    throw new Error("The array has to be [regex, translation].");
+                }
+
+                if (match[0].is(RegExp)) {
+                    result = result.replace(eval(match[0].global ? match[0].toString() : match[0].toString() + "g"), match[1]);
+                }
+                else {
+                    result = result.replace(new RegExp(match[0], "g"), match[1]);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    function toNumber (integer) {
+        return (integer) ? parseInt(this) : parseFloat(this);
+    };
+
+    function toBase (base) {
+        return this.toNumber().toBase(base);
+    };
+
+    function fromBase (base) {
+        return parseInt(this, base);
+    };
+
+    function toCode () {
+        return this.charCodeAt(0);
+    };
+
     var _encodeURI          = window.encodeURI;
     var _decodeURI          = window.decodeURI;
     var _encodeURIComponent = window.encodeURIComponent;
@@ -402,6 +585,7 @@ Object.extend(String.prototype, (function () {
 
     return {
         toQueryParams: toQueryParams,
+        parseQuery:    toQueryParams,
         toXML:         toXML,
 
         isURL:    isURL,
@@ -411,12 +595,452 @@ Object.extend(String.prototype, (function () {
 
         getHashFragment: getHashFragment,
 
+        splitEvery:  splitEvery,
+        test:        test,
+        commonChars: commonChars,
+        format:      format,
+        reverse:     reverse,
+        translate:   translate,
+
+        toNumber: toNumber,
+        toBase:   toBase,
+        fromBase: fromBase,
+        toCode:   toCode,
+
         encodeURI:          encodeURI,
         decodeURI:          decodeURI,
         encodeURIComponent: encodeURIComponent,
         decodeURIComponent: decodeURIComponent
     };
 })());
+/* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
+ *
+ * This file is part of miniLOL.
+ *
+ * miniLOL is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
+ *
+ * miniLOL is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with miniLOL. If not, see <http://www.gnu.org/licenses/>.
+ ****************************************************************************/
+
+Object.extend(Number.prototype, (function () {
+    function milliseconds () {
+        return this * 1000;
+    }
+
+    function seconds () {
+        return this;
+    }
+
+    function minutes () {
+        return this * 60;
+    }
+
+    function hours () {
+        return this * 60 * 60;
+    }
+
+    function days () {
+        return this * 60 * 60 * 24;
+    }
+
+    function weeks () {
+        return this * 60 * 60 * 24 * 7;
+    }
+
+    function years () {
+        return this * 60 * 60 * 24 * 375;
+    }
+
+    function upTo (num, iterator, context) {
+        $R(this, num+1, true).each(iterator, context);
+        return this;
+    }
+
+    function isEven () {
+        return this % 2 == 0;
+    }
+
+    function isOdd () {
+        return this % 2 != 0;
+    }
+
+    function abs () {
+        return Math.abs(this);
+    }
+
+    function round () {
+        return Math.round(this);
+    }
+
+    function ceil () {
+        return Math.ceil(this);
+    }
+
+    function floor () {
+        return Math.floor(this);
+    }
+
+    function log () {
+        return Math.log(this);
+    }
+
+    function pow (exp) {
+        return Math.pow(this, exp);
+    }
+
+    function sqrt () {
+        return Math.sqrt(this);
+    }
+
+    function sin () {
+        return Math.sin(this);
+    }
+
+    function cos () {
+        return Math.cos(this);
+    }
+
+    function tan () {
+        return Math.tan(this);
+    }
+
+    function asin () {
+        return Math.asin(this);
+    }
+
+    function acos () {
+        return Math.acos(this);
+    }
+
+    function atan () {
+        return Math.atan(this);
+    }
+
+    function toBase (base) {
+        return this.toString(base).toUpperCase();
+    }
+
+    function toChar () {
+        return String.fromCharCode(this);
+    }
+
+    function digits () {
+        var matches = this.toString().match(/e(.*)$/);
+
+        if (matches) {
+            return (matches[1].toNumber() > 0)
+                ? 1+matches[1].toNumber()
+                : 0;
+        }
+        else {
+            return this.toString().length;
+        }
+    }
+
+    function toPaddedString (length, radix, pad) {
+        var pad    = (Object.isUndefined(pad)) ? '0' : pad.toString();
+        var string = this.toString(radix || 10);
+
+        return pad.times(length - string.length) + string;
+    }
+
+    function ordinalized () {
+        switch (parseInt(this)) {
+            case 1:  return 'st';
+            case 2:  return 'nd';
+            case 3:  return 'rd';
+            default: return 'th';
+        }
+    }
+
+    return {
+        milliseconds: milliseconds,
+        ms:           milliseconds,
+
+        seconds: seconds,
+        second:  seconds,
+        minutes: minutes,
+        minute:  minutes,
+        hours:   hours,
+        hour:    hours,
+        days:    days,
+        day:     days,
+        weeks:   weeks,
+        week:    weeks,
+        years:   years,
+        year:    years,
+
+        upTo: upTo,
+
+        isEven: isEven,
+        isOdd:  isOdd,
+
+        abs:   abs,
+        round: round,
+        ceil:  ceil,
+        floor: floor,
+        log:   log,
+        pow:   pow,
+        sqrt:  sqrt,
+        sin:   sin,
+        cos:   cos,
+        tan:   tan,
+        asin:  asin,
+        acos:  acos,
+        atan:  atan,
+
+        toPaddedString: toPaddedString,
+        toBase:         toBase,
+        toChar:         toChar,
+
+        digits:      digits,
+        ordinalized: ordinalized
+    };
+})());
+/* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
+ *
+ * This file is part of miniLOL.
+ *
+ * miniLOL is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
+ *
+ * miniLOL is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with miniLOL. If not, see <http://www.gnu.org/licenses/>.
+ ****************************************************************************/
+
+(function () {
+
+Date.weekDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+Date.months   = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+var _parse = {
+    '%': /(%)/,
+    'd': /(\d\d)/
+}
+
+var _format = {
+    '%': function (date) {
+        return '%';
+    },
+
+    'a': function (date) {
+        return Date.weekDays[date.getDay()].substr(0, 3);
+    },
+
+    'A': function (date) {
+        return Date.weekDays[date.getDay()];
+    },
+
+    'b': function (date) {
+        return Date.months[date.getMonth()].substr(0, 3);
+    },
+
+    'B': function (date) {
+        return Date.months[date.getMonth()];
+    },
+
+    'c': function (date) {
+        return date.format('%a %b %_d %X %Y');
+    },
+
+    'C': function (date) {
+        return date.getFullYear().substr(0, 2);
+    },
+
+    'd': function (date) {
+        return date.getDate().toPaddedString(2);
+    },
+
+    'D': function (date) {
+        return date.format('%m/%d/%y');
+    },
+
+    'd': function (date) {
+        return (date.getMonth() + 1).toPaddedString(2);
+    },
+
+    'j': function (date) {
+        return date.getDate();
+    },
+
+    'N': function (date) {
+        return (date.getDay() == 0) ? 7 : date.getDay();
+    },
+
+    'S': function (date) {
+        return date.getDate().ordinalized();
+    },
+
+    'w': function (date) {
+        return date.getDay();
+    },
+
+    'z': function (date) {
+        var tmp = new Date();
+        tmp.setFullYear(date.getFullYear());
+        tmp.setDate(1);
+        tmp.setMonth(0);
+
+        return ((date.getTime() - tmp.getTime()) / 1000 / 60 / 60 / 24).ceil();
+    },
+
+    'W': function (date) {
+        var tmp = new Date();
+        tmp.setFullYear(date.getFullYear());
+        tmp.setDate(1);
+        tmp.setMonth(0);
+
+        return ((date.getTime() - tmp.getTime()) / 1000 / 60 / 60 / 24 / 7).ceil();
+    },
+
+    'n': function (date) {
+        return date.getMonth() + 1;
+    },
+
+    't': function (date) {
+        if (date.getMonth() % 2 == 0) {
+            return 31;
+        }
+
+        if (date.getMonth() == 1) {
+            return (date.getFullYear() % 4 == 0) ? 29 : 28;
+        }
+
+        return 30;
+    },
+
+    'L': function (date) {
+        return (date.getFullYear() % 4) ? 0 : 1;
+    },
+
+    'o': function (date) {
+        return date.getFullYear();
+    },
+
+    'Y': function (date) {
+        return date.getFullYear();
+    },
+
+    'y': function (date) {
+        return date.getFullYear().toString().substr(2, 2);
+    },
+
+    'a': function (date) {
+        return (date.getHours() > 12) ? 'pm' : 'am';
+    },
+
+    'A': function (date) {
+        return (date.getHours() > 12) ? 'PM' : 'AM';
+    },
+
+    'B': function (date) {
+        var tmp = new Date(date);
+        tmp.setHours(0);
+        tmp.setSeconds(0);
+        tmp.setMinutes(0);
+
+        return ((date.getTime() - tmp.getTime()) / 1000 / 86.4).toFixed(2);
+    },
+
+    'g': function (date) {
+        return (date.getHours() + 1 > 12) ? (date.getHours() + 1) / 2 : date.getHours() + 1;
+    },
+
+    'g': function (date) {
+        return date.getHours();
+    },
+
+    'h': function (date) {
+        return ((date.getHours() + 1 > 12) ? (date.getHours() + 1) / 2 : date.getHours() + 1).toPaddedString(2);
+    },
+
+    'H': function (date) {
+        return date.getHours().toPaddedString(2);
+    },
+
+    'i': function (date) {
+        return date.getMinutes().toPaddedString(2);
+    },
+
+    's': function (date) {
+        return date.getSeconds().toPaddedString(2);
+    },
+
+    'u': function (date) {
+        return date.getMilliseconds() * 1000;
+    },
+
+    'r': function (date) {
+        return date.toUTCString();
+    },
+
+    'U': function (date) {
+        return date.getTime();
+    }
+};
+
+Object.extend(Date, (function () {
+    var _parse = Date.parse
+
+    function parse (format, string) {
+        if (!format.include('%')) {
+            return _parse(format);
+        }
+    }
+
+    return {
+        parse: parse
+    };
+})());
+
+Object.extend(Date.prototype, (function () {
+    function format (format) {
+        var date = this;
+
+        return format.gsub(/%([\-_0^#])?(.)/, function (match) {
+            return (_format[match[1]]) ? _format[match[1]](date) : match[1];
+        });
+    }
+
+    return {
+        format: format
+    };
+})());
+
+})();
+/* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
+ *
+ * This file is part of miniLOL.
+ *
+ * miniLOL is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
+ *
+ * miniLOL is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with miniLOL. If not, see <http://www.gnu.org/licenses/>.
+ ****************************************************************************/
 
 window.Element.addMethods((function () {
     function load (path, options) {
@@ -581,12 +1205,34 @@ window.Element.addMethods((function () {
     };
 })());
 
+
 if (!Object.isObject(window.miniLOL)) {
     window.miniLOL = {
-        error: Prototype.emptyFunction
+        error: Prototype.emptyFunction,
+
+        Framework: {
+            Version: '0.1'
+        }
     };
 }
 
+/* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
+ *
+ * This file is part of miniLOL.
+ *
+ * miniLOL is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
+ *
+ * miniLOL is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with miniLOL. If not, see <http://www.gnu.org/licenses/>.
+ ****************************************************************************/
 
 miniLOL.utils = {
     exists: function (path) {
@@ -707,6 +1353,23 @@ miniLOL.utils = {
     }
 };
 
+/* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
+ *
+ * This file is part of miniLOL.
+ *
+ * miniLOL is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
+ *
+ * miniLOL is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with miniLOL. If not, see <http://www.gnu.org/licenses/>.
+ ****************************************************************************/
 
 miniLOL.History = {
     interval: 0.15,
@@ -835,6 +1498,23 @@ miniLOL.History = {
 }
 
 miniLOL.History.initialize();
+/* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
+ *
+ * This file is part of miniLOL.
+ *
+ * miniLOL is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
+ *
+ * miniLOL is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with miniLOL. If not, see <http://www.gnu.org/licenses/>.
+ ****************************************************************************/
 
 miniLOL.Resource = Class.create({
     initialize: function (name, wrapper) {
@@ -962,6 +1642,23 @@ miniLOL.Resource = Class.create({
         return this.wrapper.data;
     }
 });
+/* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
+ *
+ * This file is part of miniLOL.
+ *
+ * miniLOL is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
+ *
+ * miniLOL is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with miniLOL. If not, see <http://www.gnu.org/licenses/>.
+ ****************************************************************************/
 
 miniLOL.JSON = Class.create({
     initialize: function (data) {
@@ -1078,10 +1775,68 @@ miniLOL.JSON.unserialize = function (string) {
         return null;
     }
 };
+/* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
+ *
+ * This file is part of miniLOL.
+ *
+ * miniLOL is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
+ *
+ * miniLOL is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with miniLOL. If not, see <http://www.gnu.org/licenses/>.
+ ****************************************************************************/
 
-miniLOL.Cookie = {
-    get: function (key, options) {
-        var options = miniLOL.Cookie.options(options);
+miniLOL.Cookie = (function () {
+    function _options (options) {
+        return Object.extend({
+            expires: new Date(Date.now() + (1).day().ms()),
+            path:    '',
+            domain:  '',
+            secure:  '',
+
+            raw: false
+        }, options || {});
+    }
+
+    function encode (key, value, options) {
+        if (Object.isUndefined(options)) {
+            options = {};
+        }
+
+        return "#{key}=#{value}; #{maxAge}#{expires}#{path}#{domain}#{secure}".interpolate({
+            key:   key.encodeURIComponent(),
+            value: value.encodeURIComponent(),
+
+            maxAge:  (!Object.isUndefined(options.maxAge))  ? 'max-age=#{0}; '.interpolate([options.maxAge]) : '',
+            expires: (!Object.isUndefined(options.expires)) ? 'expires=#{0}; '.interpolate([options.expires.toUTCString()]) : '',
+            path:    (!Object.isUndefined(options.path))    ? 'path=#{0}; '.interpolate([options.path]) : '',
+            domain:  (!Object.isUndefined(options.domain))  ? 'domain=#{0}; '.interpolate([options.domain]) : '',
+
+            secure: (options.secure) ? 'secure' : ''
+        });
+    }
+
+    function keys () {
+        var result = [];
+
+        window.document.cookie.split(/; /).each(function (cookie) {
+            cookie = cookie.split(/=/);
+
+            result.push(cookie[0]);
+        });
+
+        return result.uniq();
+    }
+
+    function get (key, options) {
+        var options = _options(options);
         var matches = window.document.cookie.match(RegExp.escape(key.encodeURIComponent()) + '=([^;]*)', 'g');
 
         if (!matches) {
@@ -1101,69 +1856,56 @@ miniLOL.Cookie = {
         }
 
         return result;
-    },
+    }
 
-    set: function (key, value, options) {
-        var options = miniLOL.Cookie.options(options);
+    function set (key, value, options) {
+        var options = _options(options);
 
         if (!options.raw) {
             value = miniLOL.JSON.serialize(value) || value;
         }
 
-        window.document.cookie = miniLOL.Cookie.encode(key, value, options);
-    },
+        window.document.cookie = encode(key, value, options);
+    }
 
-    remove: function (key, options) {
-        window.document.cookie = miniLOL.Cookie.encode(key, '', Object.extend(miniLOL.Cookie.options(options), {
+    function remove (key, options) {
+        window.document.cookie = encode(key, '', Object.extend(_options(options), {
             expires: new Date(0)
         }));
-    },
-
-    clear: function () {
-        miniLOL.Cookie.keys().each(function (cookie) {
-            miniLOL.Cookie.remove(cookie);
-        });
-    },
-
-    keys: function () {
-        var result = [];
-
-        $A(window.document.cookie.split(/; /)).each(function (cookie) {
-            cookie = cookie.split(/=/);
-
-            if (cookie[1]) {
-                result.push(cookie[0]);
-            }
-        });
-
-        return result.uniq();
-    },
-
-    encode: function (key, value, options) {
-        return "#{key}=#{value}; #{maxAge}#{expires}#{path}#{domain}#{secure}".interpolate({
-            key:   key.encodeURIComponent(),
-            value: value.encodeURIComponent(),
-
-            maxAge:  (!Object.isUndefined(options.maxAge))  ? 'max-age=#{0}; '.interpolate([options.maxAge]) : '',
-            expires: (!Object.isUndefined(options.expires)) ? 'expires=#{0}; '.interpolate([options.expires.toUTCString()]) : '',
-            path:    (!Object.isUndefined(options.path))    ? 'path=#{0}; '.interpolate([options.path]) : '',
-            domain:  (!Object.isUndefined(options.domain))  ? 'domain=#{0}; '.interpolate([options.domain]) : '',
-
-            secure: (options.secure) ? 'secure' : ''
-        });
-    },
-
-    options: function (options) {
-        return Object.extend({
-            expires: new Date(new Date().getTime() + 3600 * 1000),
-            path:    '',
-            domain:  '',
-            secure:  '',
-
-            raw: false
-        }, options || {});
     }
-};
+
+    function clear () {
+        keys().each(function (cookie) {
+            remove(cookie);
+        });
+    }
+
+    return {
+        encode: encode,
+        keys:   keys,
+        get:    get,
+        set:    set,
+        remove: remove,
+        clear:  clear
+    };
+})();
+/* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
+ *
+ * This file is part of miniLOL.
+ *
+ * miniLOL is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
+ *
+ * miniLOL is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with miniLOL. If not, see <http://www.gnu.org/licenses/>.
+ ****************************************************************************/
 
 miniLOL.Storage = Class.create({
     initialize: function (name, backend) {
@@ -1364,10 +2106,26 @@ miniLOL.Storage.Backends = {
     })
 };
 
+/* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
+ *
+ * This file is part of miniLOL.
+ *
+ * miniLOL is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
+ *
+ * miniLOL is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with miniLOL. If not, see <http://www.gnu.org/licenses/>.
+ ****************************************************************************/
 
 miniLOL.Document = (function () {
     var fix;
-
     if (Prototype.Browser.IE) {
         fix = function (obj) {
             if (!obj) {
@@ -1451,6 +2209,23 @@ miniLOL.Document = (function () {
         check: check
     };
 })();
+/* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
+ *
+ * This file is part of miniLOL.
+ *
+ * miniLOL is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
+ *
+ * miniLOL is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with miniLOL. If not, see <http://www.gnu.org/licenses/>.
+ ****************************************************************************/
 
 miniLOL.CSS = (function () {
     function include (path) {

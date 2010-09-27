@@ -35,7 +35,7 @@ def miniHeader (file)
     content = File.read(file)
 
     file = File.new(file, 'w');
-    file.puts '/* miniLOL is released under AGPLv3. Copyleft meh. [http://meh.doesntexist.org | meh.ffff@gmail.com] */'
+    file.puts '/* miniLOL is released under AGPLv3. Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org] */'
     file.write content
     file.close
 end
