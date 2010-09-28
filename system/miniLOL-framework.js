@@ -244,12 +244,16 @@ Object.extend(Function.prototype, (function () {
  ****************************************************************************/
 
 Object.extend(Object, (function () {
+    function isObject (val) {
+        return typeof val == 'object';
+    }
+
     function isBoolean (val) {
         return typeof val == 'boolean' || val.constructor === Boolean;
     }
 
-    function isObject (val) {
-        return typeof val == 'object';
+    function isRegExp (val) {
+        return !Object.isUndefined(val) && val.constructor == window.RegExp;
     }
 
     function isDocument (val) {
@@ -333,8 +337,9 @@ Object.extend(Object, (function () {
     }
 
     return {
-        isBoolean:  isBoolean,
         isObject:   isObject,
+        isBoolean:  isBoolean,
+        isRegExp:   isRegExp,
         isDocument: isDocument,
         isXML:      isXML,
 
@@ -515,32 +520,32 @@ Object.extend(String.prototype, (function () {
         var result = this;
 
         if (second) {
-            for (key in table) {
+            Object.keys(table).each(function (key) {
                 if (!second[key]) {
-                    throw new Error("The second table value is missing.");
+                    throw new Error('The second table value is missing.');
                 }
 
                 if (table[key].is(RegExp)) {
-                    result = result.replace(eval(table[key].global ? table[key].toString() : table[key].toString() + "g"));
+                    result = result.replace(eval(table[key].global ? table[key].toString() : table[key].toString() + 'g'));
                 }
                 else {
-                    result = result.replace(new RegExp(table[key], "g"), second[key]);
+                    result = result.replace(new RegExp(table[key], 'g'), second[key]);
                 }
-            }
+            });
         }
         else {
-            for each (match in table) {
+            Object.values(table).each(function (match) {
                 if (match.length != 2) {
-                    throw new Error("The array has to be [regex, translation].");
+                    throw new Error('The array has to be [regex, translation].');
                 }
 
                 if (match[0].is(RegExp)) {
-                    result = result.replace(eval(match[0].global ? match[0].toString() : match[0].toString() + "g"), match[1]);
+                    result = result.replace(eval(match[0].global ? match[0].toString() : match[0].toString() + 'g'), match[1]);
                 }
                 else {
-                    result = result.replace(new RegExp(match[0], "g"), match[1]);
+                    result = result.replace(new RegExp(match[0], 'g'), match[1]);
                 }
-            }
+            });
         }
 
         return result;
@@ -1375,7 +1380,7 @@ miniLOL.History = {
     interval: 0.15,
 
     initialize: function () {
-        miniLOL.History.current = window.location.hash;
+        miniLOL.History.current = window.location.hash || '#';
 
         if (Prototype.Browser.Opera && history.navigationMode) {
             history.navigationMode = 'compatible';
@@ -1416,8 +1421,8 @@ miniLOL.History = {
         Default: function () {
             Event.observe(window, 'hashchange', function (event) {
                  Event.fire(document, ':url.change', (Prototype.Browser.Mozilla)
-                    ? window.location.hash.substring(1)
-                    : decodeURIComponent(window.location.hash.substring(1))
+                    ? window.location.hash
+                    : decodeURIComponent(window.location.hash)
                 );
             });
         },
@@ -1445,7 +1450,7 @@ miniLOL.History = {
                         doc.open();
                         doc.close();
 
-                        doc.location.hash = encodeURIComponent(hash.substring(1));
+                        doc.location.hash = encodeURIComponent(hash);
                     },
 
                     get: function () {
@@ -1471,8 +1476,8 @@ miniLOL.History = {
             }
 
             Event.fire(document, ':url.change', (Prototype.Browser.Mozilla)
-                ? window.location.hash.substring(1)
-                : decodeURIComponent(window.location.hash.substring(1))
+                ? window.location.hash
+                : decodeURIComponent(window.location.hash)
             );
         },
 
