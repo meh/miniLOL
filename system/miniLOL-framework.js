@@ -197,6 +197,8 @@ if (Prototype.Browser.IE) {
  * along with miniLOL. If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 
+Function.empty = function () { };
+
 Object.extend(Function, (function () {
     function parse (string) {
         matches = string.match(/^function\s*\((.*?)\)[\s\n]*\{([\s\S]*)\}[\s\n]*/m);
@@ -243,6 +245,7 @@ Object.extend(Function.prototype, (function () {
  * along with miniLOL. If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 
+
 Object.extend(Object, (function () {
     function isObject (val) {
         return typeof val == 'object';
@@ -254,6 +257,10 @@ Object.extend(Object, (function () {
 
     function isRegExp (val) {
         return !Object.isUndefined(val) && val.constructor == window.RegExp;
+    }
+
+    function isClass (val) {
+        return Boolean(val['__miniLOL.Class__']);
     }
 
     function isDocument (val) {
@@ -295,6 +302,70 @@ Object.extend(Object, (function () {
         }
 
         return result.substr(0, result.length - 1);
+    }
+
+    function extend (destination, source, overwrite) {
+        overwrite = (Object.isUndefined(overwrite)) ? true : Boolean(overwrite);
+
+        for (var property in source) {
+            if (!overwrite && !Object.isUndefined(destionation[property])) {
+                continue;
+            }
+
+            destination[property] = source[property];
+        }
+
+        return destination;
+    }
+
+    function extendAttributes (destination, source, overwrite) {
+        overwrite = (Object.isUndefined(overwrite)) ? true : Boolean(overwrite);
+
+        for (var property in source) {
+            if (!overwrite && !Object.isUndefined(destionation[property])) {
+                continue;
+            }
+
+            (function () {
+                var _saved;
+
+                destination[property] = function (value, force) {
+                    if (Object.isUndefined(value) && !force) {
+                        if (Object.isFunction(source[property].get)) {
+                            return source[property].get(_saved);
+                        }
+                        else {
+                            return _saved;
+                        }
+                    }
+                    else {
+                        if (Object.isFunction(source[property].set)) {
+                            return _saved = source[property].set(_saved, value);
+                        }
+                        else {
+                            return _saved = value;
+                        }
+                    }
+                };
+            })();
+        }
+
+        return destination;
+    }
+
+    function without (object, exceptions) {
+        var result = Object.extend({}, object);
+
+        if (Object.isArray(exceptions)) {
+            exceptions.each(function (exception) {
+                delete result[exception];
+            });
+        }
+        else {
+            delete result[exceptions];
+        }
+
+        return result;
     }
 
     if (!Object.isFunction(Object.defineProperty)) {
@@ -340,11 +411,16 @@ Object.extend(Object, (function () {
         isObject:   isObject,
         isBoolean:  isBoolean,
         isRegExp:   isRegExp,
+        isClass:    isClass,
         isDocument: isDocument,
         isXML:      isXML,
 
         fromAttributes: fromAttributes,
         toQueryString:  toQueryString,
+
+        extend:           extend,
+        extendAttributes: extendAttributes,
+        without:          without,
 
         defineProperty:   defineProperty,
         defineProperties: defineProperties,
@@ -1213,13 +1289,142 @@ window.Element.addMethods((function () {
 
 if (!Object.isObject(window.miniLOL)) {
     window.miniLOL = {
-        error: Prototype.emptyFunction,
+        error: Function.empty,
 
         Framework: {
             Version: '0.1'
         }
     };
 }
+
+/* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
+ *
+ * This file is part of miniLOL.
+ *
+ * miniLOL is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
+ *
+ * miniLOL is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with miniLOL. If not, see <http://www.gnu.org/licenses/>.
+ ****************************************************************************/
+
+Class = {
+    Normal:   0x01,
+    Abstract: 0x02,
+
+    create: function () {
+        var args       = $A(arguments);
+        var parent     = (args.length > 1) ? args.shift() : null;
+        var properties = args.shift();
+
+        if (!Object.isObject(properties)) {
+            throw new Error('You have to pass the class description.');
+        }
+
+        var klass = function () {
+            switch (this.__type__) {
+                case Class.Abstract:
+                throw new Error('You cannot instantiate an abstract class.');
+                break;
+
+                case Class.Normal:
+                if (Object.isFunction(this.initialize)) {
+                    return this.initialize.apply(this, arguments);
+                }
+                break;
+            }
+
+            return null;
+        }
+
+        klass['__miniLOL.Class__'] = true;
+
+        Object.extend(klass, Class.Methods);
+        klass.superclass = parent
+        klass.subclasses = [];
+
+        if (parent) {
+            if (!parent.__type__) {
+                parent.__type__ = Class.Normal;
+            }
+
+            if (!parent.subclasses) {
+                parent.subclasses = [];
+            }
+
+            var subclass       = Function.empty.clone();
+            subclass.prototype = parent.prototype
+            klass.prototype    = new subclass;
+            parent.subclasses.push(klass);
+        }
+
+        klass.__type__ = klass.prototype.__type__ = properties.type || Class.Normal;
+
+        klass.addMethods({ initialize: properties.initialize || properties.constructor || Function.empty.clone() });
+        klass.addMethods(Object.without(properties, ['constructor', 'initialize', 'Methods', 'Static', 'Attributes']));
+
+        klass.addMethods(properties.Methods || {});
+        klass.addStatic(properties.Static || {});
+        klass.addAttributes(properties.Attributes || {});
+
+        klass.prototype.constructor = klass;
+
+        return klass;
+    },
+
+    Methods: {
+        addMethods: function (source) {
+            var ancestor = (this.superclass)
+                ? this.superclass && this.superclass.prototype
+                : undefined;
+
+            for (var name in source) {
+                var value = source[name];
+
+                if (ancestor && Object.isFunction(value) && value.argumentNames().first() == '$super') {
+                    var method = value;
+
+                    value = (function (m) {
+                        return function () {
+                            return ancestor[m].apply(this, arguments);
+                        };
+                    })(name).wrap(method);
+
+                    value.valueOf  = method.valueOf.bind(method);
+                    value.toString = method.toString.bind(method);
+                }
+
+                this.prototype[name] = value;
+
+                if (this.__type__ == Class.Abstract) {
+                    this[name] = value;
+                }
+            }
+        },
+
+        addStatic: function (source) {
+            for (var property in source) {
+                this[property] = source[property];
+            }
+        },
+
+        addAttributes: function (source) {
+            Object.extendAttributes(this.prototype, source);
+
+            if (this.__type__ == Class.Abstract) {
+                Object.extendAttributes(this, source);
+            }
+        }
+    }
+};
+
 
 /* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
  *
@@ -1708,78 +1913,80 @@ miniLOL.JSON = Class.create({
 
     toString: function () {
         return miniLOL.JSON.serialize(this.data) || '{}';
+    },
+
+    Static: {
+        parse: function (raw) {
+            return new miniLOL.JSON(raw);
+        },
+
+        serializeSpecial: function (obj) {
+            if (typeof obj !== 'object') {
+                return obj;
+            }
+
+            obj = Object.clone(obj);
+
+            for (var key in obj) {
+                if (Object.isXML(obj[key])) {
+                    obj[key] = { __miniLOL_is_xml: true, value: String.fromXML(obj[key]) };
+                }
+                else if (Object.isFunction(obj[key])) {
+                    obj[key] = { __miniLOL_is_function: true, value: obj[key].toString() };
+                }
+                else {
+                    obj[key] = miniLOL.JSON.serializeSpecial(obj[key]);
+                }
+            }
+
+            return obj;
+        },
+
+        unserializeSpecial: function (obj) {
+            if (typeof obj !== 'object') {
+                return obj;
+            }
+
+            obj = Object.clone(obj);
+
+            for (var key in obj) {
+                if (obj[key].__miniLOL_is_xml) {
+                    obj[key] = obj[key].value.toXML();
+                }
+                else if (obj[key].__miniLOL_is_function) {
+                    obj[key] = Function.parse(obj[key].value);
+                }
+                else {
+                    obj[key] = miniLOL.JSON.unserializeSpecial(obj[key]);
+                }
+            }
+
+            return obj;
+        },
+
+        serialize: function (obj) {
+            try {
+                return Object.toJSON(miniLOL.JSON.serializeSpecial(obj));
+            }
+            catch (e) {
+                return false;
+            }
+        },
+
+        unserialize: function (string) {
+            if (!Object.isString(string)) {
+                return null;
+            }
+
+            try {
+                return miniLOL.JSON.unserializeSpecial(string.evalJSON());
+            }
+            catch (e) {
+                return null;
+            }
+        }
     }
 });
-
-miniLOL.JSON.parse = function (raw) {
-    return new miniLOL.JSON(raw);
-}
-
-miniLOL.JSON.serializeSpecial = function (obj) {
-    if (typeof obj !== 'object') {
-        return obj;
-    }
-
-    obj = Object.clone(obj);
-
-    for (var key in obj) {
-        if (Object.isXML(obj[key])) {
-            obj[key] = { __miniLOL_is_xml: true, value: String.fromXML(obj[key]) };
-        }
-        else if (Object.isFunction(obj[key])) {
-            obj[key] = { __miniLOL_is_function: true, value: obj[key].toString() };
-        }
-        else {
-            obj[key] = miniLOL.JSON.serializeSpecial(obj[key]);
-        }
-    }
-
-    return obj;
-};
-
-miniLOL.JSON.unserializeSpecial = function (obj) {
-    if (typeof obj !== 'object') {
-        return obj;
-    }
-
-    obj = Object.clone(obj);
-
-    for (var key in obj) {
-        if (obj[key].__miniLOL_is_xml) {
-            obj[key] = obj[key].value.toXML();
-        }
-        else if (obj[key].__miniLOL_is_function) {
-            obj[key] = Function.parse(obj[key].value);
-        }
-        else {
-            obj[key] = miniLOL.JSON.unserializeSpecial(obj[key]);
-        }
-    }
-
-    return obj;
-};
-
-miniLOL.JSON.serialize = function (obj) {
-    try {
-        return Object.toJSON(miniLOL.JSON.serializeSpecial(obj));
-    }
-    catch (e) {
-        return false;
-    }
-};
-
-miniLOL.JSON.unserialize = function (string) {
-    if (!Object.isString(string)) {
-        return null;
-    }
-
-    try {
-        return miniLOL.JSON.unserializeSpecial(string.evalJSON());
-    }
-    catch (e) {
-        return null;
-    }
-};
 /* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
  *
  * This file is part of miniLOL.
@@ -1914,7 +2121,7 @@ miniLOL.Cookie = (function () {
 
 miniLOL.Storage = Class.create({
     initialize: function (name, backend) {
-        this.name    = name;
+        this.name = name;
 
         this.backend = (miniLOL.Storage.Instances[name])
             ? miniLOL.Storage.Instances[name]
@@ -2004,12 +2211,12 @@ miniLOL.Storage.Backend = Class.create(miniLOL.JSON, {
         }
 
         return $super(data);
-    }
-});
+    },
 
-Object.extend(miniLOL.Storage.Backend, {
-    filter: function (value) {
-        return value.replace(/\s/g, '');
+    Static: {
+        filter: function (value) {
+            return value.replace(/\s/g, '');
+        }
     }
 });
 
@@ -2107,7 +2314,7 @@ miniLOL.Storage.Backends = {
     }),
 
     Null: Class.create(miniLOL.Storage.Backend, {
-        save: Prototype.emptyFunction
+        save: Function.empty
     })
 };
 

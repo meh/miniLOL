@@ -54,7 +54,9 @@ miniLOL = {
             miniLOL.theme.content().scrollTo();
         }));
 
+        // Brace for hugeness, this may look ugly but it's better than 20 copypasted ifs
         [function () {
+            // Set some default values when the core config gets loaded (this also means on reload)
             Event.observe(document, ':resource.loaded', function (event) {
                 if (event.memo.resource.name != 'miniLOL.config' || event.memo.arguments[0] != 'resources/config.xml') {
                     return;
@@ -107,7 +109,7 @@ miniLOL = {
                             var config = miniLOL.config[domain] || {};
 
                             miniLOL.config[domain] = Object.extend(config, Element.toObject(dom));
-                        }.bind(this),
+                        },
 
                         onFailure: function (http) {
                             miniLOL.error('miniLOL.config: Error while loading #{path} (#{status} - #{statusText})'.interpolate({
@@ -135,8 +137,10 @@ miniLOL = {
             $(document.body).update(miniLOL.config['core'].loadingMessage);
 
             Event.fire(document, ':initialization');
+            Event.stopObserving(document, ':initialization');
         },
 
+        // miniLOL.menus resource creation and resources/menus.xml load
         function () {
             miniLOL.resource.set(new miniLOL.Resource('miniLOL.menus', {
                 load: function (path) {
@@ -190,6 +194,7 @@ miniLOL = {
             miniLOL.resource.get('miniLOL.menus').load('resources/menus.xml');
         },
 
+        // miniLOL.pages resource creation and resource/pages.xml load
         function () {
             miniLOL.resource.set(new miniLOL.Resource('miniLOL.pages', {
                 load: function (path, ignore) {
@@ -241,6 +246,7 @@ miniLOL = {
             miniLOL.resource.get('miniLOL.pages').load('resources/pages.xml', true);
         },
 
+        // miniLOL.functions resource creation
         function () {
             miniLOL.resource.set(new miniLOL.Resource('miniLOL.functions', {
                 load: function (path) {
@@ -307,11 +313,8 @@ miniLOL = {
             miniLOL.resource.get('miniLOL.functions').load('resources/functions.xml');
         },
 
+        // Theme loading
         function () {
-            $$('link').each(function (css) {
-                miniLOL.theme.style.list[css.getAttribute('href')] = css;
-            });
-
             if (miniLOL.config['core'].theme) {
                 miniLOL.error(!miniLOL.theme.load(miniLOL.config['core'].theme));
                 miniLOL.theme.template.menu();
@@ -321,12 +324,14 @@ miniLOL = {
             }
         },
 
+        // Menu initialization
         function () {
             if (miniLOL.menu.enabled()) {
                 miniLOL.menu.set(miniLOL.config['core'].loadingMessage);
             }
         },
 
+        // miniLOL.modules resource creation and modules' initialization
         function () {
             miniLOL.content.set('Loading modules...');
 
@@ -386,12 +391,14 @@ miniLOL = {
             miniLOL.resource.get('miniLOL.modules').load('resources/modules.xml', true);
         },
 
+        // Set the menu
         function () {
             if (miniLOL.menu.enabled()) {
                 miniLOL.menu.change('default');
             }
         },
 
+        // Check for modules dependencies
         function () {
             miniLOL.content.set('Checking dependencies...');
 
