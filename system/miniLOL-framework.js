@@ -179,6 +179,7 @@ if (Prototype.Browser.IE) {
  * along with miniLOL. If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 
+
 /* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
  *
  * This file is part of miniLOL.
@@ -905,6 +906,7 @@ Object.extend(Number.prototype, (function () {
  * along with miniLOL. If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 
+
 (function () {
 
 Date.weekDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -1122,6 +1124,7 @@ Object.extend(Date.prototype, (function () {
  * You should have received a copy of the GNU Affero General Public License
  * along with miniLOL. If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
+
 
 window.Element.addMethods((function () {
     function load (path, options) {
@@ -1592,7 +1595,7 @@ miniLOL.History = {
         }
 
         Event.observe(document, ':url.change', function (event) {
-            miniLOL.History.current = (Object.isString(event.memo)) ? event.memo : '';
+            miniLOL.History.current = event.memo.toString() || '#';
         });
 
         miniLOL.History.Initializers.get().call()
@@ -1626,8 +1629,8 @@ miniLOL.History = {
         Default: function () {
             Event.observe(window, 'hashchange', function (event) {
                  Event.fire(document, ':url.change', (Prototype.Browser.Mozilla)
-                    ? window.location.hash
-                    : decodeURIComponent(window.location.hash)
+                    ? window.location.hash || '#'
+                    : decodeURIComponent(window.location.hash || '#')
                 );
             });
         },
@@ -1655,7 +1658,7 @@ miniLOL.History = {
                         doc.open();
                         doc.close();
 
-                        doc.location.hash = encodeURIComponent(hash);
+                        doc.location.hash = encodeURIComponent(hash.substring(1));
                     },
 
                     get: function () {
@@ -1681,8 +1684,8 @@ miniLOL.History = {
             }
 
             Event.fire(document, ':url.change', (Prototype.Browser.Mozilla)
-                ? window.location.hash
-                : decodeURIComponent(window.location.hash)
+                ? window.location.hash || '#'
+                : decodeURIComponent(window.location.hash || '#')
             );
         },
 
@@ -1695,7 +1698,7 @@ miniLOL.History = {
 
             if (hashes.actual != hashes.iframe) {
                 if (hashes.actual && hashes.actual == hashes.current) { // The user is moving in the History
-                    window.location.hash = miniLOL.History.current = hashes.iframe;
+                    window.location.hash = (miniLOL.History.current = hashes.iframe).substring(1);
                 }
                 else { // The user went to the actual URL
                     miniLOL.History.IE.put(miniLOL.History.current = hashes.actual);
