@@ -305,10 +305,61 @@ Object.extend(Object, (function () {
         return result.substr(0, result.length - 1);
     }
 
-    function extend (destination, source, overwrite) {
-        overwrite = (Object.isUndefined(overwrite)) ? true : Boolean(overwrite);
+    var buggy = (function () {
+        for (var property in { toString: 1 }) {
+            if (property === 'toString') {
+                return false;
+            }
+        }
 
-        for (var property in source) {
+        return true;
+    })();
+
+    var keys;
+    var values;
+
+    if (buggy) {
+        var _keys   = Object.keys;
+        var _values = Object.values;
+
+        var fix = ['toString', 'valueOf'];
+
+        keys = function (object) {
+            var result = _keys(object);
+
+            fix.each(function (fix) {
+                if (object[fix] != Object.prototype[fix]) {
+                    result.push(fix);
+                }
+            });
+
+            return result;
+        }
+
+        values = function (object) {
+            var result = _values(object);
+
+            fix.each(function (fix) {
+                if (object[fix] != Object.prototype[fix]) {
+                    result.push(object[fix]);
+                }
+            });
+
+            return result;
+        }
+    }
+    else {
+        keys   = Object.keys;
+        values = Object.values;
+    }
+
+    function extend (destination, source, overwrite) {
+        var overwrite  = (Object.isUndefined(overwrite)) ? true : Boolean(overwrite);
+        var properties = Object.keys(source);
+
+        for (var i = 0, length = properties.length; i < length; i++) {
+            var property = properties[i];
+
             if (!overwrite && !Object.isUndefined(destionation[property])) {
                 continue;
             }
@@ -418,6 +469,9 @@ Object.extend(Object, (function () {
 
         fromAttributes: fromAttributes,
         toQueryString:  toQueryString,
+
+        keys:   keys,
+        values: values,
 
         extend:           extend,
         extendAttributes: extendAttributes,
@@ -906,6 +960,65 @@ Object.extend(Number.prototype, (function () {
  * along with miniLOL. If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 
+Hash.addMethods((function () {
+    function clear () {
+        var tmp      = this._object;
+        this._object = {};
+
+        return tmp;
+    }
+
+    function replace (data) {
+        var tmp = this._object;
+
+        if (Object.isString(data)) {
+            this._object = miniLOL.JSON.unserialize(data);
+        }
+        else {
+            this._object = Object.extend({}, data);
+        }
+
+        return tmp;
+    }
+
+    var _toJSON = Hash.prototype.toJSON
+
+    function toJSON (improved) {
+        if (improved) {
+            return miniLOL.JSON.serialize(this._object) || '{}';
+        }
+        else {
+            return _toJSON.call(this);
+        }
+    }
+
+    return {
+        remove: Hash.prototype.unset,
+
+        clear:   clear,
+        replace: replace,
+
+        toJSON: toJSON
+    };
+})());
+/* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
+ *
+ * This file is part of miniLOL.
+ *
+ * miniLOL is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
+ *
+ * miniLOL is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with miniLOL. If not, see <http://www.gnu.org/licenses/>.
+ ****************************************************************************/
+
 
 (function () {
 
@@ -1318,77 +1431,20 @@ if (!Object.isObject(window.miniLOL)) {
  * along with miniLOL. If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 
-Class = {
-    Normal:   0x01,
-    Abstract: 0x02,
 
-    create: function () {
-        var args       = $A(arguments);
-        var parent     = (args.length > 1) ? args.shift() : null;
-        var properties = args.shift();
+Class = (function () {
+    var Type = {
+        Normal:   0x01,
+        Abstract: 0x02
+    };
 
-        if (!Object.isObject(properties)) {
-            throw new Error('You have to pass the class description.');
-        }
+    var Methods = (function () {
+        function addMethods (source) {
+            var ancestor   = this.superclass && this.superclass.prototype; // if superclass is defined get its prototype
+            var properties = Object.keys(source);
 
-        var klass = function () {
-            switch (this.__type__) {
-                case Class.Abstract:
-                throw new Error('You cannot instantiate an abstract class.');
-                break;
-
-                case Class.Normal:
-                if (Object.isFunction(this.initialize)) {
-                    return this.initialize.apply(this, arguments);
-                }
-                break;
-            }
-
-            return null;
-        }
-
-        klass['__miniLOL.Class__'] = true;
-
-        Object.extend(klass, Class.Methods);
-        klass.superclass = parent
-        klass.subclasses = [];
-
-        if (parent) {
-            if (!parent.__type__) {
-                parent.__type__ = Class.Normal;
-            }
-
-            if (!parent.subclasses) {
-                parent.subclasses = [];
-            }
-
-            var subclass       = Function.empty.clone();
-            subclass.prototype = parent.prototype
-            klass.prototype    = new subclass;
-            parent.subclasses.push(klass);
-        }
-
-        klass.__type__ = klass.prototype.__type__ = properties.type || Class.Normal;
-
-        klass.addMethods({ initialize: properties.initialize || properties.constructor || Function.empty.clone() });
-        klass.addMethods(Object.without(properties, ['constructor', 'initialize', 'Methods', 'Static', 'Attributes']));
-
-        klass.addMethods(properties.Methods || {});
-        klass.addStatic(properties.Static || {});
-        klass.addAttributes(properties.Attributes || {});
-
-        klass.prototype.constructor = klass;
-
-        return klass;
-    },
-
-    Methods: {
-        addMethods: function (source) {
-            var ancestor = (this.superclass)
-                ? this.superclass && this.superclass.prototype
-                : undefined;
-
-            for (var name in source) {
+            for (var i = 0, length = properties.length; i < length; i++) {
+                var name  = properties[i];
                 var value = source[name];
 
                 if (ancestor && Object.isFunction(value) && value.argumentNames().first() == '$super') {
@@ -1410,23 +1466,96 @@ Class = {
                     this[name] = value;
                 }
             }
-        },
+        }
 
-        addStatic: function (source) {
-            for (var property in source) {
-                this[property] = source[property];
+        function addStatic (source) {
+            var properties = Object.keys(source);
+
+            for (var i = 0, length = properties.length; i < length; i++) {
+                var name   = properties[i];
+                this[name] = source[name];
             }
-        },
+        }
 
-        addAttributes: function (source) {
+        function addAttributes (source) {
             Object.extendAttributes(this.prototype, source);
 
             if (this.__type__ == Class.Abstract) {
                 Object.extendAttributes(this, source);
             }
         }
+
+        return {
+            addMethods:    addMethods,
+            addStatic:     addStatic,
+            addAttributes: addAttributes
+        };
+    })();
+
+    function create () {
+        var properties = $A(arguments);
+        var parent     = (Object.isFunction(properties.first())) ? properties.shift() : null;
+
+        var klass = function () {
+            switch (this.__type__) {
+                case Type.Abstract:
+                throw new Error('You cannot instantiate an abstract class.');
+                break;
+
+                default:
+                if (Object.isFunction(this.initialize)) {
+                    return this.initialize.apply(this, arguments);
+                }
+                break;
+            }
+
+            return null;
+        }
+
+        klass['__miniLOL.Class__'] = true;
+
+        Object.extend(klass, Class.Methods);
+        klass.superclass = parent
+        klass.subclasses = [];
+
+        if (parent) {
+            if (!parent.__type__) {
+                parent.__type__ = Type.Normal;
+            }
+
+            if (!parent.subclasses) {
+                parent.subclasses = [];
+            }
+
+            var subclass       = Function.empty.clone();
+            subclass.prototype = parent.prototype
+            klass.prototype    = new subclass;
+            parent.subclasses.push(klass);
+        }
+
+        klass.__type__ = klass.prototype.__type__ = properties.first().type || Class.Normal;
+
+        properties.each(function (properties) {
+            klass.addMethods({ initialize: properties.initialize || properties.constructor || Function.empty.clone() });
+            klass.addMethods(Object.without(properties, ['constructor', 'initialize', 'Methods', 'Static', 'Attributes']));
+
+            klass.addMethods(properties.Methods || {});
+            klass.addStatic(properties.Static || {});
+            klass.addAttributes(properties.Attributes || {});
+        });
+
+        klass.prototype.constructor = klass;
+
+        return klass;
     }
-};
+
+    return {
+        create: create,
+
+        Type:    Type,
+        Methods: Methods
+    };
+})();
 
 
 /* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
@@ -1447,8 +1576,8 @@ Class = {
  * along with miniLOL. If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 
-miniLOL.utils = {
-    exists: function (path) {
+miniLOL.utils = (function () {
+    function exists (path) {
         var result = false;
 
         new Ajax.Request(path, {
@@ -1461,9 +1590,25 @@ miniLOL.utils = {
         });
 
         return result;
-    },
+    }
 
-    execute: function (path) {
+    function get (path, minified) {
+        var result;
+
+        new Ajax.Request(path, {
+            method:       'get',
+            minified:     minified,
+            asynchronous: false,
+
+            onSuccess: function (http) {
+                result = http.responseText;
+            }
+        });
+
+        return result;
+    }
+
+    function execute (path) {
         var result;
         var error;
 
@@ -1500,9 +1645,9 @@ miniLOL.utils = {
         }
 
         return result;
-    },
+    }
 
-    include: function (path) {
+    function include (path) {
         var result = false;
 
         new Ajax.Request(path, {
@@ -1521,9 +1666,9 @@ miniLOL.utils = {
         });
 
         return result;
-    },
+    }
 
-    require: function (path) {
+    function require (path) {
         var error = false;
 
         new Ajax.Request(path, {
@@ -1564,7 +1709,16 @@ miniLOL.utils = {
 
         return true;
     }
-};
+
+    return {
+        exists: exists,
+        get:    get,
+
+        execute: execute,
+        include: include,
+        require: require
+    };
+})();
 
 /* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
  *
@@ -1873,123 +2027,87 @@ miniLOL.Resource = Class.create({
  * along with miniLOL. If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 
-miniLOL.JSON = Class.create({
-    initialize: function (data) {
-        this.replace(data);
-    },
+miniLOL.JSON = (function () {
+    function parse (raw) {
+        return new miniLOL.JSON(raw);
+    }
 
-    get: function (key) {
-        return this.data[key];
-    },
-
-    set: function (key, value) {
-        return this.data[key] = value;
-    },
-
-    remove: function (key) {
-        var tmp = this.data[key];
-
-        delete this.data[key];
-
-        return tmp;
-    },
-
-    clear: function () {
-        var tmp   = this.data;
-        this.data = {};
-
-        return tmp;
-    },
-
-    replace: function (data) {
-        var tmp = this.data;
-
-        if (Object.isString(data)) {
-            this.data = miniLOL.JSON.unserialize(data);
-        }
-        else {
-            this.data = Object.extend({}, data);
+    function serializeSpecial (obj) {
+        if (typeof obj !== 'object') {
+            return obj;
         }
 
-        return tmp;
-    },
+        obj = Object.clone(obj);
 
-    toString: function () {
-        return miniLOL.JSON.serialize(this.data) || '{}';
-    },
-
-    Static: {
-        parse: function (raw) {
-            return new miniLOL.JSON(raw);
-        },
-
-        serializeSpecial: function (obj) {
-            if (typeof obj !== 'object') {
-                return obj;
+        for (var key in obj) {
+            if (Object.isXML(obj[key])) {
+                obj[key] = { __miniLOL_is_xml: true, value: String.fromXML(obj[key]) };
             }
-
-            obj = Object.clone(obj);
-
-            for (var key in obj) {
-                if (Object.isXML(obj[key])) {
-                    obj[key] = { __miniLOL_is_xml: true, value: String.fromXML(obj[key]) };
-                }
-                else if (Object.isFunction(obj[key])) {
-                    obj[key] = { __miniLOL_is_function: true, value: obj[key].toString() };
-                }
-                else {
-                    obj[key] = miniLOL.JSON.serializeSpecial(obj[key]);
-                }
+            else if (Object.isFunction(obj[key])) {
+                obj[key] = { __miniLOL_is_function: true, value: obj[key].toString() };
             }
+            else {
+                obj[key] = miniLOL.JSON.serializeSpecial(obj[key]);
+            }
+        }
 
+        return obj;
+    }
+
+    function unserializeSpecial (obj) {
+        if (typeof obj !== 'object') {
             return obj;
-        },
+        }
 
-        unserializeSpecial: function (obj) {
-            if (typeof obj !== 'object') {
-                return obj;
-            }
+        obj = Object.clone(obj);
 
-            obj = Object.clone(obj);
+        for (var key in obj) {
+            if (obj[key].__miniLOL_is_xml) {
+                obj[key] = obj[key].value.toXML();
+            }
+            else if (obj[key].__miniLOL_is_function) {
+                obj[key] = Function.parse(obj[key].value);
+            }
+            else {
+                obj[key] = miniLOL.JSON.unserializeSpecial(obj[key]);
+            }
+        }
 
-            for (var key in obj) {
-                if (obj[key].__miniLOL_is_xml) {
-                    obj[key] = obj[key].value.toXML();
-                }
-                else if (obj[key].__miniLOL_is_function) {
-                    obj[key] = Function.parse(obj[key].value);
-                }
-                else {
-                    obj[key] = miniLOL.JSON.unserializeSpecial(obj[key]);
-                }
-            }
+        return obj;
+    }
 
-            return obj;
-        },
-
-        serialize: function (obj) {
-            try {
-                return Object.toJSON(miniLOL.JSON.serializeSpecial(obj));
-            }
-            catch (e) {
-                return false;
-            }
-        },
-
-        unserialize: function (string) {
-            if (!Object.isString(string)) {
-                return null;
-            }
-
-            try {
-                return miniLOL.JSON.unserializeSpecial(string.evalJSON());
-            }
-            catch (e) {
-                return null;
-            }
+    function serialize (obj) {
+        try {
+            return Object.toJSON(miniLOL.JSON.serializeSpecial(obj));
+        }
+        catch (e) {
+            return false;
         }
     }
-});
+
+    function unserialize (string) {
+        if (!Object.isString(string)) {
+            return null;
+        }
+
+        try {
+            return miniLOL.JSON.unserializeSpecial(string.evalJSON());
+        }
+        catch (e) {
+            return null;
+        }
+    }
+
+    return {
+        parse: parse,
+
+        serializeSpecial:   serializeSpecial,
+        unserializeSpecial: unserializeSpecial,
+
+        serialize:   serialize,
+        unserialize: unserialize
+    };
+})();
 /* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
  *
  * This file is part of miniLOL.
@@ -2126,11 +2244,13 @@ miniLOL.Storage = Class.create({
     initialize: function (name, backend) {
         this.name = name;
 
-        this.backend = (miniLOL.Storage.Instances[name])
-            ? miniLOL.Storage.Instances[name]
-            : new (backend || miniLOL.Storage.Backends.available())(name);
-
-        miniLOL.Storage.Instances[name] = this.backend;
+        if (miniLOL.Storage.Instances[name]) {
+            this.backend = miniLOL.Storage.Instances[name];
+        }
+        else {
+            this.backend = miniLOL.Storage.Instances[name] =
+                new (backend || miniLOL.Storage.Backends.available())(name);
+        }
     },
 
     get: function (key) {
@@ -2160,9 +2280,9 @@ miniLOL.Storage = Class.create({
 
 miniLOL.Storage.Instances = {};
 
-miniLOL.Storage.Backend = Class.create(miniLOL.JSON, {
+miniLOL.Storage.Backend = Class.create(Hash, {
     initialize: function ($super, name, data) {
-        $super(data);
+        $super(((Object.isString(data)) ? miniLOL.JSON.unserialize(data) : data) || {});
 
         this.name = miniLOL.Storage.Backend.filter(name);
 
@@ -2252,7 +2372,7 @@ miniLOL.Storage.Backends = {
         },
 
         save: function () {
-            var raw = this.toString();
+            var raw = this.toJSON(true);
 
             this.size = raw.length;
 
@@ -2268,7 +2388,7 @@ miniLOL.Storage.Backends = {
         },
 
         save: function () {
-            var raw = this.toString();
+            var raw = this.toJSON(true);
 
             this.size = raw.length;
 
@@ -2291,7 +2411,7 @@ miniLOL.Storage.Backends = {
         },
 
         save: function () {
-            var raw = this.toString();
+            var raw = this.toJSON(true);
 
             this.size = raw.length;
 
@@ -2308,7 +2428,7 @@ miniLOL.Storage.Backends = {
         },
 
         save: function () {
-            var raw = this.toString();
+            var raw = this.toJSON(true);
 
             this.size = raw.length;
 

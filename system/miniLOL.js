@@ -761,21 +761,13 @@ miniLOL = {
             }
 
             // Get the html layout and set it
-            new Ajax.Request('#{path}/template.html'.interpolate({ path: path, theme: name }), {
-                method: 'get',
-                asynchronous: false,
+            var template = miniLOL.utils.get('#{path}/template.html'.interpolate({ path: path, theme: name }), true);
 
-                onSuccess: function (http) {
-                    $(document.body).update(http.responseText);
-                },
-
-                onFailure: function () {
-                    error = 'Could not load template.html.';
-                }
-            });
-
-            if (error) {
-                miniLOL.error(error, true);
+            if (template) {
+                $(document.body).update(template);
+            }
+            else {
+                miniLOL.error('Could not load template.html.', true);
                 return false;
             }
 
