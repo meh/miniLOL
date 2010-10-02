@@ -2563,10 +2563,25 @@ miniLOL.Document = (function () {
  ****************************************************************************/
 
 miniLOL.CSS = (function () {
-    function include (path) {
-        var style = false;
+    function include (path, minified) {
+        if (minified) {
+            minified = path.replace(/\.css$/, '.min.css');
+        }
 
-        if (!(style = $$('link').find(function (css) { return css.getAttribute('href') == path })) && miniLOL.utils.exists(path)) {
+        var style = $$('link').find(function (css) {
+            return css.getAttribute('href') == path || css.getAttribute('href') === minified;
+        });
+
+        if (!style) {
+            if (minified && miniLOL.utils.exists(minified)) {
+                path = minified;
+            }
+            else {
+                if (!miniLOL.utils.exists(path)) {
+                    return false;
+                }
+            }
+
             style = new Element('link', {
                 rel: 'stylesheet',
                 href: path,

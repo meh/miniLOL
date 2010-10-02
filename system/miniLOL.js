@@ -543,11 +543,7 @@ miniLOL = {
                 }
 
                 var file  = '#{path}/#{style}.css'.interpolate({ path: path, style: name });
-                var style;
-                
-                if (!(style = miniLOL.CSS.include(file.replace(/\.css$/, '.min.css')))) {
-                    style = miniLOL.CSS.include(file);
-                }
+                var style = miniLOL.CSS.include(file, true);
 
                 if (!style) {
                     return false;
