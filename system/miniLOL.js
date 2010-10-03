@@ -641,7 +641,7 @@ miniLOL = {
                     after:  '#{data}',
 
                     link: '<div class="#{class}" id="#{id}">#{before}<a href="#{href}" target="#{target}" #{attributes}>#{text}</a>#{after}</div>',
-                    item: '<div class="#{class}" id="#{id}2>#{before}<span #{attributes}>#{text}</span>#{after}</div>',
+                    item: '<div class="#{class}" id="#{id}">#{before}<span #{attributes}>#{text}</span>#{after}</div>',
                     nest: '<div class="#{class}" style="#{style}">#{data}</div>',
                     data: '<div class="data">#{before}#{data}#{after}</div>'
                 }, miniLOL.theme.templates.list['default'] || {});
