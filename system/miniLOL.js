@@ -31,6 +31,8 @@ miniLOL = {
             throw new Error('miniLOL has already been initialized.');
         }
 
+        miniLOL.Template.Engine.load('system/templates/HAML.js', { minified: true });
+
         miniLOL.initialized = false;
         miniLOL.path        = location.href.match(/^\w+:\/\/.*?(\/.*?)(#|$)/)[1];
         miniLOL.storage     = new miniLOL.Storage('miniLOL.core');
@@ -317,7 +319,6 @@ miniLOL = {
         function () {
             if (miniLOL.config['core'].theme) {
                 miniLOL.error(!miniLOL.theme.load(miniLOL.config['core'].theme));
-                miniLOL.theme.template.menu();
             }
             else {
                 miniLOL.error(!miniLOL.theme.deprecated());
@@ -575,59 +576,7 @@ miniLOL = {
         },
 
         template: {
-            load: function (name, path, check) {
-                if (!path && !miniLOL.theme.name) {
-                    return 0;
-                }
-
-                path = path || '#{path}/#{theme}'.interpolate({
-                    path: miniLOL.theme.path,
-                    theme: miniLOL.theme.name
-                });
-
-                Event.fire(document, ':theme.template.load', { name: name, path: path });
-
-                var file = '#{path}/#{name}.xml'.interpolate({ path: path, name: name });
-
-                if (!check && !Object.isUndefined(miniLOL.theme.template.cache[file])) {
-                    return miniLOL.theme.template.cache[file];
-                }
-
-                new Ajax.Request(file, {
-                    method: 'get',
-                    asynchronous: false,
-
-                    onSuccess: function (http) {
-                        if (miniLOL.Document.check(http.responseXML, file)) {
-                            return;
-                        }
-
-                        miniLOL.theme.template.cache[file] = miniLOL.Document.fix(http.responseXML);
-                    },
-
-                    onFailure: function () {
-                        miniLOL.theme.template.cache[file] = false;
-                    }
-                });
-
-                if (miniLOL.error()) {
-                    return false;
-                }
-
-                return miniLOL.theme.template.cache[file];
-            },
-
-            menu: function () {
-                return miniLOL.theme.templates.menu;
-            },
-
-            exists: function (name, path) {
-                return Boolean(miniLOL.theme.template.load(name, path));
-            },
-
-            clearCache: function () {
-                miniLOL.theme.template.cache = {};
-
+            initialize: function () {
                 miniLOL.theme.templates = {};
             },
 
@@ -757,7 +706,7 @@ miniLOL = {
             }
 
             // Get the html layout and set it
-            var template = miniLOL.utils.get('#{path}/template.html'.interpolate({ path: path, theme: name }), true);
+            var template = miniLOL.utils.get('#{path}/template.html'.interpolate({ path: path, theme: name }), { minified: true });
 
             if (template) {
                 $(document.body).update(template);
@@ -807,7 +756,7 @@ miniLOL = {
         },
 
         unload: function (noFinalization) {
-            miniLOL.theme.template.clearCache();
+            miniLOL.theme.template.initialize();
 
             if (!miniLOL.theme.name) {
                 return;
@@ -845,7 +794,7 @@ miniLOL = {
             miniLOL.theme.path         = 'themes';
             miniLOL.theme.content.node = miniLOL.config['core'].contentNode || 'body';
             miniLOL.theme.menu.node    = miniLOL.config['core'].menuNode || 'menu';
-            miniLOL.theme.template.clearCache();
+            miniLOL.theme.template.initialize();
 
             new Ajax.Request('resources/template.html', {
                 method: 'get',
@@ -927,7 +876,7 @@ miniLOL = {
         parse: function (menu, layer) {
             layer = layer || 0;
 
-            var template = miniLOL.theme.template.menu();
+            var template = miniLOL.theme.templates.menu;
 
             if (!template || !menu) {
                 if (miniLOL.error()) {
@@ -1490,23 +1439,10 @@ miniLOL = {
             Event.fire(document, ':module.load', name);
 
             try {
-                try {
-                    miniLOL.utils.require('#{path}/#{module}/main.min.js'.interpolate({
-                        path: miniLOL.module.path,
-                        module: name
-                    }));
-                }
-                catch (e) {
-                    if (e.http) {
-                        miniLOL.utils.require('#{path}/#{module}/main.js'.interpolate({
-                            path: miniLOL.module.path,
-                            module: name
-                        }));               
-                    }
-                    else {
-                        throw e;
-                    }
-                }
+                miniLOL.utils.require('#{path}/#{module}/main.js'.interpolate({
+                    path: miniLOL.module.path,
+                    module: name
+                }), { minified: true });
 
                 if (miniLOL.error()) {
                     return false;

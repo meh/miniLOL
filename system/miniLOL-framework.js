@@ -248,8 +248,12 @@ Object.extend(Function.prototype, (function () {
 
 
 Object.extend(Object, (function () {
+    function is (klass, val) {
+        return !Object.isUndefined(val) && (val.constructor == klass || val == klass);
+    }
+
     function isObject (val) {
-        return typeof val == 'object';
+        return typeof val == 'object' && val.constructor === Object;
     }
 
     function isBoolean (val) {
@@ -460,6 +464,7 @@ Object.extend(Object, (function () {
     }
 
     return {
+        is:         is,
         isObject:   isObject,
         isBoolean:  isBoolean,
         isRegExp:   isRegExp,
@@ -682,21 +687,60 @@ Object.extend(String.prototype, (function () {
         return result;
     }
 
+    function interpolate (object, pattern) {
+        if (Object.isRegExp(pattern)) {
+            return new Template(this, pattern).evaluate(object);
+        }
+        else {
+            return new miniLOL.Template(this, pattern).evaluate(object)
+        }
+    }
+
     function toNumber (integer) {
         return (integer) ? parseInt(this) : parseFloat(this);
-    };
+    }
 
     function toBase (base) {
         return this.toNumber().toBase(base);
-    };
+    }
 
     function fromBase (base) {
         return parseInt(this, base);
-    };
+    }
 
     function toCode () {
         return this.charCodeAt(0);
-    };
+    }
+
+    function toPaddedString (length, pad, pad2) {
+        var pad = (Object.isUndefined(pad2 || pad)) ? '0' : (pad2 || pad).toString();
+
+        return pad.times(length - this.length) + this;
+    }
+
+    function toInvertedCase () {
+        var result = '';
+
+        for (var i = 0, length = this.length; i < length; i++) {
+            var chr  = this.charAt(i);
+            var down = chr.toLowerCase();
+            var up   = chr.toUpperCase();
+
+            if (up == down) {
+                result += down;
+            }
+            else {
+                if (chr == down) {
+                    result += up;
+                }
+                else {
+                    result += down;
+                }
+            }
+        }
+
+        return result;
+    }
 
     var _encodeURI          = window.encodeURI;
     var _decodeURI          = window.decodeURI;
@@ -737,11 +781,14 @@ Object.extend(String.prototype, (function () {
         format:      format,
         reverse:     reverse,
         translate:   translate,
+        interpolate: interpolate,
 
-        toNumber: toNumber,
-        toBase:   toBase,
-        fromBase: fromBase,
-        toCode:   toCode,
+        toNumber:       toNumber,
+        toBase:         toBase,
+        fromBase:       fromBase,
+        toCode:         toCode,
+        toPaddedString: toPaddedString,
+        toInvertedCase: toInvertedCase,
 
         encodeURI:          encodeURI,
         decodeURI:          decodeURI,
@@ -1025,12 +1072,67 @@ Hash.addMethods((function () {
 Date.weekDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 Date.months   = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
+var _width = {
+    'd': 2,
+    'H': 2,
+    'I': 2,
+    'j': 3,
+    'k': 2,
+    'l': 2,
+    'm': 2,
+    'M': 2,
+    'N': 9,
+    'S': 2,
+    'U': 2,
+    'V': 2,
+    'W': 2,
+    'y': 2,
+
+    'i': 3
+};
+
 var _parse = {
     '%': /(%)/,
     'd': /(\d\d)/
-}
+};
+
+Object.extend(Date, (function () {
+    var _parse = Date.parse
+
+    function parse (format, string) {
+        if (!format.include('%')) {
+            return _parse(format);
+        }
+    }
+
+    return {
+        parse: parse
+    };
+})());
 
 var _format = {
+    flag: {
+        '-': function (value, width) {
+            return value;
+        },
+
+        '_': function (value, width) {
+            return value.toPaddedString(width, 10, ' ');
+        },
+
+        '0': function (value, width) {
+            return value.toPaddedString(width, 10, '0');
+        },
+
+        '^': function (value, width) {
+            return value.toString().toUpperCase().toPaddedString(width, ' ')
+        },
+
+        '#': function (value, width) {
+            return value.toString().toInvertedCase().toPaddedString(width, ' ');
+        }
+    },
+
     '%': function (date) {
         return '%';
     },
@@ -1056,38 +1158,48 @@ var _format = {
     },
 
     'C': function (date) {
-        return date.getFullYear().substr(0, 2);
+        return date.getFullYear().toString().substr(0, 2);
     },
 
     'd': function (date) {
-        return date.getDate().toPaddedString(2);
+        return date.getDate();
     },
 
     'D': function (date) {
         return date.format('%m/%d/%y');
     },
 
-    'd': function (date) {
-        return (date.getMonth() + 1).toPaddedString(2);
+    'e': function (date) {
+        return date.format('%_d');
+    },
+
+    'F': function (date) {
+        return date.format('%Y-%m-%d');
+    },
+
+    'g': function (date) {
+        return date.format('%y');
+    },
+
+    'G': function (date) {
+        return date.format('%Y');
+    },
+
+    'h': function (date) {
+        return date.format('%b');
+    },
+
+    'H': function (date) {
+        return date.getHours();
+    },
+
+    'I': function (date) {
+        var hours = date.getHours();
+
+        return ((hours + 1 > 12) ? (hours + 1) / 2 : hours + 1);
     },
 
     'j': function (date) {
-        return date.getDate();
-    },
-
-    'N': function (date) {
-        return (date.getDay() == 0) ? 7 : date.getDay();
-    },
-
-    'S': function (date) {
-        return date.getDate().ordinalized();
-    },
-
-    'w': function (date) {
-        return date.getDay();
-    },
-
-    'z': function (date) {
         var tmp = new Date();
         tmp.setFullYear(date.getFullYear());
         tmp.setDate(1);
@@ -1096,7 +1208,67 @@ var _format = {
         return ((date.getTime() - tmp.getTime()) / 1000 / 60 / 60 / 24).ceil();
     },
 
-    'W': function (date) {
+    'k': function (date) {
+        return date.format('%_H');
+    },
+
+    'l': function (date) {
+        return date.format('%_l');
+    },
+
+    'm': function (date) {
+        return (date.getMonth() + 1);
+    },
+
+    'M': function (date) {
+        return date.getMinutes();
+    },
+
+    'n': function (date) {
+        return "\n";
+    },
+
+    'N': function (date) {
+        return date.getMilliseconds() * 1000000;
+    },
+
+    'p': function (date) {
+        return (date.getHours() > 12) ? 'PM' : 'AM';
+    },
+
+    'P': function (date) {
+        return date.format('%#p');
+    },
+
+    'r': function (date) {
+        return date.format('%I:%M:%S %p');
+    },
+
+    'R': function (date) {
+        return date.format('%H:%M');
+    },
+
+    's': function (date) {
+        return date.getDate();
+    },
+
+    'S': function (date) {
+        return date.getSeconds();
+    },
+
+    't': function (date) {
+        return "\t";
+    },
+
+    'T': function (date) {
+        return date.format('%H:%M:%S');
+    },
+
+    'u': function (date) {
+        return (date.getDay() == 0) ? 7 : date.getDay();
+    },
+
+    'U': function (date) {
         var tmp = new Date();
         tmp.setFullYear(date.getFullYear());
         tmp.setDate(1);
@@ -1105,11 +1277,36 @@ var _format = {
         return ((date.getTime() - tmp.getTime()) / 1000 / 60 / 60 / 24 / 7).ceil();
     },
 
-    'n': function (date) {
-        return date.getMonth() + 1;
+    'V': function (date) {
+        return date.format('%U');
     },
 
-    't': function (date) {
+    'w': function (date) {
+        return date.getDay();
+    },
+
+    'W': function (date) {
+        return date.format('%U');
+    },
+
+    'x': function (date) {
+        return date.format('%m/%d/%y');
+    },
+
+    'X': function (date) {
+        return date.format('%T');
+    },
+
+    'y': function (date) {
+        return date.getFullYear().toString().substr(2, 2)
+    },
+
+    'Y': function (date) {
+        return date.getFullYear();
+    },
+
+
+    'E': function (date) {
         if (date.getMonth() % 2 == 0) {
             return 31;
         }
@@ -1121,96 +1318,38 @@ var _format = {
         return 30;
     },
 
-    'L': function (date) {
+    'o': function (date) {
+        return date.getDate().ordinalized();
+    },
+
+    'O': function (date) {
         return (date.getFullYear() % 4) ? 0 : 1;
     },
 
-    'o': function (date) {
-        return date.getFullYear();
-    },
-
-    'Y': function (date) {
-        return date.getFullYear();
-    },
-
-    'y': function (date) {
-        return date.getFullYear().toString().substr(2, 2);
-    },
-
-    'a': function (date) {
-        return (date.getHours() > 12) ? 'pm' : 'am';
-    },
-
-    'A': function (date) {
-        return (date.getHours() > 12) ? 'PM' : 'AM';
-    },
-
-    'B': function (date) {
+    'i': function (date) {
         var tmp = new Date(date);
         tmp.setHours(0);
         tmp.setSeconds(0);
         tmp.setMinutes(0);
 
         return ((date.getTime() - tmp.getTime()) / 1000 / 86.4).toFixed(2);
-    },
-
-    'g': function (date) {
-        return (date.getHours() + 1 > 12) ? (date.getHours() + 1) / 2 : date.getHours() + 1;
-    },
-
-    'g': function (date) {
-        return date.getHours();
-    },
-
-    'h': function (date) {
-        return ((date.getHours() + 1 > 12) ? (date.getHours() + 1) / 2 : date.getHours() + 1).toPaddedString(2);
-    },
-
-    'H': function (date) {
-        return date.getHours().toPaddedString(2);
-    },
-
-    'i': function (date) {
-        return date.getMinutes().toPaddedString(2);
-    },
-
-    's': function (date) {
-        return date.getSeconds().toPaddedString(2);
-    },
-
-    'u': function (date) {
-        return date.getMilliseconds() * 1000;
-    },
-
-    'r': function (date) {
-        return date.toUTCString();
-    },
-
-    'U': function (date) {
-        return date.getTime();
     }
 };
-
-Object.extend(Date, (function () {
-    var _parse = Date.parse
-
-    function parse (format, string) {
-        if (!format.include('%')) {
-            return _parse(format);
-        }
-    }
-
-    return {
-        parse: parse
-    };
-})());
 
 Object.extend(Date.prototype, (function () {
     function format (format) {
         var date = this;
 
-        return format.gsub(/%([\-_0^#])?(.)/, function (match) {
-            return (_format[match[1]]) ? _format[match[1]](date) : match[1];
+        return format.gsub(/%([\-_0^#])?(\d+)?(.)/, function (match) {
+            var flag  = match[1] || '0';
+            var width = parseInt(match[2] || _width[type] || '0');
+            var type  = match[3];
+
+            if (!_format[type]) {
+                return match[0];
+            }
+
+            return _format.flag[flag](_format[type](date), width);
         });
     }
 
@@ -1239,7 +1378,7 @@ Object.extend(Date.prototype, (function () {
  ****************************************************************************/
 
 
-window.Element.addMethods((function () {
+Element.addMethods((function () {
     function load (path, options) {
         if (options && !Object.isUndefined(options.frequency)) {
             new Ajax.PeriodicalUpdater(this, path, options);
@@ -1401,6 +1540,94 @@ window.Element.addMethods((function () {
         toObject:           toObject
     };
 })());
+/*  Prototype JavaScript framework, version 1.7_rc2
+ *  (c) 2005-2010 Sam Stephenson
+ *
+ *  Prototype is freely distributable under the terms of an MIT-style license.
+ *  For details, see the Prototype web site: http://www.prototypejs.org/
+ *
+ *--------------------------------------------------------------------------*/
+
+/*
+ * Little modifications by meh. [http://meh.doesntexist.org | meh@paranoici.org]
+ * to adapt the code to miniLOL.
+ */
+
+Ajax.Request.addMethods({
+    request: function (url) {
+        this.url    = url;
+        this.method = this.options.method;
+
+        if (Object.isString(this.options.parameters)) {
+            this.options.parameters = this.options.parameters.toQueryParams();
+        }
+
+        if (this.options.minified) {
+            var minified = this.url.replace(/\.([^.]+)$/, '.min.$1');
+
+            if (miniLOL.utils.exists(minified)) {
+                this.url = minified;
+            }
+        }
+
+        if (this.options.cached === false) {
+            this.url += ((this.url.include('?')) ? '&' : '?') + Math.random();
+
+            this.options.requestHeaders = Object.extend(this.options.requestHeaders || {}, {
+                'Cache-Control': 'must-revalidate',
+                'Pragma':        'no-cache'
+            });
+        }
+
+        var params = Object.toQueryString(this.options.parameters);
+
+        if (!['get', 'post', 'head'].include(this.method)) {
+            params      += (params ? '&' : '') + '_method=' + this.method;
+            this.method  = 'post';
+        }
+
+        if (params) {
+            if (this.method == 'get' || this.method == 'head') {
+                this.url += (this.url.include('?') ? '&' : '?') + params;
+            }
+            else if (/Konqueror|Safari|KHTML/.test(navigator.userAgent)) {
+                params += '&_=';
+            }
+        }
+
+        this.parameters = params.toQueryParams();
+
+        try {
+            var response = new Ajax.Response(this);
+
+            if (this.options.onCreate) {
+                this.options.onCreate(response);
+            }
+
+            Ajax.Responders.dispatch('onCreate', this, response);
+
+            this.transport.open(this.method.toUpperCase(), this.url, this.options.asynchronous);
+
+            if (this.options.asynchronous) {
+                this.respondToReadyState.bind(this).defer(1);
+            }
+
+            this.transport.onreadystatechange = this.onStateChange.bind(this);
+            this.setRequestHeaders();
+
+            this.body = this.method == 'post' ? (this.options.postBody || params) : null;
+            this.transport.send(this.body);
+
+            /* Force Firefox to handle ready state 4 for synchronous requests */
+            if (!this.options.asynchronous && this.transport.overrideMimeType) {
+                this.onStateChange();
+            }
+        }
+        catch (e) {
+            this.dispatchException(e);
+        }
+    }
+});
 
 
 if (!Object.isObject(window.miniLOL)) {
@@ -1581,8 +1808,9 @@ miniLOL.utils = (function () {
         var result = false;
 
         new Ajax.Request(path, {
-            method: 'head',
+            method:       'head',
             asynchronous: false,
+            evalJS:       false,
 
             onSuccess: function () {
                 result = true;
@@ -1592,30 +1820,35 @@ miniLOL.utils = (function () {
         return result;
     }
 
-    function get (path, minified) {
+    function get (path, options) {
         var result;
 
-        new Ajax.Request(path, {
+        new Ajax.Request(path, Object.extend(options || {}, {
             method:       'get',
-            minified:     minified,
             asynchronous: false,
+            evalJS:       false,
 
             onSuccess: function (http) {
-                result = http.responseText;
+                if (http.request.options.raw) {
+                    result = http.responseText;
+                }
+                else {
+                    result = http.responseXML || http.responseText;
+                }
             }
-        });
+        }));
 
         return result;
     }
 
-    function execute (path) {
+    function execute (path, options) {
         var result;
         var error;
 
-        new Ajax.Request(path, {
-            method: 'get',
+        new Ajax.Request(path, Object.extend(options || {}, {
+            method:       'get',
             asynchronous: false,
-            evalJS: false,
+            evalJS:       false,
 
             onSuccess: function (http) {
                 try {
@@ -1638,7 +1871,7 @@ miniLOL.utils = (function () {
                 error.fileName   = path;
                 error.lineNumber = 0;
             }
-        });
+        }));
 
         if (error) {
             throw error;
@@ -1647,10 +1880,10 @@ miniLOL.utils = (function () {
         return result;
     }
 
-    function include (path) {
+    function include (path, options) {
         var result = false;
 
-        new Ajax.Request(path, {
+        new Ajax.Request(path, Object.extend(options || {}, {
             method: 'get',
             asynchronous: false,
             evalJS: false,
@@ -1663,15 +1896,15 @@ miniLOL.utils = (function () {
                     result = false;
                 }
             }
-        });
+        }));
 
         return result;
     }
 
-    function require (path) {
+    function require (path, options) {
         var error = false;
 
-        new Ajax.Request(path, {
+        new Ajax.Request(path, Object.extend(options || {}, {
             method: 'get',
             asynchronous: false,
             evalJS: false,
@@ -1701,7 +1934,7 @@ miniLOL.utils = (function () {
                     text:   http.statusText
                 };
             }
-        });
+        }));
 
         if (error) {
             throw error;
@@ -1738,133 +1971,319 @@ miniLOL.utils = (function () {
  * along with miniLOL. If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 
-miniLOL.History = {
-    interval: 0.15,
+miniLOL.File = Class.create({
+    initialize: function (path, options) {
+        this.options = Object.extend({
+            method:       'get',
+            asynchronous: false,
+            evalJS:       false,
+            minified:     false,
+            cached:       true,
 
-    initialize: function () {
-        miniLOL.History.current = window.location.hash || '#';
+            onSuccess: function (http) {
+                this.content = http.responseText;
+                this.special = http.responseXML;
+                this.loaded  = true;
 
-        if (Prototype.Browser.Opera && history.navigationMode) {
-            history.navigationMode = 'compatible';
-        }
+                if (Object.isFunction(this.options.onLoaded)) {
+                    this.options.onLoaded(this);
+                }
+            }.bind(this),
 
-        Event.observe(document, ':url.change', function (event) {
-            miniLOL.History.current = event.memo.toString() || '#';
-        });
+            onFailure: function (http) {
+                this.error = Object.clone(http);
+            }.bind(this)
+        }, options || {});
 
-        miniLOL.History.Initializers.get().call()
+        this.loaded = false;
+
+        this.path      = path;
+        this.extension = miniLOL.File.extension(path);
+
+        new Ajax.Request(this.path, this.options);
     },
 
-    reset: function (interval, callback) {
-        if (Object.isNumber(interval)) {
-            miniLOL.History.interval = interval;
-        }
+    reload: function () {
+        this.loaded = false;
 
-        if (!Object.isUndefined(miniLOL.History.timer)) {
-            clearInterval(miniLOL.History.timer);
-        }
-
-        miniLOL.History.timer = setInterval(callback, miniLOL.History.interval * 1000);
+        new Ajax.Request(this.path, this.options);
     },
 
-    Initializers: {
-        get: function () {
-            if ('onhashchange' in window && !(Prototype.Browser.InternetExplorer && Prototype.Browser.Version == 7)) {
-                return miniLOL.History.Initializers.Default;
-            }
-            else if (Prototype.Browser.InternetExplorer) {
-                return miniLOL.History.Initializers.InternetExplorer;
+    interpolate: function (data, engine) {
+        if (engine) {
+            return this.content.interpolate(data, engine);
+        }
+        else {
+            return new miniLOL.Template(this).evaluate(data);
+        }
+    },
+
+    Static: {
+        extension: function (path) {
+            var matches = path.match(/\.([^.]+)$/)
+
+            if (matches) {
+                return matches[1];
             }
             else {
-                return miniLOL.History.Initializers.Unsupported;
-            }
-        },
-
-        Default: function () {
-            Event.observe(window, 'hashchange', function (event) {
-                 Event.fire(document, ':url.change', (Prototype.Browser.Mozilla)
-                    ? window.location.hash || '#'
-                    : decodeURIComponent(window.location.hash || '#')
-                );
-            });
-        },
-
-        Unsupported: function () {
-            document.observe('dom:loaded', function () {
-                miniLOL.History.reset(miniLOL.History.interval, miniLOL.History.Checkers.Default);
-            });
-        },
-
-        InternetExplorer: function () {
-            document.observe('dom:loaded', function () {
-                miniLOL.History.IE = {
-                    check: function () {
-                        if (!miniLOL.History.IE.element.parentNode || miniLOL.History.IE.element.parentNode.nodeName == '#document-fragment') {
-                            $(document.body).insert({ top: miniLOL.History.IE.element });
-                        }
-                    },
-
-                    put: function (hash) {
-                        miniLOL.History.IE.check();
-
-                        var doc = miniLOL.History.IE.element.contentWindow.document;
-
-                        doc.open();
-                        doc.close();
-
-                        doc.location.hash = encodeURIComponent(hash.substring(1));
-                    },
-
-                    get: function () {
-                        miniLOL.History.IE.check();
-
-                        return miniLOL.History.IE.element.contentWindow.document.location.hash;
-                    },
-
-                    element: new Element('iframe', { id: '__miniLOL.History', style: 'display: none !important; z-index: -9001 !important;', src: 'javascript:false;' })
-                };
-
-                $(document.body).insert({ top: miniLOL.History.IE.element });
-                miniLOL.History.IE.put(miniLOL.History.current);
-                miniLOL.History.reset(miniLOL.History.interval, miniLOL.History.Checkers.InternetExplorer);
-            });
-        }
-    },
-
-    Checkers: {
-        Default: function () {
-            if (miniLOL.History.current == window.location.hash) {
-                return;
-            }
-
-            Event.fire(document, ':url.change', (Prototype.Browser.Mozilla)
-                ? window.location.hash || '#'
-                : decodeURIComponent(window.location.hash || '#')
-            );
-        },
-
-        InternetExplorer: function () {
-            var hashes = {
-                iframe: miniLOL.History.IE.get(),
-                actual: window.location.hash || '#',
-                current: miniLOL.History.current
-            };
-
-            if (hashes.actual != hashes.iframe) {
-                if (hashes.actual && hashes.actual == hashes.current) { // The user is moving in the History
-                    window.location.hash = (miniLOL.History.current = hashes.iframe).substring(1);
-                }
-                else { // The user went to the actual URL
-                    miniLOL.History.IE.put(miniLOL.History.current = hashes.actual);
-                }
-
-                Event.fire(document, ':url.change', miniLOL.History.current);
+                return '';
             }
         }
     }
-}
+});
+/* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
+ *
+ * This file is part of miniLOL.
+ *
+ * miniLOL is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
+ *
+ * miniLOL is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with miniLOL. If not, see <http://www.gnu.org/licenses/>.
+ ****************************************************************************/
 
-miniLOL.History.initialize();
+miniLOL.Template = Class.create({
+    initialize: function (template, engine) {
+        if (Object.is(miniLOL.File, template)) {
+            if (!template.loaded || !template.extension) {
+                throw 'The File has to be loaded and have an extension.';
+            }
+
+            this.engine = miniLOL.Template.Engine.get(template.extension);
+
+            if (!this.engine) {
+                throw 'Engine not available for the given file.';
+            }
+
+            this.template = new this.engine(template.content);
+        }
+        else {
+            this.engine = miniLOL.Template.Engine.get(engine) || Template;
+
+            if (!this.engine) {
+                 throw 'Engine not available for the given file.';
+            }
+
+            this.template = new this.engine(template);
+        }
+    },
+
+    evaluate: function (data, context) {
+        return this.template.evaluate(data, context);
+    }
+});
+
+miniLOL.Template.Engine = (function () {
+    var _engines = {};
+
+    function get (extension) {
+        return _engines[(extension || '').toLowerCase()];
+    }
+
+    function add (extension, engine) {
+        _engines[extension.toLowerCase()] = engine;
+    }
+
+    function load (path, options) {
+        miniLOL.utils.execute(path, options);
+    }
+
+    return {
+        get:  get,
+        add:  add,
+        load: load
+    };
+})();
+
+/* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
+ *
+ * This file is part of miniLOL.
+ *
+ * miniLOL is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
+ *
+ * miniLOL is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with miniLOL. If not, see <http://www.gnu.org/licenses/>.
+ ****************************************************************************/
+
+miniLOL.Document = (function () {
+    var fix;
+    if (Prototype.Browser.IE) {
+        fix = function (obj) {
+            if (!obj) {
+                return;
+            }
+
+            obj = { real: obj };
+
+            obj.documentElement = obj.real.documentElement;
+
+            obj.getElementsByTagName = function (name) {
+                return this.real.getElementsByTagName(name);
+            };
+
+            obj.getElementById = (function (id) {
+                return Element.xpath(this, "//*[@id='#{0}']".interpolate([id])).first();
+            }).bind(obj.real);
+
+            obj.real.setProperty('SelectionLanguage', 'XPath');
+
+            obj.xpath  = Element.xpath.bind(obj.real);
+            obj.select = Element.select.bind(obj.real);
+
+            return obj;
+        }
+    }
+    else if (!Prototype.Browser.Good) {
+        fix = function (obj) {
+            if (!obj) {
+                return;
+            }
+
+            obj.getElementById = function (id) {
+                return this.xpath("//*[@id='#{0}']".interpolate([id])).first();
+            };
+
+            obj.xpath  = Element.xpath;
+            obj.select = Element.select;
+
+            return obj;
+        }
+    }
+    else {
+        fix = function (obj) {
+            if (!obj) {
+                return;
+            }
+
+            obj.xpath  = Element.xpath;
+            obj.select = Element.select;
+
+            return obj;
+        }
+    }
+
+    function check (xml, path) {
+        var error = false;
+
+        if (!xml) {
+            error = 'There is a syntax error.';
+        }
+
+        if (xml.documentElement.nodeName == 'parsererror') {
+            error = xml.documentElement.textContent;
+        }
+
+        if (path && error) {
+            miniLOL.error('Error while parsing #{path}\n\n#{error}'.interpolate({
+                path:  path,
+                error: error
+            }), true);
+
+            return error;
+        }
+
+        return error;
+    }
+
+    return {
+        fix:   fix,
+        check: check
+    };
+})();
+/* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
+ *
+ * This file is part of miniLOL.
+ *
+ * miniLOL is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
+ *
+ * miniLOL is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with miniLOL. If not, see <http://www.gnu.org/licenses/>.
+ ****************************************************************************/
+
+miniLOL.CSS = (function () {
+    function include (path, minified) {
+        if (minified) {
+            minified = path.replace(/\.css$/, '.min.css');
+        }
+
+        var style = $$('link').find(function (css) {
+            return css.getAttribute('href') == path || css.getAttribute('href') === minified;
+        });
+
+        if (!style) {
+            if (minified && miniLOL.utils.exists(minified)) {
+                path = minified;
+            }
+            else {
+                if (!miniLOL.utils.exists(path)) {
+                    return false;
+                }
+            }
+
+            style = new Element('link', {
+                rel: 'stylesheet',
+                href: path,
+                type: 'text/css'
+            });
+
+            $$('head')[0].insert(style);
+
+            Event.fire(document, ':css.included', style);
+        }
+
+        return style;
+    }
+
+    function create (style, id) {
+        var css = new Element('style', { type: 'text/css' });
+
+        if (Prototype.Browser.IE) {
+            css.styleSheet.cssText = style;
+        }
+        else {
+            css.update(style);
+        }
+
+        if (id) {
+            css.setAttribute('id', id);
+        }
+
+        $$('head').first().appendChild(css);
+
+        Event.fire(document, ':css.created', css);
+
+        return css;
+    }
+
+    return {
+        include: include,
+        create:  create
+    };
+})();
+
 /* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
  *
  * This file is part of miniLOL.
@@ -2028,52 +2447,53 @@ miniLOL.Resource = Class.create({
  ****************************************************************************/
 
 miniLOL.JSON = (function () {
-    function parse (raw) {
-        return new miniLOL.JSON(raw);
-    }
-
-    function serializeSpecial (obj) {
-        if (typeof obj !== 'object') {
-            return obj;
-        }
-
-        obj = Object.clone(obj);
-
-        for (var key in obj) {
-            if (Object.isXML(obj[key])) {
-                obj[key] = { __miniLOL_is_xml: true, value: String.fromXML(obj[key]) };
+    function convert (data) {
+        if (Object.isObject(data)) {
+            if (data.__miniLOL_is_xml) {
+                return data.value.toXML();
             }
-            else if (Object.isFunction(obj[key])) {
-                obj[key] = { __miniLOL_is_function: true, value: obj[key].toString() };
+            else if (data.__miniLOL_is_function) {
+                return Function.parse(data.value);
             }
             else {
-                obj[key] = miniLOL.JSON.serializeSpecial(obj[key]);
+                return miniLOL.JSON.unserializeSpecial(data);
             }
         }
-
-        return obj;
-    }
-
-    function unserializeSpecial (obj) {
-        if (typeof obj !== 'object') {
-            return obj;
-        }
-
-        obj = Object.clone(obj);
-
-        for (var key in obj) {
-            if (obj[key].__miniLOL_is_xml) {
-                obj[key] = obj[key].value.toXML();
+        else {
+            if (Object.isXML(data)) {
+                return { __miniLOL_is_xml: true, value: String.fromXML(data) };
             }
-            else if (obj[key].__miniLOL_is_function) {
-                obj[key] = Function.parse(obj[key].value);
+            else if (Object.isFunction(data)) {
+                return { __miniLOL_is_function: true, value: data.toString() };
             }
             else {
-                obj[key] = miniLOL.JSON.unserializeSpecial(obj[key]);
+                return miniLOL.JSON.serializeSpecial(data);
             }
         }
+    }
 
-        return obj;
+    function special (obj) {
+        var result;
+
+        if (Object.isObject(obj)) {
+            result = Object.clone(obj);
+
+            for (var key in obj) {
+                result[key] = convert(obj[key]);
+            }
+        }
+        else if (Object.isArray(obj)) {
+            result = [];
+
+            obj.each(function (data) {
+                result.push(convert(data));
+            });
+        }
+        else {
+            result = obj;
+        }
+
+        return result;
     }
 
     function serialize (obj) {
@@ -2099,13 +2519,14 @@ miniLOL.JSON = (function () {
     }
 
     return {
-        parse: parse,
-
-        serializeSpecial:   serializeSpecial,
-        unserializeSpecial: unserializeSpecial,
+        special:            special,
+        serializeSpecial:   special,
+        unserializeSpecial: special,
 
         serialize:   serialize,
-        unserialize: unserialize
+        unserialize: unserialize,
+
+        convert: convert
     };
 })();
 /* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
@@ -2213,14 +2634,30 @@ miniLOL.Cookie = (function () {
         });
     }
 
-    return {
+    function _each (iterator) {
+        keys().each(function (key) {
+            var value = get(key);
+            var pair  = [key, value];
+
+            pair.name  = key;
+            pair.key   = key;
+            pair.value = value;
+
+            iterator(pair);
+        });
+    }
+
+    return Object.extend(Enumerable, {
+        _each: _each,
+
         encode: encode,
         keys:   keys,
         get:    get,
         set:    set,
         remove: remove,
+        unset:  remove,
         clear:  clear
-    };
+    });
 })();
 /* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
  *
@@ -2459,166 +2896,130 @@ miniLOL.Storage.Backends = {
  * along with miniLOL. If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 
-miniLOL.Document = (function () {
-    var fix;
-    if (Prototype.Browser.IE) {
-        fix = function (obj) {
-            if (!obj) {
-                return;
-            }
+miniLOL.History = {
+    interval: 0.15,
 
-            obj = { real: obj };
+    initialize: function () {
+        miniLOL.History.current = window.location.hash || '#';
 
-            obj.documentElement = obj.real.documentElement;
-
-            obj.getElementsByTagName = function (name) {
-                return this.real.getElementsByTagName(name);
-            };
-
-            obj.getElementById = (function (id) {
-                return Element.xpath(this, "//*[@id='#{0}']".interpolate([id])).first();
-            }).bind(obj.real);
-
-            obj.real.setProperty('SelectionLanguage', 'XPath');
-
-            obj.xpath  = Element.xpath.bind(obj.real);
-            obj.select = Element.select.bind(obj.real);
-
-            return obj;
-        }
-    }
-    else if (!Prototype.Browser.Good) {
-        fix = function (obj) {
-            if (!obj) {
-                return;
-            }
-
-            obj.getElementById = function (id) {
-                return this.xpath("//*[@id='#{0}']".interpolate([id])).first();
-            };
-
-            obj.xpath  = Element.xpath;
-            obj.select = Element.select;
-
-            return obj;
-        }
-    }
-    else {
-        fix = function (obj) {
-            if (!obj) {
-                return;
-            }
-
-            obj.xpath  = Element.xpath;
-            obj.select = Element.select;
-
-            return obj;
-        }
-    }
-
-    function check (xml, path) {
-        var error = false;
-
-        if (!xml) {
-            error = 'There is a syntax error.';
+        if (Prototype.Browser.Opera && history.navigationMode) {
+            history.navigationMode = 'compatible';
         }
 
-        if (xml.documentElement.nodeName == 'parsererror') {
-            error = xml.documentElement.textContent;
-        }
-
-        if (path && error) {
-            miniLOL.error('Error while parsing #{path}\n\n#{error}'.interpolate({
-                path:  path,
-                error: error
-            }), true);
-
-            return error;
-        }
-
-        return error;
-    }
-
-    return {
-        fix:   fix,
-        check: check
-    };
-})();
-/* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
- *
- * This file is part of miniLOL.
- *
- * miniLOL is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published
- * by the Free Software Foundation, either version 3 of the License,
- * or (at your option) any later version.
- *
- * miniLOL is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with miniLOL. If not, see <http://www.gnu.org/licenses/>.
- ****************************************************************************/
-
-miniLOL.CSS = (function () {
-    function include (path, minified) {
-        if (minified) {
-            minified = path.replace(/\.css$/, '.min.css');
-        }
-
-        var style = $$('link').find(function (css) {
-            return css.getAttribute('href') == path || css.getAttribute('href') === minified;
+        Event.observe(document, ':url.change', function (event) {
+            miniLOL.History.current = event.memo.toString() || '#';
         });
 
-        if (!style) {
-            if (minified && miniLOL.utils.exists(minified)) {
-                path = minified;
+        miniLOL.History.Initializers.get().call()
+    },
+
+    reset: function (interval, callback) {
+        if (Object.isNumber(interval)) {
+            miniLOL.History.interval = interval;
+        }
+
+        if (!Object.isUndefined(miniLOL.History.timer)) {
+            clearInterval(miniLOL.History.timer);
+        }
+
+        miniLOL.History.timer = setInterval(callback, miniLOL.History.interval * 1000);
+    },
+
+    Initializers: {
+        get: function () {
+            if ('onhashchange' in window && !(Prototype.Browser.InternetExplorer && Prototype.Browser.Version == 7)) {
+                return miniLOL.History.Initializers.Default;
+            }
+            else if (Prototype.Browser.InternetExplorer) {
+                return miniLOL.History.Initializers.InternetExplorer;
             }
             else {
-                if (!miniLOL.utils.exists(path)) {
-                    return false;
-                }
+                return miniLOL.History.Initializers.Unsupported;
+            }
+        },
+
+        Default: function () {
+            Event.observe(window, 'hashchange', function (event) {
+                 Event.fire(document, ':url.change', (Prototype.Browser.Mozilla)
+                    ? window.location.hash || '#'
+                    : decodeURIComponent(window.location.hash || '#')
+                );
+            });
+        },
+
+        Unsupported: function () {
+            document.observe('dom:loaded', function () {
+                miniLOL.History.reset(miniLOL.History.interval, miniLOL.History.Checkers.Default);
+            });
+        },
+
+        InternetExplorer: function () {
+            document.observe('dom:loaded', function () {
+                miniLOL.History.IE = {
+                    check: function () {
+                        if (!miniLOL.History.IE.element.parentNode || miniLOL.History.IE.element.parentNode.nodeName == '#document-fragment') {
+                            $(document.body).insert({ top: miniLOL.History.IE.element });
+                        }
+                    },
+
+                    put: function (hash) {
+                        miniLOL.History.IE.check();
+
+                        var doc = miniLOL.History.IE.element.contentWindow.document;
+
+                        doc.open();
+                        doc.close();
+
+                        doc.location.hash = encodeURIComponent(hash.substring(1));
+                    },
+
+                    get: function () {
+                        miniLOL.History.IE.check();
+
+                        return miniLOL.History.IE.element.contentWindow.document.location.hash;
+                    },
+
+                    element: new Element('iframe', { id: '__miniLOL.History', style: 'display: none !important; z-index: -9001 !important;', src: 'javascript:false;' })
+                };
+
+                $(document.body).insert({ top: miniLOL.History.IE.element });
+                miniLOL.History.IE.put(miniLOL.History.current);
+                miniLOL.History.reset(miniLOL.History.interval, miniLOL.History.Checkers.InternetExplorer);
+            });
+        }
+    },
+
+    Checkers: {
+        Default: function () {
+            if (miniLOL.History.current == window.location.hash) {
+                return;
             }
 
-            style = new Element('link', {
-                rel: 'stylesheet',
-                href: path,
-                type: 'text/css'
-            });
+            Event.fire(document, ':url.change', (Prototype.Browser.Mozilla)
+                ? window.location.hash || '#'
+                : decodeURIComponent(window.location.hash || '#')
+            );
+        },
 
-            $$('head')[0].insert(style);
+        InternetExplorer: function () {
+            var hashes = {
+                iframe: miniLOL.History.IE.get(),
+                actual: window.location.hash || '#',
+                current: miniLOL.History.current
+            };
 
-            Event.fire(document, ':css.included', style);
+            if (hashes.actual != hashes.iframe) {
+                if (hashes.actual && hashes.actual == hashes.current) { // The user is moving in the History
+                    window.location.hash = (miniLOL.History.current = hashes.iframe).substring(1);
+                }
+                else { // The user went to the actual URL
+                    miniLOL.History.IE.put(miniLOL.History.current = hashes.actual);
+                }
+
+                Event.fire(document, ':url.change', miniLOL.History.current);
+            }
         }
-
-        return style;
     }
+}
 
-    function create (style, id) {
-        var css = new Element('style', { type: 'text/css' });
-
-        if (Prototype.Browser.IE) {
-            css.styleSheet.cssText = style;
-        }
-        else {
-            css.update(style);
-        }
-
-        if (id) {
-            css.setAttribute('id', id);
-        }
-
-        $$('head').first().appendChild(css);
-
-        Event.fire(document, ':css.created', css);
-
-        return css;
-    }
-
-    return {
-        include: include,
-        create:  create
-    };
-})();
+miniLOL.History.initialize();
