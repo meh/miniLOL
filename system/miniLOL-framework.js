@@ -249,7 +249,7 @@ Object.extend(Function.prototype, (function () {
 
 Object.extend(Object, (function () {
     function is (klass, val) {
-        return !Object.isUndefined(val) && (val.constructor == klass || val == klass);
+        return !Object.isUndefined(val) && (val instanceof klass || val == klass);
     }
 
     function isObject (val) {
@@ -1821,6 +1821,10 @@ miniLOL.utils = (function () {
     }
 
     function get (path, options) {
+        options = Object.extend({
+            raw: true
+        }, options);
+
         var result;
 
         new Ajax.Request(path, Object.extend(options || {}, {
