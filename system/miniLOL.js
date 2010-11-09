@@ -581,7 +581,9 @@ miniLOL = {
             },
 
             setDefaults: function () {
-                miniLOL.theme.templates.list = {};
+                if (!miniLOL.theme.templates.list) {
+                    miniLOL.theme.templates.list = {};
+                }
 
                 miniLOL.theme.templates.list['default'] = Object.extend({
                     global: '<div #{attributes}>#{data}</div>',
@@ -606,6 +608,17 @@ miniLOL = {
                     nest: '<div class="#{class}" style="#{style}">#{data}</div>',
                     data: '<div class="data">#{before}#{data}#{after}</div>'
                 }, miniLOL.theme.templates.list['table'] || {});
+
+                if (!miniLOL.theme.templates.menu) {
+                    miniLOL.theme.templates.menu = {};
+                }
+
+                miniLOL.theme.templates.menu.layers = Object.extend({
+                    '0': {
+                        menu: '<div class="menu">#{data}</div>',
+                        item: '<span class="item"><a href="#{href}">#{text}</a></span>'
+                    }
+                }, miniLOL.theme.templates.menu.layers || {});
             }
         },
 
