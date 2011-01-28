@@ -268,8 +268,8 @@ Object.extend(Object, (function () {
         return Boolean(val['__miniLOL.Class__']);
     }
 
-    function isDocument (val) {
-        return val.toString().include('Document');
+    function isDocument(element) {
+        return element.nodeType === Node.DOCUMENT_NODE;
     }
 
     function isXML (val) {
@@ -359,7 +359,7 @@ Object.extend(Object, (function () {
 
     function extend (destination, source, overwrite) {
         var overwrite  = (Object.isUndefined(overwrite)) ? true : Boolean(overwrite);
-        var properties = Object.keys(source);
+        var properties = Object.keys(source || {});
 
         for (var i = 0, length = properties.length; i < length; i++) {
             var property = properties[i];
@@ -1823,7 +1823,7 @@ miniLOL.utils = (function () {
     function get (path, options) {
         options = Object.extend({
             raw: true
-        }, options);
+        }, options || {});
 
         var result;
 
@@ -1833,7 +1833,7 @@ miniLOL.utils = (function () {
             evalJS:       false,
 
             onSuccess: function (http) {
-                if (http.request.options.raw) {
+                if (options.raw) {
                     result = http.responseText;
                 }
                 else {

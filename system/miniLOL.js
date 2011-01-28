@@ -39,23 +39,6 @@ miniLOL = {
         miniLOL.resources   = {};
         miniLOL.tmp         = {};
 
-        Event.observe(document, 'unload', function (event) {
-            Event.fire(document, ':finalization', event);
-        });
-
-        Event.observe(document, ':url.change', function (event) {
-            if (event.memo) {
-                miniLOL.go(event.memo);
-            }
-            else {
-                miniLOL.go(miniLOL.config['core'].homePage);
-            }
-        });
-
-        Event.observe(document, ':go', (miniLOL.tmp.fixScroll = function () {
-            miniLOL.theme.content().scrollTo();
-        }));
-
         // Brace for hugeness, this may look ugly but it's better than 20 copypasted ifs
         [function () {
             // Set some default values when the core config gets loaded (this also means on reload)
@@ -425,6 +408,27 @@ miniLOL = {
         if (miniLOL.error()) {
             return false;
         }
+
+        Event.observe(document, 'unload', function (event) {
+            Event.fire(document, ':finalization', event);
+        });
+
+        Event.observe(document, ':url.change', function (event) {
+            if (event.stopped) {
+                return;
+            }
+
+            if (event.memo) {
+                miniLOL.go(event.memo);
+            }
+            else {
+                miniLOL.go(miniLOL.config['core'].homePage);
+            }
+        });
+
+        Event.observe(document, ':go', (miniLOL.tmp.fixScroll = function () {
+            miniLOL.theme.content().scrollTo();
+        }));
 
         if (miniLOL.config['core'].initialization) {
             eval(miniLOL.config['core'].initialization);
@@ -1393,7 +1397,7 @@ miniLOL = {
 
             if (!miniLOL.module.exists(name)) {
                 if (output) {
-                    miniLOL.error('The module `#{name}` is not loaded.'.interpolate({ name: name }), true);
+                    miniLOL.error('The module `#{name}` is not loaded.'.interpolate({ name: name }));
                 }
 
                 return false;
