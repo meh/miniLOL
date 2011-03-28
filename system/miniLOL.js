@@ -68,6 +68,14 @@ miniLOL = {
                     }
                 }
 
+                if ($('__miniLOL.core.style')) {
+                  $('__miniLOL.core.style').remove();
+                }
+
+                if (miniLOL.config['core'].style) {
+                    miniLOL.CSS.create(miniLOL.config['core'].style, '__miniLOL.core.style');
+                }
+
                 if (!document.title) {
                     document.title = miniLOL.config['core'].siteTitle;
                 }
@@ -427,7 +435,7 @@ miniLOL = {
         });
 
         Event.observe(document, ':go', (miniLOL.tmp.fixScroll = function () {
-            miniLOL.theme.content().scrollTo();
+            $(document.body).scrollTo();
         }));
 
         if (miniLOL.config['core'].initialization) {
@@ -1298,6 +1306,7 @@ miniLOL = {
 
             new Ajax.Request('data/#{path}?#{queries}'.interpolate({ path: path, queries: Object.toQueryString(queries) }), {
                 method: 'get',
+                cached: !queries.nocache,
 
                 onSuccess: function (http) {
                     if (queries.type) {

@@ -15,7 +15,7 @@ miniLOL.module.create("Markdown", {
 
     initialize: function () {
         miniLOL.utils.require(this.root+"/system/showdown.min.js");
-        
+
         this.converter = new Showdown.converter;
 
         miniLOL.resource.get("miniLOL.config").load(this.root+"/resources/config.xml");
@@ -38,7 +38,7 @@ miniLOL.module.create("Markdown", {
 
     execute: function (elements) {
         if (Object.isString(elements)) {
-            return this.converter.makeHtml(elements);
+            return this.converter.makeHtml(elements) || elements;
         }
         else if (Object.isElement(elements)) {
             elements = [elements];
