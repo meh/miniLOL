@@ -1919,6 +1919,8 @@ miniLOL.utils = (function () {
     }
 
     function include (path, options) {
+        options = options || {};
+
         if (path.startsWith('http')) {
           $(document.head).insert(new Element('script', { type: 'text/javascript', src: path, id: options['id'] }));
 
@@ -1946,6 +1948,8 @@ miniLOL.utils = (function () {
     }
 
     function require (path, options) {
+        options = options || {};
+
         if (path.startsWith('http')) {
           $(document.head).insert(new Element('script', { type: 'text/javascript', src: path, id: options['id'] }));
 

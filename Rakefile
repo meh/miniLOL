@@ -2,7 +2,7 @@ require 'rake'
 require 'rake/clean'
 
 # You need this: http://code.google.com/closure/compiler/
-COMPILER = 'closure-compiler' # --compilation_level ADVANCED_OPTIMIZATIONS'
+COMPILER = 'closure' # --compilation_level ADVANCED_OPTIMIZATIONS'
 
 CLEAN.include('system/miniLOL.min.js')
 
