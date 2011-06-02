@@ -1,4 +1,4 @@
-/* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
+/* Copyleft meh. [http://meh.paranoid.pk | meh@paranoici.org]
  *
  * This file is part of miniLOL.
  *
@@ -16,7 +16,7 @@
  * along with miniLOL. If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 
-/* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
+/* Copyleft meh. [http://meh.paranoid.pk | meh@paranoici.org]
  *
  * This file is part of miniLOL.
  *
@@ -161,7 +161,7 @@ if (Prototype.Browser.IE) {
 
 })();
 
-/* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
+/* Copyleft meh. [http://meh.paranoid.pk | meh@paranoici.org]
  *
  * This file is part of miniLOL.
  *
@@ -180,7 +180,7 @@ if (Prototype.Browser.IE) {
  ****************************************************************************/
 
 
-/* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
+/* Copyleft meh. [http://meh.paranoid.pk | meh@paranoici.org]
  *
  * This file is part of miniLOL.
  *
@@ -228,7 +228,7 @@ Object.extend(Function.prototype, (function () {
         clone: clone
     };
 })());
-/* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
+/* Copyleft meh. [http://meh.paranoid.pk | meh@paranoici.org]
  *
  * This file is part of miniLOL.
  *
@@ -488,7 +488,7 @@ Object.extend(Object, (function () {
     };
 })());
 
-/* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
+/* Copyleft meh. [http://meh.paranoid.pk | meh@paranoici.org]
  *
  * This file is part of miniLOL.
  *
@@ -796,7 +796,7 @@ Object.extend(String.prototype, (function () {
         decodeURIComponent: decodeURIComponent
     };
 })());
-/* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
+/* Copyleft meh. [http://meh.paranoid.pk | meh@paranoici.org]
  *
  * This file is part of miniLOL.
  *
@@ -989,7 +989,7 @@ Object.extend(Number.prototype, (function () {
         ordinalized: ordinalized
     };
 })());
-/* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
+/* Copyleft meh. [http://meh.paranoid.pk | meh@paranoici.org]
  *
  * This file is part of miniLOL.
  *
@@ -1018,7 +1018,7 @@ Object.extend(Enumerable, (function () {
 })());
 
 Object.extend(Array.prototype, Enumerable);
-/* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
+/* Copyleft meh. [http://meh.paranoid.pk | meh@paranoici.org]
  *
  * This file is part of miniLOL.
  *
@@ -1077,7 +1077,7 @@ Hash.addMethods((function () {
         toJSON: toJSON
     };
 })());
-/* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
+/* Copyleft meh. [http://meh.paranoid.pk | meh@paranoici.org]
  *
  * This file is part of miniLOL.
  *
@@ -1388,7 +1388,7 @@ Object.extend(Date.prototype, (function () {
 })());
 
 })();
-/* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
+/* Copyleft meh. [http://meh.paranoid.pk | meh@paranoici.org]
  *
  * This file is part of miniLOL.
  *
@@ -1578,7 +1578,7 @@ Element.addMethods((function () {
  *--------------------------------------------------------------------------*/
 
 /*
- * Little modifications by meh. [http://meh.doesntexist.org | meh@paranoici.org]
+ * Little modifications by meh. [http://meh.paranoid.pk | meh@paranoici.org]
  * to adapt the code to miniLOL.
  */
 
@@ -1669,7 +1669,7 @@ if (!Object.isObject(window.miniLOL)) {
     };
 }
 
-/* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
+/* Copyleft meh. [http://meh.paranoid.pk | meh@paranoici.org]
  *
  * This file is part of miniLOL.
  *
@@ -1814,7 +1814,7 @@ Class = (function () {
 })();
 
 
-/* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
+/* Copyleft meh. [http://meh.paranoid.pk | meh@paranoici.org]
  *
  * This file is part of miniLOL.
  *
@@ -2003,7 +2003,7 @@ miniLOL.utils = (function () {
     };
 })();
 
-/* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
+/* Copyleft meh. [http://meh.paranoid.pk | meh@paranoici.org]
  *
  * This file is part of miniLOL.
  *
@@ -2081,7 +2081,7 @@ miniLOL.File = Class.create({
         }
     }
 });
-/* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
+/* Copyleft meh. [http://meh.paranoid.pk | meh@paranoici.org]
  *
  * This file is part of miniLOL.
  *
@@ -2161,7 +2161,7 @@ miniLOL.Template.Engine = (function () {
     };
 })();
 
-/* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
+/* Copyleft meh. [http://meh.paranoid.pk | meh@paranoici.org]
  *
  * This file is part of miniLOL.
  *
@@ -2264,7 +2264,7 @@ miniLOL.Document = (function () {
         check: check
     };
 })();
-/* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
+/* Copyleft meh. [http://meh.paranoid.pk | meh@paranoici.org]
  *
  * This file is part of miniLOL.
  *
@@ -2343,7 +2343,7 @@ miniLOL.CSS = (function () {
     };
 })();
 
-/* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
+/* Copyleft meh. [http://meh.paranoid.pk | meh@paranoici.org]
  *
  * This file is part of miniLOL.
  *
@@ -2487,7 +2487,7 @@ miniLOL.Resource = Class.create({
         return this.wrapper.data;
     }
 });
-/* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
+/* Copyleft meh. [http://meh.paranoid.pk | meh@paranoici.org]
  *
  * This file is part of miniLOL.
  *
@@ -2588,7 +2588,7 @@ miniLOL.JSON = (function () {
         convert: convert
     };
 })();
-/* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
+/* Copyleft meh. [http://meh.paranoid.pk | meh@paranoici.org]
  *
  * This file is part of miniLOL.
  *
@@ -2718,7 +2718,7 @@ miniLOL.Cookie = (function () {
         clear:  clear
     });
 })();
-/* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
+/* Copyleft meh. [http://meh.paranoid.pk | meh@paranoici.org]
  *
  * This file is part of miniLOL.
  *
@@ -2937,7 +2937,7 @@ miniLOL.Storage.Backends = {
     })
 };
 
-/* Copyleft meh. [http://meh.doesntexist.org | meh@paranoici.org]
+/* Copyleft meh. [http://meh.paranoid.pk | meh@paranoici.org]
  *
  * This file is part of miniLOL.
  *
