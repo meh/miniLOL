@@ -1407,6 +1407,10 @@ Object.extend(Date.prototype, (function () {
  ****************************************************************************/
 
 
+if (Prototype.Browser.IE && !document.head) {
+  document.head = document.getElementsByTagName('head')[0];
+}
+
 Element.addMethods((function () {
     function load (path, options) {
         if (options && !Object.isUndefined(options.frequency)) {
