@@ -1026,7 +1026,7 @@ miniLOL = {
 
             Event.fire(document, ':page.get', { name: name, queries: queries });
 
-            var page = miniLOL.pages.data[name];
+            var page = miniLOL.page.current = miniLOL.pages.data[name];
             var type = queries.type;
 
             if (!page) {
@@ -1565,6 +1565,8 @@ miniLOL = {
         if (queries.menu) {
             miniLOL.menu.change(queries.menu);
         }
+
+        miniLOL.page.current = null;
 
         if (matches) {
             queries.page = matches[2] || matches[3];
