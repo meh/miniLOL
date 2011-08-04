@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+
+    <!--
+    If you don't phear the Google empire and want more speed, you can use the Google lib APIs.
+    But the client needs external access to make it work and it's not good in an intranet.
+
+    For using Google lib APIs comment the internal libraries block and uncomment the Google libraries block.
+    To use the internal libraries just leave it as it is.
+    -->
+    
+    <!-- internal libraries -->
+    <script type="text/javascript" src="system/prototype.js"></script>
+    <!-- Uncomment this if you need scriptaculous support, it's really doubling the files to get loaded
+    <script type="text/javascript" src="system/scriptaculous.min.js"></script>
+    -->
+    
+    <!-- Google libraries
+    <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+    <script type="text/javascript">// <![CDATA[
+
+    google.load("prototype", "1.7"); // this is needed by the core
+
+    // Uncomment this if you need scriptaculous support, it's really doubling the files to get loaded
+    // google.load("scriptaculous", "1.8.3");
+
+    // ]]></script>
+    -->
+
+    <script type="text/javascript" src="system/miniLOL.js"></script>
+    <script type="text/javascript" src="system/miniLOL-framework.js"></script>
+</head> 
+
+<body onload="miniLOL.initialize();">
+    <center>To view this website you need Javascript enabled.</center>
+
+    <script>$(document.body).update("");</script>
+</body>
+</html>
