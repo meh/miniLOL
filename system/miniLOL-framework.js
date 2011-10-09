@@ -202,10 +202,10 @@ Function.empty = function () { };
 
 Object.extend(Function, (function () {
     function parse (string) {
-        matches = string.match(/^function\s*\((.*?)\)[\s\n]*\{([\s\S]*)\}[\s\n]*/m);
+        var matches = string.match(/^function\s*\((.*?)\)[\s\n]*\{([\s\S]*)\}[\s\n]*/m);
 
         if (!matches) {
-            return null;
+            return;
         }
 
         var signature = matches[1].split(/\s*,\s*/);
